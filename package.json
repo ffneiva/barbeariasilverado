@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/check-logic.ts",
+    "check:dev": "node scripts/check-dev.mjs",
     "assets": "node scripts/optimize-images.mjs",
     "og": "node scripts/generate-og.mjs"
   },

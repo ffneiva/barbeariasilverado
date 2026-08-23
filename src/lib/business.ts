@@ -203,27 +203,87 @@ export const STATS = [
 ]
 
 /**
- * Depoimentos reais, copiados do perfil do Google da barbearia.
+ * Depoimentos reais, transcritos do perfil do Google da barbearia.
  *
- * Esta lista está vazia de propósito. Ela chegou a ter quatro textos plausíveis
- * escritos por mim — o que, no site de um negócio real, é propaganda enganosa
- * com nome e sobrenome de gente que não existe. Enquanto não houver avaliação
- * de verdade aqui, a seção mostra o convite para avaliar no Google, e não
- * elogio fabricado.
+ * Regra deste arquivo: **texto verbatim**. Nada aqui é reescrito, resumido ou
+ * "melhorado" — inclusive a pontuação e as maiúsculas de quem escreveu. Um
+ * depoimento editado deixa de ser depoimento.
  *
- * Para preencher: copie do perfil do Google (nome de quem escreveu, o texto e
- * a nota) e adicione abaixo.
+ * `handle` não é invenção: sai dos campos que o próprio Google publica junto da
+ * avaliação (serviços contratados, estilo pedido, selo de Local Guide).
+ *
+ * O JSON-LD de propósito NÃO marca estas avaliações: as diretrizes do Google
+ * excluem review coletado em outra plataforma e republicado pelo próprio
+ * negócio. Elas ficam aqui como prova social para quem lê, não como rich snippet.
  */
 export type Testimonial = {
   name: string
-  /** De onde a pessoa é, ou há quanto tempo é cliente. */
+  /** De onde vem a pessoa ou o que ela contratou, conforme publicado no Google. */
   handle: string
   text: string
   /** Nota de 1 a 5, como publicada no Google. */
   rating: number
 }
 
-export const TESTIMONIALS: Testimonial[] = []
+export const TESTIMONIALS: Testimonial[] = [
+  {
+    name: 'Tiago Silva',
+    handle: 'Avaliação no Google',
+    rating: 5,
+    text:
+      'Excelente atendimento! Fiquei muito satisfeito com o corte e com todo o profissionalismo. ' +
+      'O barbeiro é extremamente atencioso, caprichoso e demonstra muita experiência no que faz. ' +
+      'O ambiente é agradável, organizado e faz a gente se sentir à vontade. Sem dúvida, um dos ' +
+      'melhores atendimentos que já recebi. Recomendo de olhos fechados para quem procura ' +
+      'qualidade, respeito e um resultado impecável. Parabéns pelo excelente trabalho!',
+  },
+  {
+    name: 'Gui Motta',
+    handle: 'Corte, barba e navalha',
+    rating: 5,
+    text: 'Profissional extremamente competente! Fez um corte perfeito e um degrade perfeito! Indico demais!',
+  },
+  {
+    name: 'Yuri Tavares',
+    handle: 'Corte personalizado',
+    rating: 5,
+    text:
+      'O cara é muito bom, o trabalho mais bem feito que já vi, sendo que já paguei caro e não ' +
+      'chegou perto do que ele faz!!!',
+  },
+  {
+    name: 'kal ly',
+    handle: 'Degradê · atendido por Lucas',
+    rating: 5,
+    text: 'Melhor barbearia da região, corte rápido e bem feito! ✅',
+  },
+  {
+    name: 'Halys Andrade Jr',
+    handle: 'Local Guide no Google',
+    rating: 5,
+    text: 'Fiquei satisfeito com o corte. Lucas foi atencioso. Recomendo cortar com ele.',
+  },
+  {
+    name: 'Regis Lima',
+    handle: 'Corte, barba e sobrancelha',
+    rating: 5,
+    text: 'Atendimento excelente, ambiente agradável, o corte saiu do jeito que eu pedi.',
+  },
+  {
+    name: 'Fabio Ferreira',
+    handle: 'Corte em degradê e barba',
+    rating: 5,
+    text: 'O melhor de Goiânia!! Só corto meu cabelo com ele!',
+  },
+  {
+    name: 'Leonardo Diniz Alencar',
+    handle: 'Corte de cabelo',
+    rating: 5,
+    text:
+      'Excelente atendimento, barbeiro muito simpático e super educado, ficou ótimo meu corte ' +
+      'de cabelo…. Super indico 👍👍',
+  },
+]
 
 /** Link direto para o perfil no Google, usado para ler e deixar avaliações. */
 export const GOOGLE_PROFILE = 'https://share.google/wN91cRZ1BJSv56FWj'

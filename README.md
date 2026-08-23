@@ -246,6 +246,12 @@ fim do horário de verão, então os testes valem em qualquer máquina, em qualq
 fuso. Sem framework de teste e sem dependência nova: o Node 22 remove os tipos
 do TypeScript sozinho.
 
+O segundo teste sobe o **servidor de desenvolvimento de verdade** e percorre o
+grafo de módulos a partir da entrada. Ele existe porque `vite build` e
+`vite dev` resolvem imports por caminhos diferentes: já aconteceu de o build
+passar e o `npm run dev` quebrar no primeiro import — um erro que nenhuma das
+outras verificações via.
+
 ---
 
 ## Estrutura
@@ -291,6 +297,7 @@ npm run dev          # http://localhost:5173
 | `npm run preview`    | serve o `dist/` localmente                                       |
 | `npm run lint`       | ESLint                                                           |
 | `npm run check`      | 37 asserções sobre horário e grade de agendamento                |
+| `npm run check:dev`  | sobe o dev server e percorre o grafo de módulos                   |
 | `npm run assets`     | regenera `public/images` a partir de `assets-src`                |
 | `npm run og`         | regenera cartão social, favicons, manifest, robots e sitemap     |
 

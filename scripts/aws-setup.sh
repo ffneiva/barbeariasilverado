@@ -433,8 +433,14 @@ else
   ok "Provider OIDC criado."
 fi
 
-# A condição `sub` amarra a role a este repositório E a este branch: um fork,
-# um PR de terceiro ou outro branch não conseguem assumi-la.
+# A condição `sub` amarra a role a este repositório: um fork, um PR de terceiro
+# ou outro branch não conseguem assumi-la.
+#
+# São dois valores aceitos porque o GitHub muda o formato do `sub` conforme o
+# job. Quando ele declara `environment:`, o token vem como
+# "repo:owner/repo:environment:production" — e NÃO como o ref. Aceitar só a
+# forma de branch é o erro clássico aqui: o deploy falha com
+# "Not authorized to perform sts:AssumeRoleWithWebIdentity" sem dizer por quê.
 cat > "$TMP_DIR/silverado-trust.json" <<EOF
 {
   "Version": "2012-10-17",
@@ -445,7 +451,10 @@ cat > "$TMP_DIR/silverado-trust.json" <<EOF
     "Condition": {
       "StringEquals": {
         "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-        "token.actions.githubusercontent.com:sub": "repo:${GITHUB_REPO}:ref:refs/heads/main"
+        "token.actions.githubusercontent.com:sub": [
+          "repo:${GITHUB_REPO}:environment:production",
+          "repo:${GITHUB_REPO}:ref:refs/heads/main"
+        ]
       }
     }
   }]

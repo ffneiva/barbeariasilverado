@@ -1,4 +1,4 @@
-import { Quote, Star } from 'lucide-react'
+import { ArrowUpRight, Quote, Star } from 'lucide-react'
 import { Section, SectionHeading } from '@/components/SectionHeading'
 import { Reveal } from '@/components/Reveal'
 import { Button } from '@/components/Button'
@@ -46,9 +46,10 @@ export function Testimonials() {
         />
 
         {hasReviews ? (
-          <ul className="mt-16 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {TESTIMONIALS.map((item, i) => (
-              <Reveal key={item.name} delay={0.06 * i} as="li" className="h-full">
+          <>
+            <ul className="mt-16 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {TESTIMONIALS.map((item, i) => (
+                <Reveal key={item.name} delay={0.06 * i} as="li" className="h-full">
                 <figure
                   className={cn(
                     'flex h-full flex-col gap-6 border border-steel-900 bg-white/[0.015] p-7',
@@ -82,7 +83,20 @@ export function Testimonials() {
                 </figure>
               </Reveal>
             ))}
-          </ul>
+            </ul>
+
+            <Reveal delay={0.2}>
+              <a
+                href={GOOGLE_PROFILE}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-10 inline-flex items-center gap-2 font-mono text-[0.7rem] tracking-[0.18em] text-steel-500 uppercase transition-colors hover:text-steel-100"
+              >
+                Ver todas as avaliações no Google
+                <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.6} />
+              </a>
+            </Reveal>
+          </>
         ) : (
           <Reveal delay={0.1}>
             <div className="mt-14 flex flex-col items-start gap-7 border border-steel-800 bg-white/[0.02] p-8 sm:p-12 lg:flex-row lg:items-center lg:justify-between">

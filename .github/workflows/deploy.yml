@@ -26,10 +26,10 @@ jobs:
 
     steps:
       - name: ⬇️ Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 🟢 Node 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           cache: npm
@@ -45,13 +45,19 @@ jobs:
       - name: 🧪 Verificar horários e agendamento
         run: npm run check
 
+      # `vite build` e `vite dev` resolvem módulos por caminhos diferentes — dá
+      # para ter build verde e `npm run dev` quebrando no primeiro import. Este
+      # passo sobe o dev server de verdade e percorre o grafo a partir da entrada.
+      - name: 🖥️ Smoke test do dev server
+        run: npm run check:dev
+
       - name: 🏗️ Build
         run: npm run build
 
       # As credenciais são temporárias (1h) e emitidas na hora pelo STS a partir
       # do token OIDC do GitHub. Não existe access key guardada em lugar nenhum.
       - name: 🔐 Assumir a role na AWS (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           role-session-name: github-deploy-${{ github.run_id }}

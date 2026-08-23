@@ -117,20 +117,16 @@ export function Manifesto() {
         <div className="container-x grid gap-14 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-20">
           <Reveal className="relative">
             <div data-manifesto-photo className="relative aspect-4/3 overflow-hidden">
-              {/* Foto real de um atendimento da casa. A imagem que estava aqui
-                  antes era gerada por IA e trazia a semelhança de uma pessoa
-                  pública — num site comercial isso lê como endosso, e endosso
-                  que não existe. Saiu. */}
               <Picture
-                name="corte-degrade-v"
-                alt="Nuca em V feita na navalha, corte da Barbearia Silverado"
+                name="hero-shop"
+                alt="Atendimento na cadeira da Barbearia Silverado"
                 className="h-full w-full"
                 sizes="(min-width: 1024px) 52vw, 100vw"
               />
               <div aria-hidden className="absolute inset-0 bg-linear-to-t from-void/70 via-transparent to-transparent" />
               <div aria-hidden className="absolute inset-0 ring-1 ring-steel-800/70 ring-inset" />
             </div>
-            <span className="label-mono mt-4 block">Degradê com V · acabamento na lâmina livre</span>
+            <span className="label-mono mt-4 block">Av. C-4, 73 · Jardim América · Goiânia</span>
           </Reveal>
 
           <div>

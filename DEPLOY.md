@@ -195,10 +195,23 @@ ainda assim persistir, é cache do navegador — teste em janela anônima.
 Bucket policy provavelmente aponta para a distribuição errada. Confira que o
 `AWS:SourceArn` da policy bate com o ARN da distribuição em uso.
 
-**A Action falha em "Assumir a role na AWS".**
-Ou a variável `AWS_ROLE_ARN` está errada, ou a trust policy não bate com o
-branch. A condição inclui o branch: um push em outro branch não consegue
-assumir a role (e não deve mesmo).
+**A Action falha com "Not authorized to perform sts:AssumeRoleWithWebIdentity".**
+
+A mensagem não diz o motivo, mas o CloudTrail diz. O `sub` que o GitHub
+realmente apresentou fica no campo `userIdentity.userName` do evento:
+
+```bash
+aws cloudtrail lookup-events --region us-east-2   --lookup-attributes AttributeKey=EventName,AttributeValue=AssumeRoleWithWebIdentity   --max-results 5 --output json   | python -c "import sys,json;[print(json.loads(e['CloudTrailEvent'])['userIdentity'].get('userName')) for e in json.load(sys.stdin)['Events']]"
+```
+
+Compare o resultado com a `StringLike` da trust policy. Duas armadilhas comuns:
+
+1. **`:environment:` e não `:ref:`.** Quando o job declara `environment:`, o
+   subject vira `repo:owner/repo:environment:production`. Uma policy que só
+   aceita a forma de branch rejeita tudo.
+2. **Subject imutável.** O GitHub também emite
+   `repo:owner@<ownerId>/repo@<repoId>:...`, com IDs numéricos. Foi o caso
+   aqui. A policy aceita os dois formatos.
 
 **O certificado não sai de `PENDING_VALIDATION`.**
 Quase sempre é o CNAME de validação proxiado no Cloudflare. Coloque a nuvem

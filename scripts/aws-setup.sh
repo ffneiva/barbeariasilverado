@@ -434,13 +434,40 @@ else
 fi
 
 # A condição `sub` amarra a role a este repositório: um fork, um PR de terceiro
-# ou outro branch não conseguem assumi-la.
+# ou outro repositório não conseguem assumi-la.
 #
-# São dois valores aceitos porque o GitHub muda o formato do `sub` conforme o
-# job. Quando ele declara `environment:`, o token vem como
-# "repo:owner/repo:environment:production" — e NÃO como o ref. Aceitar só a
-# forma de branch é o erro clássico aqui: o deploy falha com
-# "Not authorized to perform sts:AssumeRoleWithWebIdentity" sem dizer por quê.
+# São dois formatos aceitos porque o GitHub emite o `sub` de duas maneiras e a
+# documentação clássica só descreve a primeira:
+#
+#   repo:owner/repo:environment:production
+#   repo:owner@<ownerId>/repo@<repoId>:environment:production   ← subject imutável
+#
+# O segundo formato inclui os IDs numéricos e é o que este repositório recebe.
+# Ele é, aliás, o mais seguro dos dois: nomes de usuário e de repositório podem
+# ser abandonados e registrados por outra pessoa; IDs, não.
+#
+# Note também o `:environment:` no lugar do `:ref:`. Quando o job declara
+# `environment:`, é assim que o GitHub monta o subject — usar só a forma de
+# branch faz o deploy falhar com um lacônico "Not authorized to perform
+# sts:AssumeRoleWithWebIdentity", sem dizer o motivo. Quando isso acontecer, o
+# `sub` real aparece no CloudTrail, no campo userIdentity.userName do evento
+# AssumeRoleWithWebIdentity.
+info "Consultando os IDs numéricos de $GITHUB_REPO na API do GitHub..."
+REPO_META=$(curl -fsS "https://api.github.com/repos/${GITHUB_REPO}" 2>/dev/null || echo "")
+
+if [ -n "$REPO_META" ]; then
+  OWNER_ID=$(echo "$REPO_META" | "$PY" -c "import sys,json; print(json.load(sys.stdin)['owner']['id'])")
+  REPO_ID=$(echo "$REPO_META" | "$PY" -c "import sys,json; print(json.load(sys.stdin)['id'])")
+  OWNER_NAME=${GITHUB_REPO%%/*}
+  REPO_NAME=${GITHUB_REPO##*/}
+  IMMUTABLE_SUB="repo:${OWNER_NAME}@${OWNER_ID}/${REPO_NAME}@${REPO_ID}:*"
+  ok "Subject imutável: $IMMUTABLE_SUB"
+else
+  # Sem rede ou repositório privado: cai para o formato clássico apenas.
+  IMMUTABLE_SUB="repo:${GITHUB_REPO}:*"
+  warn "Não consegui ler os IDs na API do GitHub — usando só o formato clássico."
+fi
+
 cat > "$TMP_DIR/silverado-trust.json" <<EOF
 {
   "Version": "2012-10-17",
@@ -449,11 +476,11 @@ cat > "$TMP_DIR/silverado-trust.json" <<EOF
     "Principal": { "Federated": "$OIDC_ARN" },
     "Action": "sts:AssumeRoleWithWebIdentity",
     "Condition": {
-      "StringEquals": {
-        "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+      "StringEquals": { "token.actions.githubusercontent.com:aud": "sts.amazonaws.com" },
+      "StringLike": {
         "token.actions.githubusercontent.com:sub": [
-          "repo:${GITHUB_REPO}:environment:production",
-          "repo:${GITHUB_REPO}:ref:refs/heads/main"
+          "$IMMUTABLE_SUB",
+          "repo:${GITHUB_REPO}:*"
         ]
       }
     }

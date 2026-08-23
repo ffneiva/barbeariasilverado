@@ -220,6 +220,34 @@ O `@graph` publica `HairSalon` (com `openingHoursSpecification` dos dois turnos,
 
 ---
 
+## O que é testado
+
+Layout quebrado aparece na tela. Horário errado, não — ele manda o cliente para
+uma barbearia fechada. Então a única lógica de negócio do site tem asserções
+próprias, rodando no CI antes de qualquer deploy:
+
+```
+$ npm run check
+
+── hours.ts ─────────────────────────────────────────────
+  ok   seg 12h30 — volta do almoço
+  ok   sábado 18h — aberto até 19h
+  ok   vira-noite respeita o fuso da loja
+── booking.ts ───────────────────────────────────────────
+  ok   hoje/corte — respeita 1h de antecedência
+  ok   hoje/combo 70min — não cabe na manhã
+  ok   domingo — nenhum horário
+…
+✅ Toda a lógica passou.
+```
+
+As datas dos casos são fixas e em UTC — Goiânia é UTC−3 o ano inteiro desde o
+fim do horário de verão, então os testes valem em qualquer máquina, em qualquer
+fuso. Sem framework de teste e sem dependência nova: o Node 22 remove os tipos
+do TypeScript sozinho.
+
+---
+
 ## Estrutura
 
 ```
@@ -262,6 +290,7 @@ npm run dev          # http://localhost:5173
 | `npm run build`      | type-check + build de produção em `dist/`                        |
 | `npm run preview`    | serve o `dist/` localmente                                       |
 | `npm run lint`       | ESLint                                                           |
+| `npm run check`      | 37 asserções sobre horário e grade de agendamento                |
 | `npm run assets`     | regenera `public/images` a partir de `assets-src`                |
 | `npm run og`         | regenera cartão social, favicons, manifest, robots e sitemap     |
 

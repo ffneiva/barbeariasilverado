@@ -45,8 +45,25 @@ function usePath() {
 
 export default function App() {
   const { path, navigate } = usePath()
-  const [ready, setReady] = useState(false)
   const isPrivacy = path.startsWith('/politica-de-privacidade')
+
+  /**
+   * O preloader só existe para a primeira visita à home.
+   *
+   * A decisão é congelada no estado inicial (avaliado uma única vez) e não
+   * derivada de `path`: assim quem entra direto na política de privacidade não
+   * assiste a uma cortina que não faz sentido ali, e quem navega entre as duas
+   * rotas não vê a abertura de novo — o componente segue montado, com o próprio
+   * estado interno lembrando que já terminou.
+   */
+  const [showPreloader] = useState(
+    () => !window.location.pathname.startsWith('/politica-de-privacidade'),
+  )
+
+  // `ready` libera a coreografia de entrada do Hero. Sem preloader não há o que
+  // esperar — e sem isto o <h1> ficaria preso no translateY inicial, invisível,
+  // para quem chegasse à home vindo da política de privacidade.
+  const [ready, setReady] = useState(!showPreloader)
 
   useSmoothScroll()
 
@@ -81,7 +98,7 @@ export default function App() {
 
   return (
     <>
-      {!isPrivacy && <Preloader onDone={onDone} />}
+      {showPreloader && <Preloader onDone={onDone} />}
 
       <Cursor />
       <Grain />

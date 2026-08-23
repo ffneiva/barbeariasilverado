@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
+    "check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/check-logic.ts",
     "assets": "node scripts/optimize-images.mjs",
     "og": "node scripts/generate-og.mjs"
   },

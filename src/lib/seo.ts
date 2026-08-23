@@ -1,4 +1,4 @@
-import { BUSINESS, CUTS, FAQ, SCHEDULE, SERVICES } from './business'
+import { BUSINESS, CUTS, FAQ, SCHEDULE, SERVICES } from './business.ts'
 
 /**
  * JSON-LD para o Google entender que isto é uma barbearia física em Goiânia.

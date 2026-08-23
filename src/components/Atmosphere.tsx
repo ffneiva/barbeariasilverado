@@ -62,7 +62,7 @@ export function ScrollProgress() {
   }, [reduced])
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[70] h-px bg-steel-900/60">
+    <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[110] h-px bg-steel-900/60">
       <div
         ref={ref}
         className="h-full origin-left scale-x-0 bg-linear-to-r from-steel-600 via-steel-100 to-steel-400"

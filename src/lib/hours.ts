@@ -1,4 +1,4 @@
-import { SCHEDULE, type Shift } from './business'
+import { SCHEDULE, type Shift } from './business.ts'
 
 /**
  * Tudo que envolve horário é resolvido no fuso da barbearia, não no do visitante.

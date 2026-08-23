@@ -1,5 +1,5 @@
-import { BUSINESS, SCHEDULE, SERVICES, type Service } from './business'
-import { fromMinutes, nowInShop, toMinutes } from './hours'
+import { BUSINESS, SCHEDULE, SERVICES, type Service } from './business.ts'
+import { fromMinutes, nowInShop, toMinutes } from './hours.ts'
 
 /**
  * Agendamento sem servidor.

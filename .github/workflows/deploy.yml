@@ -40,6 +40,11 @@ jobs:
       - name: 🔍 Lint
         run: npm run lint
 
+      # Horário e grade de agendamento são a única lógica de negócio do site —
+      # e a única cujo bug manda um cliente para uma barbearia fechada.
+      - name: 🧪 Verificar horários e agendamento
+        run: npm run check
+
       - name: 🏗️ Build
         run: npm run build
 

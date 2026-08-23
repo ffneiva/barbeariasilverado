@@ -2,7 +2,7 @@ import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
-import { buildJsonLd } from './src/lib/seo'
+import { buildJsonLd } from './src/lib/seo.ts'
 
 /**
  * Injeta o JSON-LD no index.html em tempo de build.

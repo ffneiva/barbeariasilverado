@@ -118,12 +118,32 @@ jobs:
             --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" \
             --id "$ID"
 
-      # Confere que o site respondeu 200 antes de declarar sucesso. Um deploy
+      # Confere que o site respondeu 200 antes de declarar sucesso — um deploy
       # verde com o site fora do ar é pior do que um deploy vermelho.
+      #
+      # Enquanto o DNS do domínio próprio não estiver apontado, testar
+      # barbeariasilverado.com.br deixaria TODO deploy vermelho por um motivo que
+      # não é do deploy. Então o teste cai para o endereço do CloudFront, que é
+      # sempre válido, e avisa em vez de falhar.
       - name: ✅ Smoke test
         run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://barbeariasilverado.com.br/)
-          echo "GET / → $STATUS"
+          CF_DOMAIN=$(aws cloudfront get-distribution \
+            --id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --query 'Distribution.DomainName' --output text)
+
+          check() { curl -sS -o /dev/null -w "%{http_code}" --max-time 20 "$1" 2>/dev/null || echo "000"; }
+
+          STATUS=$(check "https://barbeariasilverado.com.br/")
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ https://barbeariasilverado.com.br/ → 200"
+            echo "SITE_URL=https://barbeariasilverado.com.br" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          echo "::warning::O domínio próprio respondeu $STATUS. Testando o endereço do CloudFront."
+          STATUS=$(check "https://$CF_DOMAIN/")
+          echo "https://$CF_DOMAIN/ → $STATUS"
+          echo "SITE_URL=https://$CF_DOMAIN" >> "$GITHUB_ENV"
           test "$STATUS" = "200"
 
       - name: 📋 Resumo
@@ -131,7 +151,7 @@ jobs:
           {
             echo "### 🪒 Deploy concluído"
             echo ""
-            echo "- **Site:** https://barbeariasilverado.com.br"
+            echo "- **Site:** $SITE_URL"
             echo "- **Commit:** \`${{ github.sha }}\`"
             echo "- **Bucket:** \`${{ vars.S3_BUCKET_NAME }}\`"
           } >> "$GITHUB_STEP_SUMMARY"

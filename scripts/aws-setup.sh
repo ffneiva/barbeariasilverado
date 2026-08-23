@@ -484,7 +484,13 @@ cat > "$TMP_DIR/silverado-perms.json" <<EOF
     {
       "Sid": "Invalidate",
       "Effect": "Allow",
-      "Action": "cloudfront:CreateInvalidation",
+      "Action": ["cloudfront:CreateInvalidation", "cloudfront:GetInvalidation"],
+      "Resource": "$DIST_ARN"
+    },
+    {
+      "Sid": "ReadDistribution",
+      "Effect": "Allow",
+      "Action": "cloudfront:GetDistribution",
       "Resource": "$DIST_ARN"
     }
   ]

@@ -1,0 +1,34 @@
+{
+  "name": "Barbearia Silverado",
+  "short_name": "Silverado",
+  "description": "Barbearia no Jardim América, em Goiânia. Degradê, navalhado e barba com acabamento de lâmina.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030304",
+  "theme_color": "#030304",
+  "lang": "pt-BR",
+  "categories": [
+    "lifestyle",
+    "business"
+  ],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

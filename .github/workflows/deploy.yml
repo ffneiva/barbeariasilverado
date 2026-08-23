@@ -1,0 +1,137 @@
+name: 🪒 Deploy — Barbearia Silverado
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Um deploy por vez. Se dois commits caírem juntos, o segundo espera em vez de
+# disputar o mesmo bucket — e o primeiro é cancelado, porque só interessa o
+# estado final.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write # necessário para o OIDC trocar o token do GitHub por credenciais AWS
+
+jobs:
+  deploy:
+    name: Build & publicar
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://barbeariasilverado.com.br
+
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: 📦 Instalar dependências
+        run: npm ci
+
+      - name: 🔍 Lint
+        run: npm run lint
+
+      - name: 🏗️ Build
+        run: npm run build
+
+      # As credenciais são temporárias (1h) e emitidas na hora pelo STS a partir
+      # do token OIDC do GitHub. Não existe access key guardada em lugar nenhum.
+      - name: 🔐 Assumir a role na AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          role-session-name: github-deploy-${{ github.run_id }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # 1) Tudo que tem hash no nome (ou muda junto com o deploy) pode ser
+      #    cacheado para sempre — o nome muda quando o conteúdo muda.
+      - name: 📤 Assets (cache imutável)
+        run: |
+          aws s3 sync dist/ "s3://${{ vars.S3_BUCKET_NAME }}" \
+            --delete \
+            --no-progress \
+            --exclude "index.html" \
+            --exclude "robots.txt" \
+            --exclude "sitemap.xml" \
+            --exclude "site.webmanifest" \
+            --cache-control "public,max-age=31536000,immutable"
+
+      # 2) O AWS CLI adivinha o Content-Type pelo mimetypes do Python, que não
+      #    conhece .webp nem .woff2 — sem isto eles subiriam como
+      #    binary/octet-stream. Uma segunda passada corrige só esses tipos.
+      - name: 🏷️ Corrigir Content-Type de webp e woff2
+        run: |
+          aws s3 cp "s3://${{ vars.S3_BUCKET_NAME }}/images" "s3://${{ vars.S3_BUCKET_NAME }}/images" \
+            --recursive --no-progress \
+            --exclude "*" --include "*.webp" \
+            --content-type "image/webp" \
+            --cache-control "public,max-age=31536000,immutable" \
+            --metadata-directive REPLACE
+
+          aws s3 cp "s3://${{ vars.S3_BUCKET_NAME }}/fonts" "s3://${{ vars.S3_BUCKET_NAME }}/fonts" \
+            --recursive --no-progress \
+            --exclude "*" --include "*.woff2" \
+            --content-type "font/woff2" \
+            --cache-control "public,max-age=31536000,immutable" \
+            --metadata-directive REPLACE
+
+      # 3) O index.html referencia os assets com hash: se ele ficar em cache,
+      #    o visitante continua vendo a versão antiga do site.
+      - name: 📤 index.html (sem cache)
+        run: |
+          aws s3 cp dist/index.html "s3://${{ vars.S3_BUCKET_NAME }}/index.html" \
+            --no-progress \
+            --content-type "text/html; charset=utf-8" \
+            --cache-control "no-cache,must-revalidate"
+
+      - name: 📤 Arquivos de SEO e manifest
+        run: |
+          aws s3 cp dist/robots.txt "s3://${{ vars.S3_BUCKET_NAME }}/robots.txt" \
+            --no-progress --content-type "text/plain; charset=utf-8" \
+            --cache-control "public,max-age=3600"
+
+          aws s3 cp dist/sitemap.xml "s3://${{ vars.S3_BUCKET_NAME }}/sitemap.xml" \
+            --no-progress --content-type "application/xml; charset=utf-8" \
+            --cache-control "public,max-age=3600"
+
+          aws s3 cp dist/site.webmanifest "s3://${{ vars.S3_BUCKET_NAME }}/site.webmanifest" \
+            --no-progress --content-type "application/manifest+json" \
+            --cache-control "public,max-age=86400"
+
+      - name: 🔄 Invalidar o CloudFront
+        run: |
+          ID=$(aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --paths "/*" \
+            --query 'Invalidation.Id' --output text)
+          echo "Invalidação criada: $ID"
+          aws cloudfront wait invalidation-completed \
+            --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --id "$ID"
+
+      # Confere que o site respondeu 200 antes de declarar sucesso. Um deploy
+      # verde com o site fora do ar é pior do que um deploy vermelho.
+      - name: ✅ Smoke test
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://barbeariasilverado.com.br/)
+          echo "GET / → $STATUS"
+          test "$STATUS" = "200"
+
+      - name: 📋 Resumo
+        run: |
+          {
+            echo "### 🪒 Deploy concluído"
+            echo ""
+            echo "- **Site:** https://barbeariasilverado.com.br"
+            echo "- **Commit:** \`${{ github.sha }}\`"
+            echo "- **Bucket:** \`${{ vars.S3_BUCKET_NAME }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

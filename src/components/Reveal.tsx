@@ -6,6 +6,24 @@ import { useReducedMotion } from '@/hooks/useMediaQuery'
 
 gsap.registerPlugin(ScrollTrigger)
 
+/**
+ * REGRA DESTE ARQUIVO: o estado escondido nunca mora no markup.
+ *
+ * A versão anterior marcava o elemento como invisível no JSX (classe
+ * `invisible`, `transform` inline) e contava com o GSAP para revelá-lo. O modo
+ * de falha disso é péssimo: se o ScrollTrigger não disparar, se um `revert()`
+ * restaurar o estado inicial, se o JS quebrar — o conteúdo some para sempre, e
+ * some silenciosamente.
+ *
+ * Aqui é o contrário: o HTML entrega tudo visível, e é o próprio efeito que
+ * esconde (com `gsap.set`) um instante antes de animar. Qualquer caminho de
+ * falha degrada para "aparece sem animação", que é um resultado aceitável.
+ *
+ * O custo é um quadro em que o elemento pode piscar visível antes do efeito
+ * rodar. Na home isso acontece atrás da cortina do preloader; abaixo da dobra,
+ * ninguém está olhando. É uma troca barata por não ter seção fantasma.
+ */
+
 type Props = {
   children: ReactNode
   className?: string
@@ -16,11 +34,6 @@ type Props = {
   as?: 'div' | 'section' | 'li' | 'article' | 'header' | 'footer'
 }
 
-/**
- * Entrada por scroll. Um único ScrollTrigger por elemento, disparado uma vez
- * ("once") — a página tem dezenas destes e triggers que reavaliam a cada
- * rolagem custam caro no celular.
- */
 export function Reveal({ children, className, delay = 0, y = 28, as: Tag = 'div' }: Props) {
   const ref = useRef<HTMLElement>(null)
   const reduced = useReducedMotion()
@@ -29,18 +42,19 @@ export function Reveal({ children, className, delay = 0, y = 28, as: Tag = 'div'
     const el = ref.current
     if (!el || reduced) return
 
-    const anim = gsap.fromTo(
-      el,
-      { autoAlpha: 0, y },
-      {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.9,
-        delay,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 88%', once: true },
-      },
-    )
+    gsap.set(el, { autoAlpha: 0, y })
+
+    const anim = gsap.to(el, {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.9,
+      delay,
+      ease: 'power3.out',
+      // Termina sem estilo inline nenhum: o elemento volta a ser governado
+      // pelo CSS, e um revert posterior não tem o que esconder.
+      clearProps: 'transform,opacity,visibility',
+      scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+    })
 
     return () => {
       anim.scrollTrigger?.kill()
@@ -51,7 +65,7 @@ export function Reveal({ children, className, delay = 0, y = 28, as: Tag = 'div'
 
   return (
     // @ts-expect-error — a união de tags não estreita o tipo da ref, mas todas são HTMLElement
-    <Tag ref={ref} className={cn(reduced ? undefined : 'invisible', className)}>
+    <Tag ref={ref} className={className}>
       {children}
     </Tag>
   )
@@ -80,6 +94,8 @@ export function SplitHeading({ text, className, stagger = 0.07 }: SplitProps) {
     if (!el || reduced) return
 
     const words = el.querySelectorAll<HTMLElement>('[data-word]')
+    if (!words.length) return
+
     const anim = gsap.fromTo(
       words,
       { yPercent: 115 },
@@ -88,6 +104,7 @@ export function SplitHeading({ text, className, stagger = 0.07 }: SplitProps) {
         duration: 1.1,
         stagger,
         ease: 'expo.out',
+        clearProps: 'transform',
         scrollTrigger: { trigger: el, start: 'top 90%', once: true },
       },
     )
@@ -95,6 +112,7 @@ export function SplitHeading({ text, className, stagger = 0.07 }: SplitProps) {
     return () => {
       anim.scrollTrigger?.kill()
       anim.kill()
+      gsap.set(words, { clearProps: 'all' })
     }
   }, [stagger, reduced])
 
@@ -102,9 +120,9 @@ export function SplitHeading({ text, className, stagger = 0.07 }: SplitProps) {
     <span ref={ref} className={cn('inline', className)}>
       {text.split(' ').map((word, i) => (
         <span key={`${word}-${i}`} className="inline-block overflow-hidden align-bottom">
-          <span data-word className="inline-block" style={reduced ? undefined : { transform: 'translateY(115%)' }}>
+          <span data-word className="inline-block">
             {word}
-            {' '}
+            {' '}
           </span>
         </span>
       ))}

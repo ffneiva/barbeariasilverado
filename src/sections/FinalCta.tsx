@@ -52,7 +52,7 @@ export function FinalCta() {
         </div>
 
         <h2 className="max-w-3xl text-[clamp(2.2rem,6vw,4.25rem)] text-steel-100">
-          Sua próxima <span className="chrome">cadeira</span> está a
+          Seu próximo <span className="chrome">corte</span> está a
           <br className="hidden sm:block" /> uma mensagem de distância
         </h2>
 

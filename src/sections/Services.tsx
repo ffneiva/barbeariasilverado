@@ -106,18 +106,47 @@ export function Services() {
           ))}
         </ul>
 
-        {/* Pilares: por que vale a pena, em quatro frases. */}
-        <div className="mt-24 grid gap-x-8 gap-y-12 border-t border-steel-900 pt-14 sm:grid-cols-2 lg:grid-cols-4">
-          {PILLARS.map((pillar, i) => {
-            const Icon = PILLAR_ICONS[pillar.icon as keyof typeof PILLAR_ICONS]
-            return (
-              <Reveal key={pillar.title} delay={0.06 * i}>
-                <Icon className="h-6 w-6 text-steel-500" strokeWidth={1.4} />
-                <h3 className="mt-5 text-xl text-steel-100">{pillar.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-steel-500">{pillar.text}</p>
-              </Reveal>
-            )
-          })}
+        {/*
+          Pilares.
+
+          A versão anterior era uma fileira de quatro colunas soltas, sem moldura
+          e sem hierarquia — flutuava no meio da página. Agora é uma grade com
+          bordas, no mesmo vocabulário visual dos cards de serviço logo acima:
+          índice em mono, ícone, título e uma frase concreta.
+        */}
+        <div className="mt-24">
+          <Reveal>
+            <span className="label-mono flex items-center gap-3">
+              <span aria-hidden className="h-px w-8 bg-steel-700" />
+              Por que aqui
+            </span>
+          </Reveal>
+
+          <ul className="mt-8 grid border-t border-l border-steel-900 sm:grid-cols-2">
+            {PILLARS.map((pillar, i) => {
+              const Icon = PILLAR_ICONS[pillar.icon as keyof typeof PILLAR_ICONS]
+              return (
+                <Reveal key={pillar.title} delay={0.06 * i} as="li">
+                  <div className="group flex h-full flex-col gap-4 border-r border-b border-steel-900 bg-white/[0.012] p-7 transition-colors duration-500 hover:bg-white/[0.03] sm:p-9">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="font-mono text-[0.65rem] tracking-[0.22em] text-steel-700">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <Icon
+                        className="h-5 w-7 text-steel-600 transition-colors duration-500 group-hover:text-steel-300"
+                        strokeWidth={1.5}
+                      />
+                    </div>
+
+                    <h3 className="mt-2 text-2xl leading-tight text-steel-100 sm:text-[1.75rem]">
+                      {pillar.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-steel-500">{pillar.text}</p>
+                  </div>
+                </Reveal>
+              )
+            })}
+          </ul>
         </div>
       </div>
     </Section>

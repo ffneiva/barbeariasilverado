@@ -37,30 +37,61 @@ type Softbox = {
   rotation?: [number, number, number]
 }
 
-/** Cada retângulo só existe no reflexo — é ele que desenha o brilho na lâmina. */
+/**
+ * Cada retângulo só existe no reflexo — é ele que desenha o brilho na lâmina.
+ *
+ * A primeira versão tinha só quatro luzes frontais, e a navalha "apagava"
+ * sempre que o ponteiro a girava para longe delas: metal com `metalness: 1`
+ * não tem cor própria, só reflexo, e o que havia atrás era preto. Agora o
+ * estúdio envolve o objeto — inclusive por trás e por baixo —, de modo que
+ * nenhuma orientação deixa a lâmina sem nada para refletir.
+ */
 const SOFTBOXES: Softbox[] = [
   // Key light: a faixa larga que corre pelas costas da lâmina.
   { position: [0, 3.5, 4], scale: [9, 3], intensity: 5, color: '#ffffff' },
   // Rim fria, atrás, para separar o objeto do fundo.
-  { position: [-5, 1, -4], scale: [6, 6], intensity: 3.2, color: '#dbe4f0' },
+  { position: [-5, 1, -4], scale: [6, 6], intensity: 3.4, color: '#dbe4f0' },
   // Kicker quente — sem ele o metal puxa para o azul.
-  { position: [5, -1.5, 2], scale: [5, 3], intensity: 1.6, color: '#fff0dc' },
+  { position: [5, -1.5, 2], scale: [5, 3], intensity: 2, color: '#fff0dc' },
   // Barra fina inclinada: vira o "risco" característico do cromo.
   { position: [1.5, 4, -1], scale: [0.35, 8], intensity: 7, color: '#ffffff', rotation: [0, 0, Math.PI / 5] },
+
+  // ── Preenchimento: fracos, largos e por todos os lados. São eles que
+  //    garantem um mínimo de brilho em qualquer ângulo de giro.
+  { position: [-7, 0, 3], scale: [7, 7], intensity: 1.1, color: '#c8d0dc' },   // esquerda
+  { position: [7, 1.5, -2], scale: [7, 7], intensity: 1.1, color: '#c8d0dc' }, // direita
+  { position: [0, -5, 1], scale: [10, 5], intensity: 0.9, color: '#9aa4b2' },  // por baixo
+  { position: [0, 1, -8], scale: [12, 8], intensity: 1.4, color: '#aeb8c6' },  // fundo
 ]
 
-/**
- * Cozinha o estúdio num environment map.
- *
- * `PMREMGenerator.fromScene` renderiza a cena auxiliar nas seis faces de um
- * cubo e pré-filtra o resultado por nível de rugosidade — é o mesmo caminho que
- * o three usa para um .hdr, só que a fonte aqui é geometria, não um arquivo.
- * Roda uma vez; depois é só uma textura.
- */
+function makeSkyTexture(): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas')
+  canvas.width = 4
+  canvas.height = 256
+  const ctx = canvas.getContext('2d')!
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, 256)
+  gradient.addColorStop(0, '#4a5260')   // zênite: o "teto do estúdio"
+  gradient.addColorStop(0.45, '#22262d')
+  gradient.addColorStop(0.72, '#101216')
+  gradient.addColorStop(1, '#050506')   // chão
+  ctx.fillStyle = gradient
+  ctx.fillRect(0, 0, 4, 256)
+
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.mapping = THREE.EquirectangularReflectionMapping
+  texture.colorSpace = THREE.SRGBColorSpace
+  return texture
+}
+
 function buildStudioEnvMap(gl: THREE.WebGLRenderer): THREE.Texture {
   const pmrem = new THREE.PMREMGenerator(gl)
   const studio = new THREE.Scene()
-  studio.background = new THREE.Color('#08080a')
+
+  // Fundo em degradê vertical, e não preto chapado: mesmo virada para o "chão",
+  // a lâmina reflete alguma coisa. É esse piso de luminância que impede o
+  // objeto de desaparecer quando o ponteiro o inclina.
+  studio.background = makeSkyTexture()
 
   const disposables: Array<THREE.BufferGeometry | THREE.Material> = []
 
@@ -83,6 +114,7 @@ function buildStudioEnvMap(gl: THREE.WebGLRenderer): THREE.Texture {
   // A cena auxiliar já cumpriu seu papel: o conteúdo dela vive agora na textura.
   pmrem.dispose()
   for (const item of disposables) item.dispose()
+  ;(studio.background as THREE.CanvasTexture).dispose()
 
   return target.texture
 }
@@ -189,11 +221,13 @@ function Razor(props: ThreeElements['group']) {
   const handle = useHandleGeometry()
 
   const steel = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#c9ced6', metalness: 1, roughness: 0.12, envMapIntensity: 1.5 }),
+    // roughness um pouco maior espalha o reflexo em vez de concentrá-lo num
+    // ponto: o brilho fica menos "liga/desliga" conforme a lâmina gira.
+    () => new THREE.MeshStandardMaterial({ color: '#dfe4ea', metalness: 0.96, roughness: 0.19, envMapIntensity: 2.1 }),
     [],
   )
   const darkSteel = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#3a3d44', metalness: 0.95, roughness: 0.3, envMapIntensity: 1.1 }),
+    () => new THREE.MeshStandardMaterial({ color: '#4a4e57', metalness: 0.9, roughness: 0.34, envMapIntensity: 1.6 }),
     [],
   )
 
@@ -211,9 +245,12 @@ function Razor(props: ThreeElements['group']) {
     // sensação a 60 ou a 144 Hz — um `lerp` de passo fixo ficaria mais rápido
     // em telas mais velozes.
     if (outer.current) {
+      // Amplitude curta de propósito. Com o giro largo original, o ponteiro no
+      // canto da tela levava a lâmina a um ângulo em que ela refletia só o
+      // fundo escuro — e sumia. Aqui ela sempre fica dentro do cone de luz.
       const k = 1 - Math.pow(0.0015, delta)
-      outer.current.rotation.y += (pointer.current.x * 0.55 - outer.current.rotation.y) * k
-      outer.current.rotation.x += (-pointer.current.y * 0.3 - outer.current.rotation.x) * k
+      outer.current.rotation.y += (pointer.current.x * 0.3 - outer.current.rotation.y) * k
+      outer.current.rotation.x += (-pointer.current.y * 0.14 - outer.current.rotation.x) * k
     }
 
     // Flutuação ociosa: duas senoides de período diferente, para o movimento

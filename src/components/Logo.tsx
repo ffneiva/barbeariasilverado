@@ -61,7 +61,11 @@ export function Logo({ variant = 'wordmark', className, animated = false, title 
  */
 export function BladeIcon({ className, strokeWidth = 2.4 }: { className?: string; strokeWidth?: number }) {
   return (
-    <svg viewBox="0 0 100 100" fill="none" className={cn('h-full w-full', className)} aria-hidden>
+    // Sem tamanho padrão de propósito. A versão anterior fixava `h-full w-full`
+    // e concatenava a classe do chamador, então um `h-6 w-6` virava
+    // "h-full w-full h-6 w-6" — duas regras de mesma especificidade brigando,
+    // e o ícone estourava para a largura inteira do container.
+    <svg viewBox="0 0 100 100" fill="none" className={cn('shrink-0', className)} aria-hidden>
       <path
         d="M8 14h74c3 0 5 2 5 4s-2 4-5 4H30l42 30c3 2 3 6 0 8L20 92c-3 2-7 0-7-4 0-2 1-3 2-4l44-26L9 22c-3-2-3-8-1-8z"
         fill="currentColor"

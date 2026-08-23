@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Mail, MapPin, Navigation, Phone } from 'lucide-react'
+import { Mail, Navigation, Phone } from 'lucide-react'
 import { InstagramIcon } from '@/components/BrandIcons'
 import { Section, SectionHeading } from '@/components/SectionHeading'
 import { Reveal } from '@/components/Reveal'
@@ -12,13 +11,12 @@ import { cn } from '@/lib/utils'
 /**
  * Onde fica, quando abre e como falar.
  *
- * O mapa entra por *facade*: enquanto ninguém clica, o que existe é um bloco
- * estático. O iframe do Google — que sozinho traz centenas de kB de script de
- * terceiro e um cookie de rastreamento — só é criado sob demanda. Quem quer o
- * mapa clica; quem só quer o endereço não paga por ele.
+ * O iframe do Google carrega junto com a seção, mas com `loading="lazy"`: o
+ * navegador só busca o mapa quando ele chega perto da viewport, então quem
+ * nunca rola até aqui não paga por ele. Como a seção fica no fim da página,
+ * isso já mantém o mapa fora do carregamento inicial.
  */
 export function Location() {
-  const [mapLoaded, setMapLoaded] = useState(false)
   const today = todayIndex()
 
   return (
@@ -33,56 +31,16 @@ export function Location() {
         <div className="mt-14 grid gap-4 lg:grid-cols-[1.15fr_1fr]">
           {/* Mapa */}
           <Reveal className="relative min-h-[22rem] border border-steel-800 lg:min-h-[30rem]">
-            {mapLoaded ? (
-              <iframe
-                title={`Mapa — ${BUSINESS.name}`}
-                src={BUSINESS.mapsEmbed}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                allowFullScreen
-                className="absolute inset-0 h-full w-full grayscale-[0.35] contrast-[1.1]"
-              />
-            ) : (
-              <button
-                type="button"
-                onClick={() => setMapLoaded(true)}
-                className="group absolute inset-0 flex flex-col items-center justify-center gap-5 overflow-hidden bg-leather"
-              >
-                {/* Malha viária estilizada — só CSS, nenhum tile baixado. */}
-                <span
-                  aria-hidden
-                  className="absolute inset-0 opacity-[0.16]"
-                  style={{
-                    backgroundImage:
-                      'linear-gradient(rgba(211,215,222,0.35) 1px, transparent 1px),' +
-                      'linear-gradient(90deg, rgba(211,215,222,0.35) 1px, transparent 1px),' +
-                      'linear-gradient(115deg, rgba(211,215,222,0.6) 2px, transparent 2px)',
-                    backgroundSize: '54px 54px, 54px 54px, 100% 100%',
-                  }}
-                />
-                <span
-                  aria-hidden
-                  className="absolute inset-0"
-                  style={{ background: 'radial-gradient(ellipse 60% 55% at 50% 50%, transparent, #030304 82%)' }}
-                />
-
-                <span className="relative flex h-14 w-14 items-center justify-center rounded-full border border-steel-600 bg-void/70 transition-colors group-hover:border-steel-300">
-                  <MapPin className="h-5 w-5 text-steel-200" strokeWidth={1.5} />
-                  <span
-                    aria-hidden
-                    className="absolute inset-0 rounded-full border border-steel-500"
-                    style={{ animation: 'pulse-ring 2.8s var(--ease-blade) infinite' }}
-                  />
-                </span>
-                <span className="relative font-mono text-[0.65rem] tracking-[0.22em] text-steel-400 uppercase transition-colors group-hover:text-steel-100">
-                  Carregar mapa
-                </span>
-                <span className="relative max-w-xs px-6 text-center text-xs leading-relaxed text-steel-600">
-                  O mapa é carregado só quando você pede — assim a página abre mais rápido e
-                  o Google não é chamado sem necessidade.
-                </span>
-              </button>
-            )}
+            <iframe
+              title={`Mapa — ${BUSINESS.name}`}
+              src={BUSINESS.mapsEmbed}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+              // Dessaturado e com mais contraste para o mapa não brigar com a
+              // paleta monocromática do resto da página.
+              className="absolute inset-0 h-full w-full grayscale-[0.4] contrast-[1.15] brightness-[0.92]"
+            />
           </Reveal>
 
           {/* Ficha */}

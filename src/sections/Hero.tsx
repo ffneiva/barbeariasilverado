@@ -37,15 +37,36 @@ export function Hero({ ready }: { ready: boolean }) {
   }, [ready, reduced])
 
   // Entrada coreografada, disparada só quando a cortina do preloader saiu.
+  //
+  // Cada tween termina com `clearProps`, devolvendo o elemento ao CSS. Isso
+  // importa mais do que parece: sem isso, o estado "escondido" fica gravado
+  // inline e um revert do contexto — ou qualquer re-execução do efeito —
+  // deixaria o título permanentemente fora da tela.
   useEffect(() => {
     if (!ready || reduced) return
+
     const ctx = gsap.context(() => {
       gsap
         .timeline({ defaults: { ease: 'expo.out', duration: 1.2 } })
-        .fromTo('[data-hero-line] > span', { yPercent: 118 }, { yPercent: 0, stagger: 0.09 })
-        .fromTo('[data-hero-fade]', { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, stagger: 0.08 }, '-=0.75')
-        .fromTo('[data-hero-rule]', { scaleX: 0 }, { scaleX: 1, duration: 1.4 }, '-=1')
+        .fromTo(
+          '[data-hero-line] > span',
+          { yPercent: 118 },
+          { yPercent: 0, stagger: 0.09, clearProps: 'transform' },
+        )
+        .fromTo(
+          '[data-hero-fade]',
+          { autoAlpha: 0, y: 22 },
+          { autoAlpha: 1, y: 0, stagger: 0.08, clearProps: 'transform,opacity,visibility' },
+          '-=0.75',
+        )
+        .fromTo(
+          '[data-hero-rule]',
+          { scaleX: 0 },
+          { scaleX: 1, duration: 1.4, clearProps: 'transform' },
+          '-=1',
+        )
     }, rootRef)
+
     return () => ctx.revert()
   }, [ready, reduced])
 
@@ -104,13 +125,13 @@ export function Hero({ ready }: { ready: boolean }) {
             <span className="label-mono hidden sm:inline">Desde 2026 · Jardim América · Goiânia</span>
           </div>
 
+          {/* Sem transform inline: o título nasce visível e é o GSAP que o
+              esconde para animar. Se a animação não rodar, o pior caso é um
+              título estático — nunca um título invisível. */}
           <h1 className="text-[clamp(3.2rem,12.5vw,10.5rem)] leading-[0.85]">
             {['O talento', 'da lâmina'].map((line, i) => (
               <span key={line} data-hero-line className="block overflow-hidden pb-[0.06em]">
-                <span
-                  className={i === 0 ? 'chrome inline-block' : 'chrome animate-sheen inline-block'}
-                  style={reduced ? undefined : { transform: 'translateY(118%)' }}
-                >
+                <span className={i === 0 ? 'chrome inline-block' : 'chrome animate-sheen inline-block'}>
                   {line}
                 </span>
               </span>

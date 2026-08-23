@@ -80,15 +80,6 @@
     "aspect": 1.5018,
     "lqip": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAABwAwCdASoUAA0APu1iqU2ppaQiMAgBMB2JZwAAW+qrD63t/wAA/tjdWHFqerEuDUrC3OjzWam7OXugAAA="
   },
-  "hero-shop": {
-    "widths": [
-      960,
-      1440,
-      1920
-    ],
-    "aspect": 1.784,
-    "lqip": "data:image/webp;base64,UklGRnwAAABXRUJQVlA4WAoAAAAQAAAAEwAACgAAQUxQSBcAAAABF9D/iAgYZBupB7n353mCiP7HVQ2eAQBWUDggPgAAAHADAJ0BKhQACwA+7WSpTamlpCIwCAEwHYlpAABSXcAFumMLsAD3JrYa35pKv1w0G6YTsC2OoBfvam0KAAAA"
-  },
   "leather": {
     "widths": [
       1280,

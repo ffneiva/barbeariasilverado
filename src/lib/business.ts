@@ -176,22 +176,22 @@ export const PILLARS = [
   {
     icon: 'blade',
     title: 'Acabamento na navalha',
-    text: 'Todo corte termina na lâmina aberta. É o detalhe que separa um corte bom de um corte notado.',
+    text: 'Todo corte termina com a lâmina aberta no contorno e na nuca. É o que faz o corte continuar arrumado na segunda e na terceira semana.',
   },
   {
     icon: 'clock',
-    title: 'Hora marcada de verdade',
-    text: 'Agenda controlada por horário. Você senta na cadeira no minuto combinado — sem fila de espera.',
+    title: 'Hora marcada que se cumpre',
+    text: 'A agenda é fechada pela duração real de cada serviço. Você senta na cadeira no horário combinado — sem esperar a vez de outra pessoa.',
   },
   {
     icon: 'eye',
-    title: 'Visagismo antes da máquina',
-    text: 'A gente conversa sobre formato de rosto, rotina e manutenção antes de ligar qualquer máquina.',
+    title: 'A conversa vem antes da máquina',
+    text: 'Formato do rosto, tipo de cabelo e quanto você quer manter. O corte é combinado antes de qualquer máquina ligar.',
   },
   {
     icon: 'sparkles',
-    title: 'Produtos premium',
-    text: 'Pomadas, tônicos e pós-barba selecionados. Você leva pra casa o mesmo que usamos na cadeira.',
+    title: 'O que passa no seu cabelo, você leva',
+    text: 'Pomada, tônico, minoxidil e pós-barba ficam à venda na loja. É o mesmo produto que o barbeiro usou em você.',
   },
 ]
 
@@ -202,28 +202,31 @@ export const STATS = [
   { value: 100, prefix: '', suffix: '%', label: 'agendamento pelo WhatsApp' },
 ]
 
-export const TESTIMONIALS = [
-  {
-    name: 'Rafael M.',
-    handle: 'cliente desde a inauguração',
-    text: 'Fui pedir um mid fade e saí com um corte melhor do que a foto que levei. O acabamento na navalha faz toda a diferença.',
-  },
-  {
-    name: 'Diego A.',
-    handle: 'Jardim América',
-    text: 'Marquei pelo WhatsApp às 22h e às 9h do dia seguinte já estava na cadeira. Nunca esperei um minuto sequer.',
-  },
-  {
-    name: 'Vinícius P.',
-    handle: 'Setor Bueno',
-    text: 'O degradê com V ficou perfeito. Já é o terceiro mês seguido que volto — e sempre sai idêntico ao combinado.',
-  },
-  {
-    name: 'Lucas F.',
-    handle: 'Setor Oeste',
-    text: 'Ambiente tranquilo, conversa boa e zero pressa. Sai com corte, barba feita e a cabeça leve.',
-  },
-]
+/**
+ * Depoimentos reais, copiados do perfil do Google da barbearia.
+ *
+ * Esta lista está vazia de propósito. Ela chegou a ter quatro textos plausíveis
+ * escritos por mim — o que, no site de um negócio real, é propaganda enganosa
+ * com nome e sobrenome de gente que não existe. Enquanto não houver avaliação
+ * de verdade aqui, a seção mostra o convite para avaliar no Google, e não
+ * elogio fabricado.
+ *
+ * Para preencher: copie do perfil do Google (nome de quem escreveu, o texto e
+ * a nota) e adicione abaixo.
+ */
+export type Testimonial = {
+  name: string
+  /** De onde a pessoa é, ou há quanto tempo é cliente. */
+  handle: string
+  text: string
+  /** Nota de 1 a 5, como publicada no Google. */
+  rating: number
+}
+
+export const TESTIMONIALS: Testimonial[] = []
+
+/** Link direto para o perfil no Google, usado para ler e deixar avaliações. */
+export const GOOGLE_PROFILE = 'https://share.google/wN91cRZ1BJSv56FWj'
 
 export const FAQ = [
   {

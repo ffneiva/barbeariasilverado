@@ -66,10 +66,10 @@ export function Privacy({ onBack }: { onBack: () => void }) {
               conversa de WhatsApp.
             </li>
             <li>
-              <strong className="text-steel-200">Google Maps.</strong> O mapa da página de
-              localização só é carregado se você clicar em “Carregar mapa”. Antes disso, nenhuma
-              requisição é feita ao Google. Ao carregá-lo, o Google poderá registrar seu IP,
-              conforme a política de privacidade dele.
+              <strong className="text-steel-200">Google Maps.</strong> A seção de localização
+              embute um mapa do Google. Ele é carregado de forma preguiçosa — só quando você
+              rola até ele —, mas a partir daí o Google poderá registrar seu IP e seus dados
+              de navegação, conforme a política de privacidade dele.
             </li>
             <li>
               <strong className="text-steel-200">Instagram (Meta).</strong> Os links levam ao perfil

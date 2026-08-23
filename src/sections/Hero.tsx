@@ -50,7 +50,7 @@ export function Hero({ ready }: { ready: boolean }) {
         .timeline({ defaults: { ease: 'expo.out', duration: 1.2 } })
         .fromTo(
           '[data-hero-line] > span',
-          { yPercent: 118 },
+          { yPercent: 130 },
           { yPercent: 0, stagger: 0.09, clearProps: 'transform' },
         )
         .fromTo(
@@ -122,15 +122,15 @@ export function Hero({ ready }: { ready: boolean }) {
         <div className="max-w-4xl">
           <div data-hero-fade className="mb-7 flex flex-wrap items-center gap-4">
             <OpenBadge />
-            <span className="label-mono hidden sm:inline">Desde 2026 · Jardim América · Goiânia</span>
+            <span className="label-mono hidden sm:inline">Barbearia · Jardim América, Goiânia</span>
           </div>
 
           {/* Sem transform inline: o título nasce visível e é o GSAP que o
               esconde para animar. Se a animação não rodar, o pior caso é um
               título estático — nunca um título invisível. */}
           <h1 className="text-[clamp(3.2rem,12.5vw,10.5rem)] leading-[0.85]">
-            {['O talento', 'da lâmina'].map((line, i) => (
-              <span key={line} data-hero-line className="block overflow-hidden pb-[0.06em]">
+            {['Do jeito', 'que você pediu'].map((line, i) => (
+              <span key={line} data-hero-line className="-mt-[0.18em] block overflow-hidden pt-[0.18em] pb-[0.06em]">
                 <span className={i === 0 ? 'chrome inline-block' : 'chrome animate-sheen inline-block'}>
                   {line}
                 </span>
@@ -141,13 +141,13 @@ export function Hero({ ready }: { ready: boolean }) {
           <div data-hero-rule className="hairline mt-9 max-w-lg origin-left" />
 
           <p data-hero-fade className="mt-7 max-w-xl text-base leading-relaxed text-steel-400 sm:text-lg">
-            Degradê, navalhado e barba com acabamento de lâmina, no Jardim América.
-            Hora marcada de verdade — você senta na cadeira no minuto combinado.
+            Degradê, fade, barba e sobrancelha no Jardim América. Você chega com a
+            referência na cabeça — ou só com uma ideia — e sai com o corte que pediu.
           </p>
 
           <div data-hero-fade className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
             <Button size="lg" onClick={() => scrollToSection('agendar')} magnetic={isDesktop} external={false}>
-              Agendar horário
+              Marcar meu horário
             </Button>
             <Button
               size="lg"

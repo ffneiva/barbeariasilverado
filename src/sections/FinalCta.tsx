@@ -64,7 +64,7 @@ export function FinalCta() {
             Chamar no WhatsApp
           </Button>
           <Button size="lg" variant="outline" onClick={() => scrollToSection('agendar')} external={false}>
-            Montar meu agendamento
+            Escolher dia e horário
           </Button>
         </div>
       </div>

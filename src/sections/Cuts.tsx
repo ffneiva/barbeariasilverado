@@ -196,7 +196,7 @@ export function Cuts() {
             </Reveal>
             <div className="mt-5 flex flex-wrap items-end justify-between gap-6">
               <h2 className="text-[clamp(2.4rem,6.5vw,4.75rem)] text-steel-100">
-                <SplitHeading text="Nove cortes de assinatura" />
+                <SplitHeading text="Os nove cortes da casa" />
               </h2>
               <Reveal delay={0.15}>
                 <p className="label-mono max-w-xs leading-relaxed normal-case">
@@ -226,8 +226,8 @@ export function Cuts() {
               <span className="label-mono">Não achou o seu?</span>
               <h3 className="text-4xl text-steel-100">Traz a foto que a gente faz</h3>
               <p className="text-sm leading-relaxed text-steel-400">
-                Manda a referência no WhatsApp. A gente avalia se o corte funciona no seu tipo
-                de cabelo e te responde antes de você sair de casa.
+                Manda a referência no WhatsApp. A gente responde se o corte funciona no seu
+                tipo de cabelo antes de você sair de casa.
               </p>
               <Button href={whatsappUrl('Olá! Tenho uma foto de referência de corte. Consigo fazer na Silverado?')} magnetic={false}>
                 Enviar referência

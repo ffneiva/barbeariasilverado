@@ -90,12 +90,12 @@ export function Services() {
       <div className="container-x">
         <SectionHeading
           eyebrow="02 — Serviços"
-          title="O que a lâmina faz por você"
+          title="O que a gente faz"
           lead={
             <>
-              Preços a partir de. O valor final depende do comprimento e do tipo de cabelo —
-              e é sempre combinado <em className="text-steel-200 not-italic">antes</em> de a
-              máquina ligar.
+              Os preços são a partir de: o valor final depende do comprimento e do tipo de
+              cabelo, e é combinado <em className="text-steel-200 not-italic">antes</em> de a
+              máquina ligar. Nada de surpresa na hora de pagar.
             </>
           }
         />

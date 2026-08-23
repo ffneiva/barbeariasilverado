@@ -74,7 +74,7 @@ export function Booking() {
         <SectionHeading
           eyebrow="04 — Agendamento"
           title="Escolha e mande no WhatsApp"
-          lead="Monte o pedido aqui e a mensagem chega pronta para o barbeiro. Ele confirma o horário e está fechado."
+          lead="Monte o pedido aqui e a mensagem chega pronta no WhatsApp do barbeiro. Ele confirma o horário e está fechado."
           align="center"
         />
 
@@ -194,8 +194,8 @@ export function Booking() {
                   )}
 
                   <p className="mt-5 text-xs leading-relaxed text-steel-600">
-                    Estes são os horários em que a barbearia atende. A confirmação de que o
-                    horário está livre vem do barbeiro, na resposta do WhatsApp.
+                    Estes são os horários em que a barbearia atende. Quem confirma se o
+                    horário está livre é o barbeiro, na resposta do WhatsApp.
                   </p>
                 </fieldset>
               )}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { Fragment, useEffect, useRef, type ReactNode } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { cn } from '@/lib/utils'
@@ -98,7 +98,7 @@ export function SplitHeading({ text, className, stagger = 0.07 }: SplitProps) {
 
     const anim = gsap.fromTo(
       words,
-      { yPercent: 115 },
+      { yPercent: 125 },
       {
         yPercent: 0,
         duration: 1.1,
@@ -116,15 +116,34 @@ export function SplitHeading({ text, className, stagger = 0.07 }: SplitProps) {
     }
   }, [stagger, reduced])
 
+  const words = text.split(' ')
+
   return (
     <span ref={ref} className={cn('inline', className)}>
-      {text.split(' ').map((word, i) => (
-        <span key={`${word}-${i}`} className="inline-block overflow-hidden align-bottom">
-          <span data-word className="inline-block">
-            {word}
-            {' '}
+      {words.map((word, i) => (
+        <Fragment key={`${word}-${i}`}>
+          {/*
+            O padding-top dá ar para o acento.
+
+            `overflow-hidden` recorta na borda da caixa de padding, e em fonte
+            display com line-height apertado o acento de Á/Â/Ê passa DA altura
+            de caixa — a máscara cortava o acento e "AMÉRICA" virava "AMERICA".
+            A margem negativa devolve o deslocamento, então nada se move de
+            lugar: só o recorte sobe.
+          */}
+          <span className="inline-block -mt-[0.2em] overflow-hidden pt-[0.2em] align-bottom">
+            <span data-word className="inline-block">
+              {word}
+            </span>
           </span>
-        </span>
+          {/*
+            O espaço precisa ficar FORA do inline-block. Dentro, o CSS descarta
+            o espaço final da caixa e as palavras grudam ("JARDIMAMÉRICA").
+            Como texto entre os dois spans, ele é renderizado — e o leitor de
+            tela continua ouvindo uma frase, não palavras emendadas.
+          */}
+          {i < words.length - 1 ? ' ' : null}
+        </Fragment>
       ))}
     </span>
   )

@@ -20,10 +20,9 @@ gsap.registerPlugin(ScrollTrigger)
  * visitante pular tudo.
  */
 const MANIFESTO =
-  'Uma barbearia não vive de máquina nova nem de cadeira bonita. Vive de mão firme, ' +
-  'olho treinado e do minuto que o barbeiro gasta olhando o formato do seu rosto antes ' +
-  'de encostar qualquer lâmina. É isso que a gente faz no Jardim América — um corte de cada vez, ' +
-  'sem pressa e sem fila.'
+  'Uma barbearia não vive de máquina nova nem de cadeira bonita. Vive de barbeiro que ' +
+  'escuta o que você quer antes de ligar qualquer máquina — e que entrega exatamente ' +
+  'aquilo. É isso que a gente faz no Jardim América, um corte de cada vez.'
 
 export function Manifesto() {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -132,18 +131,18 @@ export function Manifesto() {
           <div>
             <Reveal>
               <h2 className="text-[clamp(2.2rem,5.5vw,3.75rem)] text-steel-100">
-                Cadeira reservada,
+                O corte é seu,
                 <br />
-                <span className="chrome">relógio respeitado</span>
+                <span className="chrome">não do barbeiro</span>
               </h2>
             </Reveal>
 
             <Reveal delay={0.1}>
               <p className="mt-6 max-w-xl leading-relaxed text-steel-400">
-                A Silverado nasceu de uma ideia simples: tratar o horário do cliente como
-                parte do serviço. A agenda é fechada por encaixe de duração real — corte de
-                40 minutos ocupa 40 minutos —, então ninguém fica sentado esperando a vez
-                de outra pessoa.
+                Tem barbeiro que ouve o pedido e faz do jeito que ele gosta. Aqui é o
+                contrário: a referência que você trouxe é o combinado, e o corte só termina
+                quando bate com ela. Se você não souber explicar, a gente sugere — mas quem
+                decide é você.
               </p>
             </Reveal>
 

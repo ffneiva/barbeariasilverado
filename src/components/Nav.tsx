@@ -20,10 +20,22 @@ const LINKS = [
   { id: 'localizacao', label: 'Onde estamos' },
 ]
 
-export function Nav({ onSection }: { onSection: (id: string) => void }) {
+export function Nav({
+  onSection,
+  /** Rota atual. Só serve para religar o observer quando a página troca. */
+  path,
+}: {
+  onSection: (id: string) => void
+  path: string
+}) {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [active, setActive] = useState('inicio')
+
+  // Numa rota sem as seções (a política de privacidade), nada deve ficar aceso.
+  // Derivar isso do path é melhor do que zerar `active` dentro do efeito: o
+  // estado antigo é preservado e volta sozinho quando o visitante retorna.
+  const highlight = LINKS.some(({ id }) => id === active) && !path.startsWith('/politica')
   const overlayRef = useRef<HTMLDivElement>(null)
   const reduced = useReducedMotion()
 
@@ -39,7 +51,18 @@ export function Nav({ onSection }: { onSection: (id: string) => void }) {
 
   // Marca o link da seção visível. Um observer por seção é mais barato do que
   // recalcular posições a cada quadro de rolagem.
+  //
+  // O efeito depende de `path` porque as seções são desmontadas na página de
+  // privacidade: sem religar o observer ao voltar para a home, ele fica sem
+  // nenhum alvo e o menu congela no último item marcado — era por isso que
+  // "Onde estamos" ficava aceso para sempre depois de visitar a política.
   useEffect(() => {
+    const sections = LINKS.map(({ id }) => document.getElementById(id)).filter(
+      (el): el is HTMLElement => el !== null,
+    )
+
+    if (!sections.length) return
+
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
@@ -50,12 +73,9 @@ export function Nav({ onSection }: { onSection: (id: string) => void }) {
       { rootMargin: '-45% 0px -45% 0px', threshold: [0, 0.25, 0.5] },
     )
 
-    for (const { id } of LINKS) {
-      const el = document.getElementById(id)
-      if (el) observer.observe(el)
-    }
+    for (const el of sections) observer.observe(el)
     return () => observer.disconnect()
-  }, [])
+  }, [path])
 
   // Menu mobile: trava a rolagem de fundo e escalona a entrada dos links.
   useEffect(() => {
@@ -117,7 +137,7 @@ export function Nav({ onSection }: { onSection: (id: string) => void }) {
                 onClick={() => go(link.id)}
                 className={cn(
                   'relative rounded-full px-4 py-2 font-mono text-[0.7rem] tracking-[0.16em] uppercase transition-colors duration-300',
-                  active === link.id ? 'text-steel-50' : 'text-steel-500 hover:text-steel-200',
+                  highlight && active === link.id ? 'text-steel-50' : 'text-steel-500 hover:text-steel-200',
                 )}
               >
                 {link.label}
@@ -125,7 +145,7 @@ export function Nav({ onSection }: { onSection: (id: string) => void }) {
                   aria-hidden
                   className={cn(
                     'absolute inset-x-4 -bottom-0.5 h-px origin-center bg-steel-300 transition-transform duration-400 ease-[var(--ease-blade)]',
-                    active === link.id ? 'scale-x-100' : 'scale-x-0',
+                    highlight && active === link.id ? 'scale-x-100' : 'scale-x-0',
                   )}
                 />
               </button>

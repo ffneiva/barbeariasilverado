@@ -111,7 +111,7 @@ export default function App() {
         Pular para o conteúdo
       </a>
 
-      <Nav onSection={goToSection} />
+      <Nav onSection={goToSection} path={path} />
 
       {isPrivacy ? (
         <Privacy onBack={() => navigate('/')} />

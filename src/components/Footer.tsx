@@ -30,7 +30,7 @@ export function Footer({
             <Logo variant="wordmark" className="w-40" />
             <p className="mt-6 max-w-xs text-sm leading-relaxed text-steel-500">
               {BUSINESS.tagline}. Barbearia no Jardim América, em Goiânia — corte, barba e
-              acabamento na lâmina, com hora marcada.
+              sobrancelha, com acabamento na navalha.
             </p>
             <div className="mt-6 flex gap-3">
               <a

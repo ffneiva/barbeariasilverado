@@ -25,7 +25,7 @@ export function Location() {
         <SectionHeading
           eyebrow="07 — Onde estamos"
           title="Jardim América, Goiânia"
-          lead="Avenida C-4, a poucos minutos do Setor Bueno e do Setor Oeste. Estacionamento na rua."
+          lead="Na Avenida C-4, a poucos minutos do Setor Bueno e do Setor Oeste."
         />
 
         <div className="mt-14 grid gap-4 lg:grid-cols-[1.15fr_1fr]">
@@ -113,7 +113,7 @@ export function Location() {
                 ))}
               </ul>
               <p className="mt-5 text-xs leading-relaxed text-steel-600">
-                O intervalo no meio do dia é o almoço da equipe. Fora dele, a agenda roda cheia.
+                O intervalo no meio do dia é o horário de almoço.
               </p>
             </Reveal>
           </div>

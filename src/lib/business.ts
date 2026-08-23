@@ -11,8 +11,9 @@ export const BUSINESS = {
   shortName: 'Silverado',
   tagline: 'O talento da lâmina',
   description:
-    'Barbearia no Jardim América, em Goiânia. Degradê, navalhado, barba e visagismo ' +
-    'com acabamento de lâmina. Agende pelo WhatsApp em menos de um minuto.',
+    'Barbearia no Jardim América, em Goiânia. Degradê, fade, barba e sobrancelha, ' +
+    'com acabamento na navalha. Você explica o corte que quer e sai com ele. ' +
+    'Agendamento pelo WhatsApp.',
 
   url: 'https://barbeariasilverado.com.br',
 
@@ -93,7 +94,7 @@ export const SERVICES: Service[] = [
     id: 'corte',
     name: 'Corte',
     description:
-      'Degradê, fade ou social. Consulta de visagismo, máquina, tesoura e acabamento na navalha.',
+      'Degradê, fade, social — ou o modelo da foto que você trouxer. Máquina, tesoura e o contorno finalizado na navalha.',
     price: 40,
     minutes: 40,
     tag: 'Mais pedido',
@@ -103,7 +104,7 @@ export const SERVICES: Service[] = [
     id: 'corte-barba',
     name: 'Corte + Barba',
     description:
-      'O combo completo: corte finalizado na lâmina, toalha quente, navalha e balm pós-barba.',
+      'Cabelo e barba na mesma sessão, os dois terminados na lâmina. Você sai com o visual inteiro alinhado.',
     price: 70,
     minutes: 70,
     tag: 'Melhor custo',
@@ -112,15 +113,14 @@ export const SERVICES: Service[] = [
   {
     id: 'barba',
     name: 'Barba',
-    description:
-      'Modelagem no desenho do rosto, toalha quente, navalha aberta e finalização hidratante.',
+    description: 'Aparo, desenho no formato do seu rosto e acabamento com navalha aberta.',
     price: null,
     minutes: 30,
   },
   {
     id: 'sobrancelha',
     name: 'Sobrancelha',
-    description: 'Alinhamento masculino na navalha, respeitando o traço natural.',
+    description: 'Alinhamento no traço natural — limpa o excesso sem tirar a sua expressão.',
     price: null,
     minutes: 15,
   },
@@ -132,13 +132,12 @@ export const SERVICES: Service[] = [
     minutes: 15,
   },
   {
-    id: 'minoxidil',
-    name: 'Consultoria Minoxidil',
+    id: 'infantil',
+    name: 'Corte infantil',
     description:
-      'Acompanhamento de crescimento de barba: rotina, aplicação e evolução registrada.',
+      'Criança tem o tempo dela. Avise ao agendar e a gente reserva um horário mais calmo.',
     price: null,
-    minutes: 20,
-    tag: 'Programa',
+    minutes: 30,
   },
 ]
 
@@ -174,19 +173,19 @@ export const CUTS: Cut[] = [
 
 export const PILLARS = [
   {
+    icon: 'eye',
+    title: 'Sai do jeito que você pediu',
+    text: 'Você explica com uma foto, com a mão na cabeça ou do jeito que der. O que sai é o que foi combinado — não a versão que o barbeiro preferia fazer.',
+  },
+  {
     icon: 'blade',
     title: 'Acabamento na navalha',
-    text: 'Todo corte termina com a lâmina aberta no contorno e na nuca. É o que faz o corte continuar arrumado na segunda e na terceira semana.',
+    text: 'O contorno e a nuca terminam com a lâmina aberta. É o que faz o corte continuar arrumado na segunda e na terceira semana.',
   },
   {
     icon: 'clock',
-    title: 'Hora marcada que se cumpre',
-    text: 'A agenda é fechada pela duração real de cada serviço. Você senta na cadeira no horário combinado — sem esperar a vez de outra pessoa.',
-  },
-  {
-    icon: 'eye',
-    title: 'A conversa vem antes da máquina',
-    text: 'Formato do rosto, tipo de cabelo e quanto você quer manter. O corte é combinado antes de qualquer máquina ligar.',
+    title: 'Não sabe o que quer? Tudo bem',
+    text: 'A gente olha o formato do seu rosto, o seu tipo de cabelo e quanto você pretende manter, e sugere o que funciona.',
   },
   {
     icon: 'sparkles',
@@ -195,11 +194,24 @@ export const PILLARS = [
   },
 ]
 
+/**
+ * Resumo do perfil do Google.
+ *
+ * Números conferidos manualmente na listagem de avaliações. Se o perfil mudar,
+ * é aqui que se atualiza — a régua de números e o texto da seção de
+ * depoimentos leem daqui.
+ */
+export const GOOGLE_REVIEWS = { count: 30, rating: 5 }
+
+/**
+ * As 54h/semana saem da soma do SCHEDULE acima: 9h por dia útil (3h de manhã +
+ * 6h à tarde) × 5, mais 9h no sábado. Não é número redondo de marketing.
+ */
 export const STATS = [
   { value: 9, prefix: '', suffix: '', label: 'cortes de assinatura' },
-  { value: 60, prefix: '', suffix: 'h', label: 'de agenda por semana' },
+  { value: 54, prefix: '', suffix: 'h', label: 'de atendimento por semana' },
   { value: 40, prefix: 'R$ ', suffix: '', label: 'a partir de' },
-  { value: 100, prefix: '', suffix: '%', label: 'agendamento pelo WhatsApp' },
+  { value: GOOGLE_REVIEWS.count, prefix: '', suffix: '', label: 'avaliações 5 estrelas no Google' },
 ]
 
 /**
@@ -291,27 +303,31 @@ export const GOOGLE_PROFILE = 'https://share.google/wN91cRZ1BJSv56FWj'
 export const FAQ = [
   {
     q: 'Preciso agendar ou posso chegar sem hora marcada?',
-    a: 'A agenda funciona por horário marcado, então o ideal é reservar pelo WhatsApp. Se aparecer sem agendar, a gente encaixa conforme a disponibilidade do dia — mas o horário garantido é sempre o agendado.',
+    a: 'Pode chegar sem agendar. Mandar mensagem antes só evita que você espere: o barbeiro responde com um horário livre e você chega na hora certa.',
   },
   {
     q: 'Quais formas de pagamento vocês aceitam?',
-    a: 'Pix, dinheiro e cartões de débito e crédito. O Pix é o mais rápido e sai na hora.',
+    a: 'Pix, dinheiro e cartões de débito e crédito.',
   },
   {
-    q: 'Quanto tempo demora um corte?',
-    a: 'Um corte leva cerca de 40 minutos. O combo corte + barba fica em torno de 1h10, porque inclui toalha quente e acabamento na navalha.',
+    q: 'Não sei explicar o corte que eu quero. Tem problema?',
+    a: 'Nenhum. Traga uma foto de referência — ou nem isso. A gente olha o formato do seu rosto, o seu tipo de cabelo e quanto você quer manter, e sugere o que combina.',
+  },
+  {
+    q: 'Quanto tempo demora?',
+    a: 'Um corte leva cerca de 40 minutos. Corte com barba fica em torno de 1h10, porque os dois terminam no acabamento com navalha.',
   },
   {
     q: 'Vocês atendem criança?',
-    a: 'Sim. É só avisar na hora de agendar para reservarmos um horário mais tranquilo, normalmente logo na abertura ou no início da tarde.',
+    a: 'Sim. Avise ao agendar para reservarmos um horário mais tranquilo — normalmente logo na abertura ou no começo da tarde.',
   },
   {
     q: 'E se eu precisar remarcar?',
-    a: 'Sem problema — avise pelo WhatsApp com pelo menos 2 horas de antecedência e a gente remarca para o próximo horário livre.',
+    a: 'Avise pelo WhatsApp assim que souber e a gente encaixa você em outro horário.',
   },
   {
     q: 'Vocês vendem os produtos usados no atendimento?',
-    a: 'Vendemos. Pomadas, tônicos, minoxidil e pós-barba ficam disponíveis na loja — pergunte ao barbeiro durante o atendimento.',
+    a: 'Vendemos. Pomada, tônico, minoxidil e pós-barba ficam disponíveis na loja — é só perguntar ao barbeiro durante o corte.',
   },
 ]
 
@@ -324,4 +340,4 @@ export function whatsappUrl(message: string): string {
 }
 
 export const WHATSAPP_DEFAULT_MESSAGE =
-  'Olá! Vim pelo site da Silverado e gostaria de agendar um horário.'
+  'Olá! Vim pelo site da Silverado e queria marcar um horário.'

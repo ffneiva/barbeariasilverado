@@ -98,12 +98,14 @@ gradiente CSS.
 Resultado: o reflexo virou código. Ele anima (`animate-sheen`), acompanha o
 tema e fica nítido em qualquer densidade de tela.
 
-### 🗺️ O Google Maps só é chamado se você pedir
+### 📋 Uma fonte de verdade para todo o conteúdo
 
-O iframe do Maps custa centenas de kB de script de terceiro e um cookie de
-rastreamento — em toda visita, mesmo de quem nunca olha o mapa. Aqui existe uma
-**facade**: um bloco desenhado só com CSS e um botão. Quem quer o mapa clica;
-quem só quer o endereço não paga por ele.
+Preço, horário, serviço, corte, depoimento e texto institucional vivem num
+arquivo só: [`src/lib/business.ts`](src/lib/business.ts). Dele saem a página, a
+mensagem pronta do WhatsApp e o JSON-LD que o Google indexa — então o preço que
+o visitante lê e o que aparece na busca não têm como divergir.
+
+Mudar um preço é editar uma linha e dar `git push`.
 
 ### 🔐 Deploy sem nenhum segredo guardado
 

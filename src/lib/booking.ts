@@ -106,8 +106,15 @@ export function humanDate(key: string): string {
   }).format(new Date(y, m - 1, d))
 }
 
+/**
+ * Agora que os preços da tabela da parede estão no site, "a partir de" só
+ * aparece onde a própria tabela diz isso (selagem e botox). Antes o rótulo era
+ * "a partir de" para tudo — o que, com preço fechado, soa como se o valor
+ * pudesse subir na hora de pagar.
+ */
 export function priceLabel(service: Service): string {
-  return service.price === null ? 'sob consulta' : `a partir de R$ ${service.price},00`
+  if (service.price === null) return 'sob consulta'
+  return service.fromPrice ? `a partir de R$ ${service.price}` : `R$ ${service.price}`
 }
 
 /**

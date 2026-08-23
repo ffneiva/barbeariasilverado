@@ -21,7 +21,7 @@ export function Faq() {
     <Section id="duvidas">
       <div className="container-x grid gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
         <div>
-          <SectionHeading eyebrow="06 — Dúvidas" title="Antes de você perguntar" />
+          <SectionHeading eyebrow="07 — Dúvidas" title="Antes de você perguntar" />
           <Reveal delay={0.1}>
             <a
               href={whatsappUrl('Olá! Tenho uma dúvida sobre os serviços da Silverado.')}

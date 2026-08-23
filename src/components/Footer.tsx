@@ -9,6 +9,7 @@ const NAV = [
   { id: 'cortes', label: 'Cortes' },
   { id: 'agendar', label: 'Agendar' },
   { id: 'depoimentos', label: 'Depoimentos' },
+  { id: 'loja', label: 'Loja' },
   { id: 'duvidas', label: 'Dúvidas' },
   { id: 'localizacao', label: 'Onde estamos' },
 ]

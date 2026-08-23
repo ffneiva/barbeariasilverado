@@ -11,6 +11,7 @@ import { Services } from '@/sections/Services'
 import { Cuts } from '@/sections/Cuts'
 import { Booking } from '@/sections/Booking'
 import { Testimonials } from '@/sections/Testimonials'
+import { Products } from '@/sections/Products'
 import { Location } from '@/sections/Location'
 import { Faq } from '@/sections/Faq'
 import { FinalCta } from '@/sections/FinalCta'
@@ -123,6 +124,7 @@ export default function App() {
           <Cuts />
           <Booking />
           <Testimonials />
+          <Products />
           <Location />
           <Faq />
           <FinalCta />

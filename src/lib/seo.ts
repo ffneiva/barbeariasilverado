@@ -1,4 +1,4 @@
-import { BUSINESS, CUTS, FAQ, SCHEDULE, SERVICES } from './business.ts'
+import { BUSINESS, CUTS, FAQ, PRODUCTS, SCHEDULE, SERVICES } from './business.ts'
 
 /**
  * JSON-LD para o Google entender que isto é uma barbearia física em Goiânia.
@@ -37,7 +37,7 @@ export function buildJsonLd() {
         email: BUSINESS.email,
         image: `${BUSINESS.url}/og.jpg`,
         logo: `${BUSINESS.url}/images/logo-wordmark.png`,
-        priceRange: 'R$ 40 – R$ 90',
+        priceRange: 'R$ 10 – R$ 90',
         currenciesAccepted: 'BRL',
         paymentAccepted: 'Pix, Dinheiro, Cartão de débito, Cartão de crédito',
         address: {
@@ -64,18 +64,42 @@ export function buildJsonLd() {
         hasOfferCatalog: {
           '@type': 'OfferCatalog',
           name: 'Serviços da Barbearia Silverado',
-          itemListElement: SERVICES.map((service) => ({
-            '@type': 'Offer',
-            itemOffered: {
-              '@type': 'Service',
-              name: service.name,
-              description: service.description,
-            },
-            ...(service.price !== null && {
-              price: service.price.toFixed(2),
+          itemListElement: [
+            ...SERVICES.map((service) => ({
+              '@type': 'Offer',
+              itemOffered: {
+                '@type': 'Service',
+                name: service.name,
+                description: service.description,
+              },
+              ...(service.price !== null && {
+                price: service.price.toFixed(2),
+                priceCurrency: 'BRL',
+                // A tabela marca selagem e botox como piso; o schema tem um campo
+                // próprio para isso, e usá-lo evita anunciar um preço que pode subir.
+                ...(service.fromPrice
+                  ? {
+                      priceSpecification: {
+                        '@type': 'PriceSpecification',
+                        minPrice: service.price.toFixed(2),
+                        priceCurrency: 'BRL',
+                      },
+                    }
+                  : {}),
+              }),
+            })),
+            ...PRODUCTS.map((product) => ({
+              '@type': 'Offer',
+              itemOffered: {
+                '@type': 'Product',
+                name: `${product.name} ${product.size}`,
+                description: product.description,
+              },
+              price: product.price.toFixed(2),
               priceCurrency: 'BRL',
-            }),
-          })),
+              availability: 'https://schema.org/InStore',
+            })),
+          ],
         },
       },
       {
@@ -98,7 +122,7 @@ export function buildJsonLd() {
       {
         '@type': 'ImageGallery',
         '@id': `${BUSINESS.url}/#cortes`,
-        name: 'Cortes de assinatura da Barbearia Silverado',
+        name: 'Cortes feitos na Barbearia Silverado',
         associatedMedia: CUTS.map((cut) => ({
           '@type': 'ImageObject',
           name: cut.name,

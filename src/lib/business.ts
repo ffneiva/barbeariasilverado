@@ -83,12 +83,21 @@ export type Service = {
   description: string
   /** Preço em reais. `null` quando é sob consulta. */
   price: number | null
+  /** Quando true, o preço é um piso ("a partir de"), como na tabela da parede. */
+  fromPrice?: boolean
   /** Duração estimada em minutos — alimenta o gerador de horários do agendamento. */
   minutes: number
   highlight?: boolean
   tag?: string
 }
 
+/**
+ * A tabela de serviços da parede, transcrita.
+ *
+ * `minutes` é estimativa da casa, não vem da tabela — ela existe só para o
+ * agendador saber se o serviço cabe no que resta do turno. Errar dez minutos
+ * aqui não muda o preço nem o atendimento; mudar o preço, sim.
+ */
 export const SERVICES: Service[] = [
   {
     id: 'corte',
@@ -101,48 +110,71 @@ export const SERVICES: Service[] = [
     highlight: true,
   },
   {
+    id: 'barba',
+    name: 'Barba',
+    description: 'Aparo, desenho no formato do seu rosto e acabamento com navalha aberta.',
+    price: 40,
+    minutes: 30,
+    highlight: true,
+  },
+  {
     id: 'corte-barba',
     name: 'Corte + Barba',
     description:
-      'Cabelo e barba na mesma sessão, os dois terminados na lâmina. Você sai com o visual inteiro alinhado.',
+      'Cabelo e barba na mesma sessão, os dois terminados na lâmina. Sai R$ 10 mais barato que separado.',
     price: 70,
     minutes: 70,
     tag: 'Melhor custo',
     highlight: true,
   },
   {
-    id: 'barba',
-    name: 'Barba',
-    description: 'Aparo, desenho no formato do seu rosto e acabamento com navalha aberta.',
-    price: null,
-    minutes: 30,
+    id: 'pezinho',
+    name: 'Acabamento pezinho',
+    description: 'Manutenção do contorno entre um corte e outro. Entra e sai.',
+    price: 10,
+    minutes: 15,
   },
   {
     id: 'sobrancelha',
     name: 'Sobrancelha',
     description: 'Alinhamento no traço natural — limpa o excesso sem tirar a sua expressão.',
-    price: null,
+    price: 10,
     minutes: 15,
   },
   {
-    id: 'pezinho',
-    name: 'Pezinho',
-    description: 'Manutenção do contorno entre um corte e outro. Entra e sai.',
-    price: null,
-    minutes: 15,
-  },
-  {
-    id: 'infantil',
-    name: 'Corte infantil',
-    description:
-      'Criança tem o tempo dela. Avise ao agendar e a gente reserva um horário mais calmo.',
-    price: null,
+    id: 'hidratacao',
+    name: 'Hidratação capilar',
+    description: 'Repõe o que o sol, o boné e a máquina tiram. Deixa o fio mais macio de manejar.',
+    price: 25,
     minutes: 30,
+  },
+  {
+    id: 'selagem',
+    name: 'Selagem / Progressiva',
+    description: 'Reduz o volume e alinha o fio. O valor final depende do comprimento do cabelo.',
+    price: 90,
+    fromPrice: true,
+    minutes: 120,
+  },
+  {
+    id: 'botox',
+    name: 'Botox capilar',
+    description: 'Preenche o fio danificado e devolve brilho, sem alisar. Valor conforme o comprimento.',
+    price: 60,
+    fromPrice: true,
+    minutes: 90,
+  },
+  {
+    id: 'depilacao',
+    name: 'Depilação nariz e orelha',
+    description: 'Cera quente, rápido e no fim do atendimento. Detalhe que ninguém elogia, mas todo mundo nota.',
+    price: 15,
+    minutes: 10,
   },
 ]
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Cortes — as 9 assinaturas da casa
+// Cortes — os 9 modelos do cardápio
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type Cut = {
@@ -156,16 +188,99 @@ export type Cut = {
 }
 
 export const CUTS: Cut[] = [
-  { id: 'degrade', name: 'Degradê', image: 'corte-degrade', family: 'Fade', blurb: 'A transição limpa que virou assinatura da casa. Volume no topo, névoa nas laterais.' },
+  { id: 'degrade', name: 'Degradê', image: 'corte-degrade', family: 'Fade', blurb: 'A transição limpa que virou a marca da casa. Volume no topo, névoa nas laterais.' },
   { id: 'americano', name: 'Americano', image: 'corte-americano', family: 'Clássico', blurb: 'Risca marcada e topo penteado. O clássico que nunca sai do lugar.' },
   { id: 'low-fade', name: 'Low Fade', image: 'corte-low-fade', family: 'Fade', blurb: 'Degradê baixo, discreto. Para quem quer estilo sem chamar atenção.' },
   { id: 'militar', name: 'Militar', image: 'corte-militar', family: 'Clássico', blurb: 'Máquina rente, testa desenhada. Praticidade com acabamento impecável.' },
-  { id: 'degrade-v', name: 'Degradê com V', image: 'corte-degrade-v', family: 'Autoral', blurb: 'A nuca em V feita na lâmina livre. Assinatura visível de longe.' },
+  { id: 'degrade-v', name: 'Degradê com V', image: 'corte-degrade-v', family: 'Autoral', blurb: 'A nuca em V feita na lâmina livre. Detalhe que se vê de longe.' },
   { id: 'skin-fade', name: 'Skin Fade', image: 'corte-skin-fade', family: 'Fade', blurb: 'Da pele ao volume sem nenhum degrau. O teste de fogo de qualquer barbeiro.' },
   { id: 'mid-fade', name: 'Mid Fade', image: 'corte-mid-fade', family: 'Fade', blurb: 'O meio-termo perfeito: nem tão alto, nem tão baixo. Combina com quase todo rosto.' },
   { id: 'mullet', name: 'Mullet', image: 'corte-mullet', family: 'Autoral', blurb: 'Curto na frente, solto atrás. O corte que voltou e ficou.' },
   { id: 'social', name: 'Social', image: 'corte-social', family: 'Clássico', blurb: 'Discreto, alinhado e pronto para qualquer compromisso.' },
 ]
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Produtos — a tabela de produtos da parede
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type Product = {
+  id: string
+  name: string
+  /** Volume ou peso, como está na embalagem. */
+  size: string
+  price: number
+  description: string
+  /**
+   * Slug do arquivo em /images (sem extensão). Opcional: sem foto, o card cai
+   * para um tratamento tipográfico em vez de mostrar um buraco.
+   */
+  image?: string
+}
+
+/** Agrupado por problema que resolve — é assim que o cliente pergunta. */
+export const PRODUCT_GROUPS: Array<{ title: string; blurb: string; items: Product[] }> = [
+  {
+    title: 'Barba que ainda está vindo',
+    blurb:
+      'O combo que o barbeiro monta para quem está fazendo a barba preencher. Ele explica a rotina no atendimento.',
+    items: [
+      {
+        id: 'minoxidil',
+        name: 'Minoxidil manipulado 5%',
+        size: '60 ml',
+        price: 80,
+        description: 'Manipulado, não industrializado. Usado na rotina de crescimento de barba.',
+      },
+      {
+        id: 'derma-roller',
+        name: 'Derma roller',
+        size: 'unidade',
+        price: 35,
+        description: 'Acompanha o minoxidil: prepara a pele antes da aplicação.',
+      },
+      {
+        id: 'oleo-classe-a',
+        name: 'Óleo para barba Classe A',
+        size: '30 ml',
+        price: 35,
+        description: 'Hidrata o fio e a pele por baixo, e tira a coceira da barba em crescimento.',
+        image: 'produto-oleo-classe-a',
+      },
+    ],
+  },
+  {
+    title: 'Para o cabelo ficar em pé em casa',
+    blurb:
+      'As pomadas que o barbeiro usa na finalização. Você leva a mesma lata que passou no seu cabelo.',
+    items: [
+      {
+        id: 'pomada-vision',
+        name: 'Pomada Vision',
+        size: '70 g',
+        price: 30,
+        description: 'Fixação média com brilho. Boa para o dia a dia e fácil de sair no banho.',
+        image: 'produto-pomada-vision',
+      },
+      {
+        id: 'pomada-infinity-80',
+        name: 'Pomada Infinity Classic',
+        size: '80 g',
+        price: 40,
+        description: 'Modeladora, para quem quer o topo firme o dia inteiro.',
+        image: 'produto-pomada-infinity',
+      },
+      {
+        id: 'pomada-infinity-160',
+        name: 'Pomada Infinity Classic',
+        size: '160 g',
+        price: 70,
+        description: 'A mesma pomada no pote grande — sai mais barato por grama.',
+      },
+    ],
+  },
+]
+
+export const PRODUCTS: Product[] = PRODUCT_GROUPS.flatMap((g) => g.items)
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Diferenciais, depoimentos e FAQ
@@ -208,7 +323,7 @@ export const GOOGLE_REVIEWS = { count: 30, rating: 5 }
  * 6h à tarde) × 5, mais 9h no sábado. Não é número redondo de marketing.
  */
 export const STATS = [
-  { value: 9, prefix: '', suffix: '', label: 'cortes de assinatura' },
+  { value: 9, prefix: '', suffix: '', label: 'modelos de corte no cardápio' },
   { value: 54, prefix: '', suffix: 'h', label: 'de atendimento por semana' },
   { value: 40, prefix: 'R$ ', suffix: '', label: 'a partir de' },
   { value: GOOGLE_REVIEWS.count, prefix: '', suffix: '', label: 'avaliações 5 estrelas no Google' },
@@ -303,7 +418,7 @@ export const GOOGLE_PROFILE = 'https://share.google/wN91cRZ1BJSv56FWj'
 export const FAQ = [
   {
     q: 'Preciso agendar ou posso chegar sem hora marcada?',
-    a: 'Pode chegar sem agendar. Mandar mensagem antes só evita que você espere: o barbeiro responde com um horário livre e você chega na hora certa.',
+    a: 'Pode chegar e fazer o encaixe. Mandar mensagem antes só evita que você espere: o barbeiro responde com um horário livre e você chega na hora certa.',
   },
   {
     q: 'Quais formas de pagamento vocês aceitam?',
@@ -326,8 +441,12 @@ export const FAQ = [
     a: 'Avise pelo WhatsApp assim que souber e a gente encaixa você em outro horário.',
   },
   {
+    q: 'Vocês trabalham com plano ou mensalidade?',
+    a: 'Não. Cada serviço tem o preço da tabela e você paga o que usou, quando usar.',
+  },
+  {
     q: 'Vocês vendem os produtos usados no atendimento?',
-    a: 'Vendemos. Pomada, tônico, minoxidil e pós-barba ficam disponíveis na loja — é só perguntar ao barbeiro durante o corte.',
+    a: 'Vendemos. Pomada Vision (R$ 30), Pomada Infinity (R$ 40 ou R$ 70), óleo para barba Classe A (R$ 35), minoxidil manipulado (R$ 80) e derma roller (R$ 35). A lista completa está na seção Loja, aqui do site.',
   },
 ]
 

@@ -23,7 +23,7 @@ export function Location() {
     <Section id="localizacao">
       <div className="container-x">
         <SectionHeading
-          eyebrow="07 — Onde estamos"
+          eyebrow="08 — Onde estamos"
           title="Jardim América, Goiânia"
           lead="Na Avenida C-4, a poucos minutos do Setor Bueno e do Setor Oeste."
         />

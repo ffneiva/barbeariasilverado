@@ -93,9 +93,9 @@ export function Services() {
           title="O que a gente faz"
           lead={
             <>
-              Os preços são a partir de: o valor final depende do comprimento e do tipo de
-              cabelo, e é combinado <em className="text-steel-200 not-italic">antes</em> de a
-              máquina ligar. Nada de surpresa na hora de pagar.
+              Preço fechado, igual ao da tabela na parede. Só selagem, progressiva e botox
+              variam com o comprimento do cabelo — e nesses o valor é combinado{' '}
+              <em className="text-steel-200 not-italic">antes</em> de começar.
             </>
           }
         />

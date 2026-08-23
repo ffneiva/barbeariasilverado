@@ -17,6 +17,7 @@ const LINKS = [
   { id: 'servicos', label: 'Serviços' },
   { id: 'cortes', label: 'Cortes' },
   { id: 'agendar', label: 'Agendar' },
+  { id: 'loja', label: 'Loja' },
   { id: 'localizacao', label: 'Onde estamos' },
 ]
 
@@ -136,7 +137,7 @@ export function Nav({
                 type="button"
                 onClick={() => go(link.id)}
                 className={cn(
-                  'relative rounded-full px-4 py-2 font-mono text-[0.7rem] tracking-[0.16em] uppercase transition-colors duration-300',
+                  'relative rounded-full px-3 py-2 font-mono text-[0.7rem] tracking-[0.16em] uppercase transition-colors duration-300',
                   highlight && active === link.id ? 'text-steel-50' : 'text-steel-500 hover:text-steel-200',
                 )}
               >
@@ -144,7 +145,7 @@ export function Nav({
                 <span
                   aria-hidden
                   className={cn(
-                    'absolute inset-x-4 -bottom-0.5 h-px origin-center bg-steel-300 transition-transform duration-400 ease-[var(--ease-blade)]',
+                    'absolute inset-x-3 -bottom-0.5 h-px origin-center bg-steel-300 transition-transform duration-400 ease-[var(--ease-blade)]',
                     highlight && active === link.id ? 'scale-x-100' : 'scale-x-0',
                   )}
                 />

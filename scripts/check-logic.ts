@@ -77,6 +77,12 @@ check('domingos no horizonte', days.filter((d) => d.closed).length, 2)
 const corte = SERVICES.find((s) => s.id === 'corte')!       // 40 min
 const combo = SERVICES.find((s) => s.id === 'corte-barba')! // 70 min
 
+// Os preços vêm da tabela da parede — se alguém mexer sem querer, o teste acusa.
+check('corte custa R$ 40', corte.price, 40)
+check('combo custa R$ 70', combo.price, 70)
+check('selagem é "a partir de"', SERVICES.find((s) => s.id === 'selagem')!.fromPrice, true)
+check('corte NÃO é "a partir de"', corte.fromPrice, undefined)
+
 const hojeCorte = slotsFor(days[0], corte, base)
 check('hoje/corte — respeita 1h de antecedência', hojeCorte[0], '11:00')
 check('hoje/corte — nada durante o almoço', hojeCorte.some((t) => t >= '12:00' && t < '14:00'), false)
@@ -108,7 +114,7 @@ const msg = draftToMessage({
   name: 'Rafael',
   notes: 'degradê mais baixo',
 })
-check('cita serviço, duração e preço', msg.includes('Corte + Barba (70 min · a partir de R$ 70,00)'), true)
+check('cita serviço, duração e preço', msg.includes('Corte + Barba (70 min · R$ 70)'), true)
 check('cita a data por extenso', msg.includes('quarta-feira, 26 de agosto'), true)
 check('cita o horário', msg.includes('15:30'), true)
 check('cita a observação', msg.includes('degradê mais baixo'), true)

@@ -74,6 +74,7 @@ jobs:
             --exclude "robots.txt" \
             --exclude "sitemap.xml" \
             --exclude "site.webmanifest" \
+            --exclude "google*.html" \
             --cache-control "public,max-age=31536000,immutable"
 
       # 2) O AWS CLI adivinha o Content-Type pelo mimetypes do Python, que não
@@ -118,6 +119,19 @@ jobs:
             --no-progress --content-type "application/manifest+json" \
             --cache-control "public,max-age=86400"
 
+      # Arquivos de verificação de propriedade (Google Search Console e afins).
+      # Cache curto de propósito: se o token for trocado, o novo precisa valer
+      # na hora — um `immutable` de um ano deixaria o Google lendo o antigo.
+      - name: 📤 Arquivos de verificação
+        run: |
+          shopt -s nullglob
+          for f in dist/google*.html; do
+            aws s3 cp "$f" "s3://${{ vars.S3_BUCKET_NAME }}/$(basename "$f")" \
+              --no-progress --content-type "text/html; charset=utf-8" \
+              --cache-control "public,max-age=300"
+            echo "publicado: $(basename "$f")"
+          done
+
       - name: 🔄 Invalidar o CloudFront
         run: |
           ID=$(aws cloudfront create-invalidation \
@@ -156,6 +170,25 @@ jobs:
           echo "https://$CF_DOMAIN/ → $STATUS"
           echo "SITE_URL=https://$CF_DOMAIN" >> "$GITHUB_ENV"
           test "$STATUS" = "200"
+
+      # A distribuição devolve o index.html em qualquer 404, para as rotas da
+      # SPA funcionarem. O efeito colateral é que um arquivo de verificação
+      # ausente responderia 200 com o HTML do site, e o Search Console falharia
+      # com "conteúdo não confere" sem dizer que o arquivo sumiu. Aqui o
+      # conteúdo é comparado byte a byte.
+      - name: 🔎 Conferir arquivos de verificação
+        run: |
+          shopt -s nullglob
+          for f in dist/google*.html; do
+            NAME=$(basename "$f")
+            REMOTO=$(curl -s --max-time 20 "$SITE_URL/$NAME")
+            if [ "$REMOTO" = "$(cat "$f")" ]; then
+              echo "✅ $NAME confere"
+            else
+              echo "::error::$NAME não confere. Servido: $(echo "$REMOTO" | head -c 120)"
+              exit 1
+            fi
+          done
 
       - name: 📋 Resumo
         run: |

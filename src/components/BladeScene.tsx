@@ -213,10 +213,31 @@ function useWindowPointer() {
   return pointer
 }
 
+/** Largura aproximada da navalha, de ponta a ponta, em unidades de cena. */
+const RAZOR_SPAN = 5.6
+
+/**
+ * Escala a navalha para caber na largura visível.
+ *
+ * A câmera é fixa, então o que muda entre telas é a proporção: num desktop
+ * 16:9 cabem ~9 unidades de cena na horizontal; num celular em pé, ~2. Com
+ * escala constante, a mesma navalha que ficava elegante no monitor invadia a
+ * tela inteira do telefone e não dava para entender o que era.
+ *
+ * `viewport` já vem do R3F em unidades de mundo no plano z=0, e é recalculado
+ * no resize — então basta uma regra de três.
+ */
+function useFitScale() {
+  const viewport = useThree((s) => s.viewport)
+  // 0.85 deixa uma folga nas laterais; o piso evita sumir em telas minúsculas.
+  return Math.min(1, Math.max(0.26, (viewport.width * 0.85) / RAZOR_SPAN))
+}
+
 function Razor(props: ThreeElements['group']) {
   const outer = useRef<THREE.Group>(null)
   const inner = useRef<THREE.Group>(null)
   const pointer = useWindowPointer()
+  const fit = useFitScale()
   const blade = useBladeGeometry()
   const handle = useHandleGeometry()
 
@@ -263,7 +284,7 @@ function Razor(props: ThreeElements['group']) {
   })
 
   return (
-    <group ref={outer} {...props}>
+    <group ref={outer} {...props} scale={(props.scale as number) * fit}>
       <group ref={inner}>
         {/* Navalha aberta: o cabo abre em relação à lâmina, como em uso. */}
         <mesh geometry={blade} material={steel} position={[0.35, 0.42, 0]} />
@@ -285,6 +306,7 @@ function Razor(props: ThreeElements['group']) {
  * um borrão que ninguém olha de perto.
  */
 function ContactShadow() {
+  const fit = useFitScale()
   const texture = useMemo(() => {
     const size = 256
     const canvas = document.createElement('canvas')
@@ -306,7 +328,7 @@ function ContactShadow() {
   useEffect(() => () => texture.dispose(), [texture])
 
   return (
-    <mesh position={[0, -1.9, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+    <mesh position={[0, -1.9 * fit, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={fit}>
       <planeGeometry args={[11, 6]} />
       <meshBasicMaterial map={texture} transparent depthWrite={false} />
     </mesh>

@@ -460,7 +460,13 @@ if [ -n "$REPO_META" ]; then
   REPO_ID=$(echo "$REPO_META" | "$PY" -c "import sys,json; print(json.load(sys.stdin)['id'])")
   OWNER_NAME=${GITHUB_REPO%%/*}
   REPO_NAME=${GITHUB_REPO##*/}
-  IMMUTABLE_SUB="repo:${OWNER_NAME}@${OWNER_ID}/${REPO_NAME}@${REPO_ID}:*"
+  # O ID do repositório entra como curinga de propósito. Ele muda se o
+  # repositório for apagado e recriado — e um deploy que quebra por isso é
+  # exatamente o tipo de armadilha que não se lembra na hora. Pinar o ID do
+  # DONO e o nome do repositório já fecha o acesso: ninguém mais consegue criar
+  # um repositório "barbeariasilverado" sob a conta 95257914.
+  IMMUTABLE_SUB="repo:${OWNER_NAME}@${OWNER_ID}/${REPO_NAME}@*:*"
+  echo "  (id do repo atual: ${REPO_ID}, deixado como curinga)" >/dev/null
   ok "Subject imutável: $IMMUTABLE_SUB"
 else
   # Sem rede ou repositório privado: cai para o formato clássico apenas.

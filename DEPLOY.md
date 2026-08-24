@@ -213,6 +213,12 @@ Compare o resultado com a `StringLike` da trust policy. Duas armadilhas comuns:
    `repo:owner@<ownerId>/repo@<repoId>:...`, com IDs numéricos. Foi o caso
    aqui. A policy aceita os dois formatos.
 
+O ID do **repositório** entra na policy como curinga (`barbeariasilverado@*`),
+enquanto o ID do **dono** fica fixo. Motivo: se o repositório for apagado e
+recriado, ele ganha um ID novo e um subject pinado deixaria o deploy morto sem
+explicação. Pinar o dono e o nome já fecha o acesso — ninguém além da conta
+95257914 consegue ter um repositório com esse nome.
+
 **O certificado não sai de `PENDING_VALIDATION`.**
 Quase sempre é o CNAME de validação proxiado no Cloudflare. Coloque a nuvem
 cinza e aguarde.

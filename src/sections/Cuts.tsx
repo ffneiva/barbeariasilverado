@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ArrowRight, X } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, X } from 'lucide-react'
 import { Picture } from '@/components/Picture'
 import { Reveal, SplitHeading } from '@/components/Reveal'
 import { Button } from '@/components/Button'
@@ -31,8 +31,15 @@ function CutCard({ cut, index, onOpen }: { cut: Cut; index: number; onOpen: (cut
       onClick={() => onOpen(cut)}
       data-cut-card
       data-cursor="ver corte"
-      className="group relative w-[78vw] shrink-0 snap-center overflow-hidden text-left sm:w-[52vw] lg:w-[30rem]"
+      className="group relative w-[78vw] shrink-0 snap-center text-left sm:w-[52vw] lg:w-[30rem]"
     >
+      {/*
+        A legenda fica ABAIXO da foto, não por cima dela.
+        Sobreposta, o nome do corte caía em cima do cabelo ou da barba — que é
+        justamente o que a pessoa veio olhar. Nenhum gradiente resolve isso de
+        forma confiável, porque o assunto ocupa uma altura diferente em cada
+        foto (o mullet desce até o ombro; o militar, não).
+      */}
       <div className="relative aspect-3/4 overflow-hidden bg-steel-900">
         <Picture
           name={cut.image}
@@ -41,8 +48,6 @@ function CutCard({ cut, index, onOpen }: { cut: Cut; index: number; onOpen: (cut
           imgClassName="transition-transform duration-[900ms] ease-[var(--ease-blade)] group-hover:scale-[1.06]"
           sizes="(min-width: 1024px) 30rem, 78vw"
         />
-
-        <div aria-hidden className="absolute inset-0 bg-linear-to-t from-void via-void/15 to-transparent" />
         <div aria-hidden className="absolute inset-0 ring-1 ring-steel-800/60 ring-inset" />
 
         {/* Fio de luz que corre pela borda inferior no hover — o "corte". */}
@@ -50,16 +55,19 @@ function CutCard({ cut, index, onOpen }: { cut: Cut; index: number; onOpen: (cut
           aria-hidden
           className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-linear-to-r from-transparent via-steel-100 to-transparent transition-transform duration-700 ease-[var(--ease-blade)] group-hover:scale-x-100"
         />
+      </div>
 
-        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-7">
+      <div className="flex items-start justify-between gap-4 border-x border-b border-steel-900 bg-white/[0.015] p-5 transition-colors duration-500 group-hover:border-steel-700 sm:p-6">
+        <div>
           <span className="label-mono">
             {String(index + 1).padStart(2, '0')} · {cut.family}
           </span>
-          <h3 className="mt-2 text-4xl text-steel-50 sm:text-5xl">{cut.name}</h3>
-          <p className="mt-3 max-w-sm text-sm leading-relaxed text-steel-400 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-            {cut.blurb}
-          </p>
+          <h3 className="mt-1.5 text-3xl text-steel-50 sm:text-4xl">{cut.name}</h3>
         </div>
+        <ArrowUpRight
+          className="mt-1 h-5 w-5 shrink-0 text-steel-700 transition-all duration-400 ease-[var(--ease-blade)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-steel-200"
+          strokeWidth={1.5}
+        />
       </div>
     </button>
   )
@@ -191,7 +199,7 @@ export function Cuts() {
             <Reveal>
               <span className="label-mono flex items-center gap-3">
                 <span aria-hidden className="h-px w-8 bg-steel-700" />
-                03 — Repertório
+                04 — Repertório
               </span>
             </Reveal>
             <div className="mt-5 flex flex-wrap items-end justify-between gap-6">

@@ -28,7 +28,7 @@ export function Location() {
           lead="Na Avenida C-4, a poucos minutos do Setor Bueno e do Setor Oeste."
         />
 
-        <div className="mt-14 grid gap-4 lg:grid-cols-[1.15fr_1fr]">
+        <div className="mt-10 grid gap-3 sm:mt-14 sm:gap-4 lg:grid-cols-[1.15fr_1fr]">
           {/* Mapa */}
           <Reveal className="relative min-h-[22rem] border border-steel-800 lg:min-h-[30rem]">
             <iframe

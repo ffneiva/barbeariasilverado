@@ -12,6 +12,12 @@ import { cn } from '@/lib/utils'
  * mostra os cards; sem nenhuma, mostra o convite para avaliar no Google em vez
  * de um vazio — ou, pior, de elogio inventado.
  *
+ * No celular, os oito cards viram uma faixa horizontal com encaixe. Aqui o
+ * carrossel é a forma certa (ao contrário de serviços e produtos): depoimento
+ * é conteúdo de passeio, não de consulta — ninguém varre a lista procurando um
+ * nome específico, e ler três já convence tanto quanto ler oito. Empilhados,
+ * eram quase mil pixels de rolagem entre o agendamento e o resto da página.
+ *
  * Quando houver volume de avaliações públicas, vale publicar `aggregateRating`
  * no JSON-LD (ver lib/seo). Nota agregada sem review verificável por trás é o
  * tipo de coisa que o Google penaliza.
@@ -47,12 +53,24 @@ export function Testimonials() {
 
         {hasReviews ? (
           <>
-            <ul className="mt-16 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <ul
+              className={cn(
+                'mt-10 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-4 sm:mt-16',
+                '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+                // A partir de md volta a ser grade: aí sobra largura para todos.
+                'md:grid md:snap-none md:grid-cols-2 md:gap-4 md:overflow-visible md:pb-0 xl:grid-cols-4',
+              )}
+            >
               {TESTIMONIALS.map((item, i) => (
-                <Reveal key={item.name} delay={0.06 * i} as="li" className="h-full">
+                <Reveal
+                  key={item.name}
+                  delay={0.06 * i}
+                  as="li"
+                  className="w-[82vw] shrink-0 snap-center sm:w-[58vw] md:w-auto md:shrink"
+                >
                 <figure
                   className={cn(
-                    'flex h-full flex-col gap-6 border border-steel-900 bg-white/[0.015] p-7',
+                    'flex h-full flex-col gap-5 border border-steel-900 bg-white/[0.015] p-5 sm:gap-6 sm:p-7',
                     'transition-colors duration-500 hover:border-steel-700',
                   )}
                 >
@@ -72,7 +90,7 @@ export function Testimonials() {
                     </div>
                   </div>
 
-                  <blockquote className="flex-1 text-sm leading-relaxed text-steel-300">
+                  <blockquote className="flex-1 text-[0.8125rem] leading-relaxed text-steel-300 sm:text-sm">
                     “{item.text}”
                   </blockquote>
 
@@ -90,7 +108,7 @@ export function Testimonials() {
                 href={GOOGLE_PROFILE}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-10 inline-flex items-center gap-2 font-mono text-[0.7rem] tracking-[0.18em] text-steel-500 uppercase transition-colors hover:text-steel-100"
+                className="mt-4 inline-flex sm:mt-10 items-center gap-2 font-mono text-[0.7rem] tracking-[0.18em] text-steel-500 uppercase transition-colors hover:text-steel-100"
               >
                 Ver todas as avaliações no Google
                 <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.6} />

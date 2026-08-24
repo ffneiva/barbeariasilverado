@@ -33,8 +33,10 @@ async function buildOg() {
     .modulate({ brightness: 0.62 })
     .toBuffer()
 
-  const wordmark = await sharp(path.join(PUB, 'images/logo-wordmark.png'))
-    .resize({ width: 620 })
+  // A variante prateada do kit, e não a máscara branca: aqui o logo é composto
+  // direto sobre a foto, sem CSS por cima para dar o acabamento metálico.
+  const wordmark = await sharp(path.join(PUB, 'images/logo-wordmark-prata.png'))
+    .resize({ width: 660 })
     .toBuffer()
 
   // Camadas de texto e vinheta em SVG — nitidez de vetor sobre a foto.
@@ -77,7 +79,7 @@ async function buildOg() {
   await sharp(leather)
     .composite([
       { input: overlay, top: 0, left: 0 },
-      { input: wordmark, top: 186, left: 290 },
+      { input: wordmark, top: 168, left: 270 },
     ])
     .jpeg({ quality: 88, mozjpeg: true })
     .toFile(path.join(PUB, 'og.jpg'))

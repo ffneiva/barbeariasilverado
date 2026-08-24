@@ -121,8 +121,8 @@ export default function App() {
           <Hero ready={ready} />
           <Manifesto />
           <Services />
-          <Cuts />
           <Booking />
+          <Cuts />
           <Testimonials />
           <Products />
           <Location />

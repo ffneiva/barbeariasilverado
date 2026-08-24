@@ -2,14 +2,12 @@ import { cn } from '@/lib/utils'
 import { BUSINESS } from '@/lib/business'
 
 /**
- * O logotipo original é um JPG cinza sobre branco. Em vez de exibi-lo direto —
- * o que colaria um retângulo branco no meio de um site preto — o pipeline de
- * imagens transformou a marca numa silhueta com canal alpha, e aqui ela é usada
- * como **máscara**: o pixel do PNG decide onde aparece, e o que aparece é um
- * degradê cromado em CSS.
+ * O logotipo é aplicado como **máscara**, não como imagem.
  *
- * O ganho é que o brilho passa a ser código: ele acompanha o tema, pode animar
- * (`animate-sheen`) e continua nítido em qualquer densidade de tela.
+ * O PNG do kit da marca (branco com alpha) decide apenas ONDE a marca aparece;
+ * o que aparece é um degradê cromado em CSS. O ganho é que o brilho vira
+ * código: acompanha o tema, pode animar (`animate-sheen`) e continua nítido em
+ * qualquer densidade de tela — coisas que um PNG prateado achatado não faz.
  */
 
 const CHROME_GRADIENT =
@@ -24,9 +22,12 @@ type Props = {
   title?: string
 }
 
+// Proporções medidas nos arquivos gerados por scripts/optimize-images.mjs.
+// Declará-las aqui evita salto de layout: a caixa já nasce com o tamanho certo,
+// antes de o PNG da máscara terminar de baixar.
 const ASSETS = {
-  wordmark: { src: '/images/logo-wordmark.png', aspect: 740 / 221 },
-  mark: { src: '/images/logo-mark.png', aspect: 1 },
+  wordmark: { src: '/images/logo-wordmark.png', aspect: 1400 / 418 },
+  mark: { src: '/images/logo-mark.png', aspect: 212 / 221 },
 }
 
 export function Logo({ variant = 'wordmark', className, animated = false, title }: Props) {

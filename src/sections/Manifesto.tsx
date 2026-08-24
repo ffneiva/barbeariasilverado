@@ -92,7 +92,7 @@ export function Manifesto() {
 
           <p
             data-manifesto-text
-            className="mt-10 max-w-5xl font-display text-[clamp(1.75rem,4.6vw,3.4rem)] leading-[1.12] text-steel-100 uppercase"
+            className="mt-8 max-w-5xl font-display text-[clamp(1.5rem,4.6vw,3.4rem)] leading-[1.14] text-steel-100 uppercase sm:mt-10"
           >
             {MANIFESTO.split(' ').map((word, i) => (
               <span key={`${word}-${i}`} data-manifesto-word className="inline-block opacity-[0.16]">
@@ -113,7 +113,7 @@ export function Manifesto() {
       />
 
       <Section id="numeros" className="pt-16 sm:pt-20 lg:pt-24">
-        <div className="container-x grid gap-14 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-20">
+        <div className="container-x grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-20">
           <Reveal className="relative">
             <div data-manifesto-photo className="relative aspect-4/3 overflow-hidden">
               <Picture
@@ -146,7 +146,7 @@ export function Manifesto() {
               </p>
             </Reveal>
 
-            <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:grid-cols-2">
+            <div className="mt-9 grid grid-cols-2 gap-x-6 gap-y-8 sm:mt-12 sm:grid-cols-4 sm:gap-y-10 lg:grid-cols-2">
               {STATS.map((stat, i) => (
                 <Reveal key={stat.label} delay={0.06 * i}>
                   <div className="border-t border-steel-800 pt-4">

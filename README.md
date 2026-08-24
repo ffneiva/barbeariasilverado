@@ -7,7 +7,7 @@
 **Landing page da [Barbearia Silverado](https://barbeariasilverado.com.br)** — Jardim América, Goiânia/GO
 
 Um site de barbearia que carrega em menos de 1 s, custa quase nada por mês
-e transforma uma visita em uma mensagem de WhatsApp já preenchida.
+e transforma uma visita numa mensagem de WhatsApp já preenchida.
 
 <br>
 
@@ -29,9 +29,21 @@ A barbearia tinha um Google Sites: nove fotos de corte, um endereço e um botão
 de WhatsApp. Funcionava — e era exatamente igual ao de todas as outras
 barbearias da cidade. O briefing foi curto: **parecer caro sem cobrar caro.**
 
-E havia uma restrição dura: **custo operacional zero**. Nada de servidor, nada
-de banco, nada de assinatura mensal de plataforma de agendamento. O que existe
+Havia uma restrição dura junto: **custo operacional zero**. Nada de servidor,
+nada de banco, nada de mensalidade de plataforma de agendamento. O que existe
 aqui precisa caber no free tier e continuar funcionando sozinho.
+
+E havia uma armadilha que só apareceu depois. A primeira versão foi construída
+em cima de "hora marcada de verdade" — um diferencial que **eu inventei**. As
+30 avaliações reais do Google apontavam outro, repetido por clientes que não se
+conhecem:
+
+> *"sabe entender agente e o jeito que agente quer, não igual a uns que só faz
+> do jeito que eles gostam"* · *"Fez exatamente o que pedi"* ·
+> *"o corte saiu do jeito que eu pedi"*
+
+O site inteiro foi reescrito em cima disso. É a lição mais cara do projeto:
+**o diferencial estava nos dados, não na minha cabeça.**
 
 ---
 
@@ -90,13 +102,37 @@ manhã dele.
 
 ### 🎭 O logotipo virou máscara, não imagem
 
-O logo original é um JPG cinza sobre fundo branco — inútil num site preto. O
-pipeline de imagens extrai a silhueta por limiar de luminância e o componente
-`<Logo>` usa esse PNG como `mask-image`, com o brilho cromado vindo de um
-gradiente CSS.
+O PNG do kit da marca decide apenas **onde** a marca aparece; o que aparece é
+um degradê cromado em CSS, através de `mask-image`.
 
 Resultado: o reflexo virou código. Ele anima (`animate-sheen`), acompanha o
-tema e fica nítido em qualquer densidade de tela.
+tema e fica nítido em qualquer densidade de tela — coisas que um PNG prateado
+achatado não faz.
+
+Antes de o kit oficial existir, o pipeline extraía a silhueta de um JPG cinza
+sobre branco por limiar de luminância. Funcionava, mas perdia a palavra
+"BARBEARIA" do lockup e comia a borda do "o" final. Com o arquivo de origem
+certo, o trabalho virou recortar a moldura transparente e redimensionar.
+
+### 📱 Densidade no celular, sem esconder informação
+
+Duas sugestões chegaram sobre o excesso de rolagem no mobile. A segunda pedia
+carrossel horizontal em serviços e produtos — e essa eu não segui.
+
+Preço é **informação de consulta**: a pessoa varre a lista procurando o item
+dela. O que sai da tela num carrossel horizontal simplesmente não é
+encontrado, e a seção mais importante do site viraria uma vitrine de três
+itens.
+
+O que resolveu o problema real foi mudar a **forma** do card, não escondê-lo:
+até `sm`, cada serviço vira uma linha densa (nome e preço na mesma altura,
+descrição em duas linhas); a partir daí volta a ser card. Nada sai da página —
+só fica mais apertado onde a tela é estreita. Nove serviços caíram de ~1.800 px
+para ~700 px.
+
+Onde o carrossel **é** a forma certa: depoimentos. Ali o conteúdo é de passeio,
+não de consulta — ninguém procura um nome específico, e ler três convence tanto
+quanto ler oito.
 
 ### 📋 Uma fonte de verdade para todo o conteúdo
 
@@ -174,7 +210,8 @@ montada para quem tem `prefers-reduced-motion` ligado.
 
 As fontes são auto-hospedadas (só os subsets `latin` e `latin-ext`, ~240 kB no
 total), o que tira o Google Fonts do caminho crítico: menos uma conexão TLS a um
-terceiro antes do primeiro texto pintar.
+terceiro antes do primeiro texto pintar. A família de texto é a **Inter** — que
+é, por coincidência feliz, a tipografia oficial do kit da marca.
 
 ---
 
@@ -184,6 +221,8 @@ Nada do que se mexe é necessário para usar o site.
 
 - `prefers-reduced-motion` desliga **tudo**: preloader, scroll suave, cursor
   customizado, parallax, revelações e a cena 3D inteira.
+- A legenda de cada corte fica **abaixo** da foto, nunca por cima: sobreposta,
+  o nome caía em cima do cabelo ou da barba, que é o que a pessoa veio ver.
 - A galeria de cortes só sequestra o scroll no desktop. No celular vale a
   rolagem horizontal nativa com `snap` — sequestrar o gesto numa tela pequena
   confunde mais do que encanta.
@@ -267,6 +306,8 @@ outras verificações via.
 │   ├── optimize-images.mjs   assets-src → public/images + manifest com LQIP
 │   ├── generate-og.mjs       cartão social, favicons, manifest, robots, sitemap
 │   ├── fetch-fonts.mjs       baixa os subsets do Google Fonts
+│   ├── check-logic.ts        asserções de horário e agendamento
+│   ├── check-dev.mjs         sobe o dev server e percorre o grafo
 │   ├── aws-setup.sh          provisiona toda a infraestrutura (idempotente)
 │   └── aws-attach-domain.sh  anexa o domínio quando o certificado sai
 └── src/
@@ -276,7 +317,8 @@ outras verificações via.
     │   ├── booking.ts        grade de horários e mensagem do WhatsApp
     │   └── seo.ts            JSON-LD
     ├── components/           Logo, Cursor, Preloader, BladeScene, Nav…
-    ├── sections/             Hero, Manifesto, Serviços, Cortes, Agendar…
+    ├── sections/             Hero, Manifesto, Serviços, Agendar, Cortes,
+    │                         Depoimentos, Loja, Dúvidas, Localização
     └── pages/Privacy.tsx
 ```
 

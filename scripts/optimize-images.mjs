@@ -28,47 +28,36 @@ function profileFor(name) {
 }
 
 /**
- * Os logos vieram em JPG com fundo branco chapado. Como o site é escuro, o
- * branco precisa virar alpha.
+ * Os logos agora vêm do kit oficial da marca: PNG com canal alpha correto.
  *
- * Um `alpha = 1 - luminância` ingênuo não serve: o logotipo é um degradê
- * prateado cujo topo chega perto de #d0d0d0, e ele sairia semitransparente.
- * O histograma do arquivo original separa bem as duas populações — corpo do
- * traço entre 128 e 223, fundo acima de 240 —, então o corte é feito por
- * limiar com uma rampa estreita no meio, que preserva o antialiasing das bordas
- * sem comer o miolo das letras.
+ * A versão anterior recebia um JPG cinza sobre fundo branco (extraído do
+ * Google Sites) e recortava o fundo por limiar de luminância — heurística que
+ * funcionava, mas perdia a palavra "BARBEARIA" do lockup e comia a borda do
+ * "o" final. Com o arquivo de origem certo, o trabalho aqui virou o mínimo:
+ * recortar a moldura transparente e redimensionar.
  *
- * O RGB é reescrito como prata clara para o PNG também funcionar sozinho (é
- * assim que ele entra no cartão de compartilhamento). No site, o componente
- * <Logo> usa este arquivo apenas como `mask-image`, então lá só o alpha conta.
+ * O RGB é forçado para branco puro porque o <Logo> usa este arquivo como
+ * `mask-image` — ali só o alpha conta, e um RGB previsível evita surpresa se
+ * algum dia ele for exibido direto. A versão prateada do kit é preservada
+ * separadamente, para o cartão de compartilhamento.
  */
-const SOLID_BELOW = 200 // abaixo disto é traço puro
-const CLEAR_ABOVE = 244 // acima disto é fundo puro
+async function logoToMaskPng(inputPath, outPath, width, { keepColor = false } = {}) {
+  const base = sharp(inputPath).trim({ threshold: 1 }).resize({ width, withoutEnlargement: true })
 
-async function logoToTransparentPng(inputPath, outPath, width) {
-  const img = sharp(inputPath).resize({ width, withoutEnlargement: true })
-  const { data, info } = await img.raw().toBuffer({ resolveWithObject: true })
-  const { width: w, height: h, channels } = info
-
-  const rgba = Buffer.alloc(w * h * 4)
-  for (let i = 0, p = 0; i < data.length; i += channels, p += 4) {
-    const lum = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114
-
-    const alpha =
-      lum <= SOLID_BELOW ? 1 : lum >= CLEAR_ABOVE ? 0 : (CLEAR_ABOVE - lum) / (CLEAR_ABOVE - SOLID_BELOW)
-
-    // Reescala 128–200 para 170–255: mantém a direção do degradê original,
-    // mas num prata que aparece sobre preto.
-    const shade = Math.round(170 + Math.min(1, Math.max(0, (lum - 128) / 72)) * 85)
-
-    rgba[p] = shade
-    rgba[p + 1] = shade
-    rgba[p + 2] = Math.min(255, shade + 4) // um fio de azul: aço, não cinza
-    rgba[p + 3] = Math.round(alpha * 255)
+  if (keepColor) {
+    await base.png({ compressionLevel: 9 }).toFile(outPath)
+    return
   }
 
-  await sharp(rgba, { raw: { width: w, height: h, channels: 4 } })
-    .png({ compressionLevel: 9, palette: false })
+  const { data, info } = await base.ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = 255
+    data[i + 1] = 255
+    data[i + 2] = 255
+  }
+
+  await sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } })
+    .png({ compressionLevel: 9 })
     .toFile(outPath)
 }
 
@@ -82,8 +71,12 @@ async function main() {
     const input = path.join(SRC, file)
 
     if (name.startsWith('logo-')) {
-      await logoToTransparentPng(input, path.join(OUT, `${name}.png`), name === 'logo-mark' ? 512 : 1024)
-      console.log(`✓ ${name}.png (alpha)`)
+      // A variante prateada mantém a cor: ela é composta direto sobre a foto
+      // de couro no cartão de compartilhamento, sem máscara CSS por cima.
+      const keepColor = name.endsWith('-prata')
+      const width = name === 'logo-mark' ? 512 : 1400
+      await logoToMaskPng(input, path.join(OUT, `${name}.png`), width, { keepColor })
+      console.log(`✓ ${name}.png (${keepColor ? 'cor original' : 'máscara'})`)
       continue
     }
 

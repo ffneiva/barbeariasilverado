@@ -72,14 +72,14 @@ export function Booking() {
 
       <div className="container-x">
         <SectionHeading
-          eyebrow="04 — Agendamento"
+          eyebrow="03 — Agendamento"
           title="Escolha e mande no WhatsApp"
           lead="Monte o pedido aqui e a mensagem chega pronta no WhatsApp do barbeiro. Ele confirma o horário e está fechado."
           align="center"
         />
 
         <Reveal delay={0.1}>
-          <div className="mx-auto mt-14 max-w-3xl border border-steel-800 bg-white/[0.02]">
+          <div className="mx-auto mt-10 max-w-3xl border border-steel-800 bg-white/[0.02] sm:mt-14">
             {/* Trilho de passos */}
             <ol className="flex border-b border-steel-900">
               {STEPS.map((label, i) => (

@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
 import { buildJsonLd } from './src/lib/seo.ts'
+import { ROUTES, canonicalFor } from './src/lib/routes.ts'
 
 /**
  * Injeta o JSON-LD no index.html em tempo de build.
@@ -28,8 +29,72 @@ function jsonLdPlugin(): Plugin {
   }
 }
 
+
+/**
+ * Gera um HTML estático por rota, a partir do index.html já construído.
+ *
+ * Sem isto, /agendar e /loja seriam servidos com o mesmo `<head>` da home: o
+ * mesmo título, a mesma description, a mesma canonical. Três consequências
+ * concretas — o robô do Google Ads avalia a página de destino e veria conteúdo
+ * genérico; o Search Console acusaria títulos duplicados; e o link colado no
+ * WhatsApp mostraria a prévia errada.
+ *
+ * O truque é barato: o app continua sendo uma SPA (mesmo bundle, mesmo CSS),
+ * só o `<head>` muda por arquivo. Cada rota vira `dist/<rota>/index.html`, e
+ * uma CloudFront Function reescreve a URL sem extensão para esse caminho.
+ */
+function perRouteHtmlPlugin(): Plugin {
+  return {
+    name: 'silverado-rotas-estaticas',
+    apply: 'build',
+    enforce: 'post',
+    generateBundle(_options, bundle) {
+      const index = bundle['index.html']
+      if (!index || index.type !== 'asset') return
+      const base = String(index.source)
+
+      for (const route of ROUTES) {
+        if (route.path === '/') continue
+
+        const html = base
+          .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(route.title)}</title>`)
+          .replace(
+            /(<meta\s+name="description"\s+content=")[^"]*(")/,
+            `$1${escapeHtml(route.description)}$2`,
+          )
+          .replace(
+            /(<link rel="canonical" href=")[^"]*(")/,
+            `$1${canonicalFor(route)}$2`,
+          )
+          .replace(
+            /(<meta property="og:title" content=")[^"]*(")/,
+            `$1${escapeHtml(route.title)}$2`,
+          )
+          .replace(
+            /(<meta property="og:url" content=")[^"]*(")/,
+            `$1${canonicalFor(route)}$2`,
+          )
+          .replace(
+            /(<meta name="twitter:title" content=")[^"]*(")/,
+            `$1${escapeHtml(route.title)}$2`,
+          )
+
+        this.emitFile({
+          type: 'asset',
+          fileName: `${route.path.replace(/^\//, '')}/index.html`,
+          source: html,
+        })
+      }
+    },
+  }
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
 export default defineConfig({
-  plugins: [react(), tailwindcss(), jsonLdPlugin()],
+  plugins: [react(), tailwindcss(), jsonLdPlugin(), perRouteHtmlPlugin()],
   resolve: {
     alias: { '@': path.resolve(import.meta.dirname, 'src') },
   },

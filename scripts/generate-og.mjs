@@ -12,6 +12,7 @@
 import sharp from 'sharp'
 import { writeFile } from 'node:fs/promises'
 import path from 'node:path'
+import { ROUTES, canonicalFor } from '../src/lib/routes.ts'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const PUB = path.join(ROOT, 'public')
@@ -140,22 +141,26 @@ async function buildSeoFiles() {
     `User-agent: *\nAllow: /\n\nSitemap: https://${SITE.url}/sitemap.xml\n`,
   )
 
+  // O sitemap é derivado de src/lib/routes.ts — a mesma lista que o roteador e
+  // o gerador de HTML por rota consomem. Rota nova entra no sitemap sozinha; a
+  // alternativa (manter uma cópia aqui) é a que envelhece calada.
+  const prioridade = { '/': '1.0', '/agendar': '0.9', '/loja': '0.8' }
+  const frequencia = { '/politica-de-privacidade': 'yearly' }
+
+  const urls = ROUTES.map(
+    (route) => `  <url>
+    <loc>${canonicalFor(route)}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${frequencia[route.path] ?? 'monthly'}</changefreq>
+    <priority>${prioridade[route.path] ?? '0.3'}</priority>
+  </url>`,
+  ).join('\n')
+
   await writeFile(
     path.join(PUB, 'sitemap.xml'),
     `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://${SITE.url}/</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://${SITE.url}/politica-de-privacidade</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
+${urls}
 </urlset>
 `,
   )

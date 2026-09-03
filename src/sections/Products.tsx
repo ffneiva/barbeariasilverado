@@ -94,17 +94,19 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
   )
 }
 
-export function Products() {
+export function Products({ showHeading = true }: { showHeading?: boolean } = {}) {
   return (
     <Section id="loja">
       <div className="container-x">
-        <SectionHeading
-          eyebrow="06 — Na loja"
-          title="Leve o que passou no seu cabelo"
-          lead="Os mesmos produtos que o barbeiro usa na cadeira ficam à venda no balcão. Preço fechado, sem pacote e sem mensalidade."
-        />
+        {showHeading && (
+          <SectionHeading
+            eyebrow="06 — Na loja"
+            title="Leve o que passou no seu cabelo"
+            lead="Os mesmos produtos que o barbeiro usa na cadeira ficam à venda no balcão. Preço fechado, sem pacote e sem mensalidade."
+          />
+        )}
 
-        <div className="mt-10 space-y-10 sm:mt-16 sm:space-y-16">
+        <div className={showHeading ? 'mt-10 space-y-10 sm:mt-16 sm:space-y-16' : 'space-y-10 sm:space-y-16'}>
           {PRODUCT_GROUPS.map((group, gi) => (
             <div key={group.title}>
               <Reveal>

@@ -16,15 +16,22 @@ import { Location } from '@/sections/Location'
 import { Faq } from '@/sections/Faq'
 import { FinalCta } from '@/sections/FinalCta'
 import { Privacy } from '@/pages/Privacy'
+import { Agendar } from '@/pages/Agendar'
+import { Loja } from '@/pages/Loja'
+import { routeFor } from '@/lib/routes'
+import { useRouteMeta } from '@/hooks/useRouteMeta'
 import { scrollToSection, useSmoothScroll } from '@/hooks/useSmoothScroll'
 
 /**
- * Roteador de 20 linhas.
+ * Roteador de ~30 linhas.
  *
- * O site tem exatamente duas telas — a landing e a política de privacidade —,
- * o que não justifica os ~15 kB do react-router. A History API resolve, e o
- * CloudFront já está configurado para devolver o index.html em qualquer 404,
- * então `/politica-de-privacidade` funciona também quando digitado direto.
+ * São quatro telas — a landing, /agendar, /loja e a política de privacidade —,
+ * o que ainda não justifica os ~15 kB do react-router. A History API resolve.
+ *
+ * As rotas e seus metadados vivem em lib/routes.ts, que também é lido pelo
+ * build para gerar um HTML estático por rota: assim /agendar e /loja chegam ao
+ * robô do Google Ads e ao leitor de link do WhatsApp já com título e descrição
+ * próprios, sem depender de a aplicação rodar.
  */
 function usePath() {
   const [path, setPath] = useState(() => window.location.pathname)
@@ -36,6 +43,7 @@ function usePath() {
   }, [])
 
   const navigate = useCallback((next: string) => {
+    if (next === window.location.pathname) return
     window.history.pushState({}, '', next)
     setPath(next)
     window.scrollTo({ top: 0, behavior: 'instant' })
@@ -46,35 +54,32 @@ function usePath() {
 
 export default function App() {
   const { path, navigate } = usePath()
-  const isPrivacy = path.startsWith('/politica-de-privacidade')
+  const route = routeFor(path)
+  const isHome = route.path === '/'
+
+  useRouteMeta(route)
+  useSmoothScroll()
 
   /**
    * O preloader só existe para a primeira visita à home.
    *
    * A decisão é congelada no estado inicial (avaliado uma única vez) e não
-   * derivada de `path`: assim quem entra direto na política de privacidade não
-   * assiste a uma cortina que não faz sentido ali, e quem navega entre as duas
-   * rotas não vê a abertura de novo — o componente segue montado, com o próprio
-   * estado interno lembrando que já terminou.
+   * derivada de `path`: quem cai direto em /agendar vindo de um anúncio não
+   * pode esperar uma cortina antes de ver o agendamento, e quem navega entre
+   * as rotas depois não vê a abertura de novo.
    */
-  const [showPreloader] = useState(
-    () => !window.location.pathname.startsWith('/politica-de-privacidade'),
-  )
+  const [showPreloader] = useState(() => routeFor(window.location.pathname).path === '/')
 
   // `ready` libera a coreografia de entrada do Hero. Sem preloader não há o que
-  // esperar — e sem isto o <h1> ficaria preso no translateY inicial, invisível,
-  // para quem chegasse à home vindo da política de privacidade.
+  // esperar — e sem isto o <h1> ficaria preso no translateY inicial, invisível.
   const [ready, setReady] = useState(!showPreloader)
-
-  useSmoothScroll()
-
   const onDone = useCallback(() => setReady(true), [])
 
   /**
    * Leva a uma seção da home a partir de qualquer rota.
    *
-   * Na página de privacidade as seções não estão montadas, então rolar até elas
-   * é impossível: primeiro volta-se para "/" e só depois — com o React já tendo
+   * Fora da home as seções não estão montadas, então rolar até elas é
+   * impossível: primeiro volta-se para "/" e só depois — com o React já tendo
    * pintado a home — é que a rolagem acontece. Os dois `requestAnimationFrame`
    * aninhados garantem esse "depois" sem `setTimeout` chutado.
    */
@@ -89,13 +94,6 @@ export default function App() {
     },
     [navigate],
   )
-
-  // O título acompanha a rota — importante para histórico e compartilhamento.
-  useEffect(() => {
-    document.title = isPrivacy
-      ? 'Política de privacidade · Barbearia Silverado'
-      : 'Barbearia Silverado · Barbearia no Jardim América, Goiânia'
-  }, [isPrivacy])
 
   return (
     <>
@@ -114,9 +112,11 @@ export default function App() {
 
       <Nav onSection={goToSection} path={path} />
 
-      {isPrivacy ? (
-        <Privacy onBack={() => navigate('/')} />
-      ) : (
+      {route.path === '/agendar' && <Agendar onNavigate={navigate} />}
+      {route.path === '/loja' && <Loja onNavigate={navigate} />}
+      {route.path === '/politica-de-privacidade' && <Privacy onBack={() => navigate('/')} />}
+
+      {isHome && (
         <main id="conteudo">
           <Hero ready={ready} />
           <Manifesto />
@@ -125,8 +125,8 @@ export default function App() {
           <Cuts />
           <Testimonials />
           <Products />
-          <Location />
           <Faq />
+          <Location />
           <FinalCta />
         </main>
       )}

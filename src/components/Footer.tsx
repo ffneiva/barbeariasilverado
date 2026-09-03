@@ -3,6 +3,18 @@ import { InstagramIcon } from './BrandIcons'
 import { Logo } from './Logo'
 import { BUSINESS, SCHEDULE_SUMMARY } from '@/lib/business'
 
+/**
+ * Links de página de verdade (com href), não âncoras.
+ *
+ * O `href` importa: é ele que o rastreador do Google segue e que o usuário vê
+ * ao passar o mouse. O `preventDefault` mantém a navegação instantânea do
+ * cliente, sem recarregar tudo.
+ */
+const PAGES = [
+  { path: '/agendar', label: 'Agendar horário' },
+  { path: '/loja', label: 'Loja' },
+]
+
 const NAV = [
   { id: 'manifesto', label: 'A casa' },
   { id: 'servicos', label: 'Serviços' },
@@ -65,6 +77,26 @@ export function Footer({
                   >
                     {item.label}
                   </button>
+                </li>
+              ))}
+            </ul>
+
+            {/* Páginas próprias: são o destino dos anúncios e, aqui, o link
+                interno que o Google segue para descobri-las. */}
+            <span className="label-mono mt-7 block">Páginas</span>
+            <ul className="mt-4 space-y-2.5">
+              {PAGES.map((page) => (
+                <li key={page.path}>
+                  <a
+                    href={page.path}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      onNavigate(page.path)
+                    }}
+                    className="text-sm text-steel-400 transition-colors hover:text-steel-100"
+                  >
+                    {page.label}
+                  </a>
                 </li>
               ))}
             </ul>

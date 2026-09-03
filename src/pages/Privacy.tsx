@@ -5,10 +5,15 @@ import { BUSINESS } from '@/lib/business'
 /**
  * Política de privacidade.
  *
- * O texto descreve o que o site realmente faz — que é quase nada: página
- * estática, sem formulário que salve dados, sem cookie próprio, sem analytics.
- * Documentar isso é mais útil (e mais defensável perante a LGPD) do que colar
- * um modelo genérico cheio de cláusulas sobre tratamentos que não existem.
+ * O texto descreve o que o site realmente faz, e só isso: página estática, sem
+ * formulário que salve dados e sem cookie próprio — mas COM a tag do Google
+ * Ads, que grava cookie de terceiro e é a única coleta que existe aqui.
+ *
+ * Descrever o tratamento real é mais útil (e mais defensável perante a LGPD)
+ * do que colar um modelo genérico. E é por isso que este arquivo precisa ser
+ * revisado toda vez que uma ferramenta de terceiro entra no site: a versão
+ * anterior dizia "não usamos ferramentas de análise", o que deixou de ser
+ * verdade no minuto em que a tag do Ads foi adicionada.
  */
 export function Privacy({ onBack }: { onBack: () => void }) {
   return (
@@ -25,7 +30,7 @@ export function Privacy({ onBack }: { onBack: () => void }) {
       <Logo variant="wordmark" className="mt-12 w-40" />
 
       <h1 className="mt-8 text-[clamp(2.2rem,6vw,3.75rem)] text-steel-100">Política de privacidade</h1>
-      <p className="label-mono mt-4">Última atualização: agosto de 2026</p>
+      <p className="label-mono mt-4">Última atualização: setembro de 2026</p>
 
       <div className="mt-12 max-w-3xl space-y-10 text-steel-400">
         <section>
@@ -45,9 +50,16 @@ export function Privacy({ onBack }: { onBack: () => void }) {
         <section>
           <h2 className="text-2xl text-steel-100">2. Quais dados coletamos</h2>
           <p className="mt-4 leading-relaxed">
-            <strong className="text-steel-200">Nenhum.</strong> Este é um site estático: não há
-            formulário que envie dados para nós, não há cadastro, não há área logada e não usamos
-            cookies próprios nem ferramentas de análise de audiência.
+            <strong className="text-steel-200">Nós, diretamente, nenhum.</strong> Este é um site
+            estático: não há formulário que envie dados para nós, não há cadastro, não há área
+            logada e não usamos cookies próprios.
+          </p>
+          <p className="mt-4 leading-relaxed">
+            Existe, porém, uma exceção que precisa ficar clara: o site carrega a{' '}
+            <strong className="text-steel-200">tag do Google Ads</strong>, usada para medir se
+            quem clicou num anúncio da barbearia chegou até aqui. Ela grava cookies do Google no
+            seu navegador e informa ao Google a página visitada, a data e o horário. Os detalhes
+            estão na seção seguinte.
           </p>
           <p className="mt-4 leading-relaxed">
             O que você digita no agendador (serviço, dia, horário, nome e observação) nunca sai do
@@ -70,6 +82,24 @@ export function Privacy({ onBack }: { onBack: () => void }) {
               embute um mapa do Google. Ele é carregado de forma preguiçosa — só quando você
               rola até ele —, mas a partir daí o Google poderá registrar seu IP e seus dados
               de navegação, conforme a política de privacidade dele.
+            </li>
+            <li>
+              <strong className="text-steel-200">Google Ads.</strong> A barbearia anuncia no
+              Google, e a tag de conversão (<code className="text-steel-300">gtag.js</code>)
+              registra que uma visita chegou a esta página. Isso permite ao Google atribuir a
+              visita a um anúncio e cobrar corretamente por ela. A tag grava cookies do Google e
+              pode ser usada para publicidade personalizada. Você pode desativar a personalização
+              de anúncios em{' '}
+              <a
+                href="https://myadcenter.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-steel-200 underline underline-offset-4"
+              >
+                myadcenter.google.com
+              </a>
+              , ou bloquear cookies de terceiros nas configurações do seu navegador — o site
+              continua funcionando igual.
             </li>
             <li>
               <strong className="text-steel-200">Instagram (Meta).</strong> Os links levam ao perfil

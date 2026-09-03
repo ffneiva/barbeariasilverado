@@ -32,7 +32,7 @@ import { cn } from '@/lib/utils'
 
 const STEPS = ['Serviço', 'Dia', 'Horário', 'Confirmar'] as const
 
-export function Booking() {
+export function Booking({ showHeading = true }: { showHeading?: boolean } = {}) {
   const [step, setStep] = useState(0)
   const [draft, setDraft] = useState<BookingDraft>(EMPTY_DRAFT)
 
@@ -71,12 +71,14 @@ export function Booking() {
       />
 
       <div className="container-x">
+        {showHeading && (
         <SectionHeading
           eyebrow="03 — Agendamento"
           title="Escolha e mande no WhatsApp"
           lead="Monte o pedido aqui e a mensagem chega pronta no WhatsApp do barbeiro. Ele confirma o horário e está fechado."
           align="center"
         />
+        )}
 
         <Reveal delay={0.1}>
           <div className="mx-auto mt-10 max-w-3xl border border-steel-800 bg-white/[0.02] sm:mt-14">

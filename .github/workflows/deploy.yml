@@ -70,7 +70,7 @@ jobs:
           aws s3 sync dist/ "s3://${{ vars.S3_BUCKET_NAME }}" \
             --delete \
             --no-progress \
-            --exclude "index.html" \
+            --exclude "*index.html" \
             --exclude "robots.txt" \
             --exclude "sitemap.xml" \
             --exclude "site.webmanifest" \
@@ -96,14 +96,22 @@ jobs:
             --cache-control "public,max-age=31536000,immutable" \
             --metadata-directive REPLACE
 
-      # 3) O index.html referencia os assets com hash: se ele ficar em cache,
+      # 3) Os index.html referenciam os assets com hash: se ficarem em cache,
       #    o visitante continua vendo a versão antiga do site.
-      - name: 📤 index.html (sem cache)
+      #
+      #    São vários agora — o build gera um por rota (dist/agendar/index.html
+      #    e afins), cada um com título, description e canonical próprios. Um
+      #    laço evita que uma rota nova seja esquecida aqui.
+      - name: 📤 index.html de todas as rotas (sem cache)
         run: |
-          aws s3 cp dist/index.html "s3://${{ vars.S3_BUCKET_NAME }}/index.html" \
-            --no-progress \
-            --content-type "text/html; charset=utf-8" \
-            --cache-control "no-cache,must-revalidate"
+          while IFS= read -r f; do
+            KEY="${f#dist/}"
+            aws s3 cp "$f" "s3://${{ vars.S3_BUCKET_NAME }}/$KEY" \
+              --no-progress \
+              --content-type "text/html; charset=utf-8" \
+              --cache-control "no-cache,must-revalidate"
+            echo "publicado: /$KEY"
+          done < <(find dist -name 'index.html')
 
       - name: 📤 Arquivos de SEO e manifest
         run: |
@@ -162,6 +170,18 @@ jobs:
           if [ "$STATUS" = "200" ]; then
             echo "✅ https://barbeariasilverado.com.br/ → 200"
             echo "SITE_URL=https://barbeariasilverado.com.br" >> "$GITHUB_ENV"
+
+            # As páginas de anúncio precisam responder com o título DELAS. Se a
+            # reescrita da CloudFront Function quebrar, a URL ainda devolve 200
+            # — só que com a home inteira dentro. Conferir o título pega isso.
+            for rota in agendar loja; do
+              TITULO=$(curl -s --max-time 20 "https://barbeariasilverado.com.br/$rota" | grep -o '<title>[^<]*</title>')
+              echo "  /$rota → $TITULO"
+              case "$TITULO" in
+                *"$rota"*|*Agendar*|*Loja*) ;;
+                *) echo "::error::/$rota não está servindo o HTML próprio da rota"; exit 1 ;;
+              esac
+            done
             exit 0
           fi
 

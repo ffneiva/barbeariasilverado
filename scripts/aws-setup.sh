@@ -185,10 +185,16 @@ FUNCTION_NAME="barbeariasilverado-redirect"
 
 cat > "$TMP_DIR/silverado-redirect.js" <<EOF
 /**
- * Consolida o tráfego em https://$DOMAIN.
+ * Roda na borda, antes de qualquer requisição chegar ao S3.
  *
- * Duas URLs servindo o mesmo conteúdo dividem sinal de SEO e confundem o
- * Search Console. O 301 é feito na borda — antes de qualquer requisição ao S3.
+ * 1. Consolida o tráfego em https://$DOMAIN — duas URLs servindo o mesmo
+ *    conteúdo dividem sinal de SEO.
+ *
+ * 2. Traduz URL de diretório para o objeto real no S3. O build gera
+ *    dist/agendar/index.html, mas o anúncio aponta para /agendar. Sem esta
+ *    reescrita o S3 devolveria 404 e o CustomErrorResponse serviria o
+ *    index.html da home: a página até apareceria, mas com o <head> errado —
+ *    título da home, canonical da home, conversão da home.
  */
 function handler(event) {
   var request = event.request;
@@ -203,12 +209,20 @@ function handler(event) {
       }
       if (parts.length) query = '?' + parts.join('&');
     }
-
     return {
       statusCode: 301,
       statusDescription: 'Moved Permanently',
       headers: { location: { value: 'https://$DOMAIN' + request.uri + query } }
     };
+  }
+
+  var uri = request.uri;
+  var lastSegment = uri.substring(uri.lastIndexOf('/') + 1);
+
+  if (uri.charAt(uri.length - 1) === '/') {
+    request.uri = uri + 'index.html';
+  } else if (lastSegment.indexOf('.') === -1) {
+    request.uri = uri + '/index.html';
   }
 
   return request;
@@ -220,13 +234,13 @@ if aws cloudfront describe-function --name "$FUNCTION_NAME" >/dev/null 2>&1; the
   aws cloudfront update-function \
     --name "$FUNCTION_NAME" \
     --if-match "$ETAG" \
-    --function-config "Comment=Redireciona www para o dominio raiz,Runtime=cloudfront-js-2.0" \
+    --function-config "Comment=Redireciona www e reescreve URL de diretorio,Runtime=cloudfront-js-2.0" \
     --function-code fileb://$TMP_DIR/silverado-redirect.js >/dev/null
   warn "Function já existia — código atualizado."
 else
   aws cloudfront create-function \
     --name "$FUNCTION_NAME" \
-    --function-config "Comment=Redireciona www para o dominio raiz,Runtime=cloudfront-js-2.0" \
+    --function-config "Comment=Redireciona www e reescreve URL de diretorio,Runtime=cloudfront-js-2.0" \
     --function-code fileb://$TMP_DIR/silverado-redirect.js >/dev/null
   ok "Function criada."
 fi
@@ -253,9 +267,17 @@ RHP_ID=$(aws cloudfront list-response-headers-policies --type custom \
 #   - tudo próprio ('self'), porque fontes, imagens e scripts são auto-hospedados;
 #   - 'unsafe-inline' em style-src por causa dos style={{…}} do React (atributos
 #     de estilo não passam por nonce/hash);
-#   - frame-src só para o Google Maps, e mesmo assim o iframe só é criado quando
-#     o visitante clica em "Carregar mapa".
-CSP="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-src https://maps.google.com https://www.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
+#   - os domínios do Google necessários para a tag do Ads. Sem eles, a tag seria
+#     bloqueada em silêncio e as conversões da campanha nunca chegariam — o tipo
+#     de falha que só aparece semanas depois, na conta do anúncio.
+#
+# Note que script-src NÃO tem 'unsafe-inline': o bootstrap do gtag mora no
+# bundle da aplicação (ver src/lib/analytics.ts), e não num <script> inline
+# colado no HTML como o e-mail do Google sugere.
+GOOGLE_IMG="https://www.googletagmanager.com https://www.google.com https://www.google.com.br https://googleads.g.doubleclick.net https://www.googleadservices.com"
+GOOGLE_CONNECT="https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://googleads.g.doubleclick.net https://www.googleadservices.com https://www.google.com https://www.google.com.br"
+
+CSP="default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: ${GOOGLE_IMG}; font-src 'self'; connect-src 'self' ${GOOGLE_CONNECT}; frame-src https://maps.google.com https://www.google.com https://td.doubleclick.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
 
 cat > "$TMP_DIR/silverado-rhp.json" <<EOF
 {

@@ -5,6 +5,7 @@ import { ArrowDown, MapPin, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/Button'
 import { Logo } from '@/components/Logo'
 import { OpenBadge } from '@/components/OpenBadge'
+import { Picture } from '@/components/Picture'
 import { BUSINESS, whatsappUrl, WHATSAPP_DEFAULT_MESSAGE } from '@/lib/business'
 import { useIsDesktop, useReducedMotion } from '@/hooks/useMediaQuery'
 import { scrollToSection } from '@/hooks/useSmoothScroll'
@@ -91,14 +92,15 @@ export function Hero({ ready }: { ready: boolean }) {
       id="inicio"
       className="relative isolate flex min-h-[100svh] flex-col justify-between overflow-hidden pt-28 pb-8"
     >
-      {/* Fundo: couro escurecido + vinheta. A textura entra como <img> para
-          poder ser servida em AVIF, o que um background-image não permite. */}
+      {/* Fundo: couro escurecido + vinheta.
+          Via <Picture> para sair em AVIF — a versão .jpg crua pesava 268 kB,
+          dez vezes mais, para um resultado idêntico a 28% de opacidade. */}
       <div aria-hidden className="absolute inset-0 -z-20">
-        <img
-          src="/images/leather.jpg"
+        <Picture
+          name="leather"
           alt=""
-          className="h-full w-full object-cover opacity-[0.28]"
-          fetchPriority="high"
+          className="h-full w-full opacity-[0.28]"
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-linear-to-b from-void via-void/70 to-void" />
         <div

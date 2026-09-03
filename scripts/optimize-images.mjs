@@ -18,7 +18,10 @@ const OUT = path.resolve(import.meta.dirname, '../public/images')
 const PROFILES = {
   cut: { widths: [640, 960, 1280], quality: 62 },
   hero: { widths: [960, 1440, 1920], quality: 60 },
-  texture: { widths: [1280, 1920], quality: 55 },
+  // A textura de couro entra a 18–28% de opacidade sobre um fundo quase preto:
+  // detalhe nenhum sobrevive a isso. Comprimir forte é literalmente invisível e
+  // derruba o maior asset do caminho crítico de 268 kB para ~26 kB.
+  texture: { widths: [960, 1280], quality: 30 },
 }
 
 function profileFor(name) {

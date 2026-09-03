@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Reveal, SplitHeading } from './Reveal'
 import { OpenBadge } from './OpenBadge'
+import { Picture } from './Picture'
 
 /**
  * Cabeçalho das páginas dedicadas (/agendar e /loja).
@@ -28,7 +29,7 @@ export function PageHero({
       {/* Mesma textura do Hero, bem mais discreta: identidade sem competir
           com o conteúdo que vem logo abaixo. */}
       <div aria-hidden className="absolute inset-0 -z-10">
-        <img src="/images/leather.jpg" alt="" className="h-full w-full object-cover opacity-[0.18]" />
+        <Picture name="leather" alt="" className="h-full w-full opacity-[0.18]" sizes="100vw" />
         <div className="absolute inset-0 bg-linear-to-b from-void/70 via-void/85 to-void" />
       </div>
 

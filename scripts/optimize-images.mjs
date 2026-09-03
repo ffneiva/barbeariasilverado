@@ -22,10 +22,15 @@ const PROFILES = {
   // detalhe nenhum sobrevive a isso. Comprimir forte é literalmente invisível e
   // derruba o maior asset do caminho crítico de 268 kB para ~26 kB.
   texture: { widths: [960, 1280], quality: 30 },
+  // O card de produto pede 22rem no desktop e uma miniatura de 5rem no celular
+  // (ver o `sizes` em sections/Products.tsx). 720px cobre 352 CSS px em telas
+  // de densidade dupla; qualquer coisa acima disso é peso que ninguém vê.
+  product: { widths: [400, 720], quality: 62 },
 }
 
 function profileFor(name) {
   if (name.startsWith('corte-')) return PROFILES.cut
+  if (name.startsWith('produto-')) return PROFILES.product
   if (name === 'leather') return PROFILES.texture
   return PROFILES.hero
 }

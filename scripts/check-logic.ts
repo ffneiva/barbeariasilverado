@@ -17,7 +17,7 @@
  */
 import { getOpenState, label, nowInShop } from '../src/lib/hours.ts'
 import { buildDays, draftToMessage, humanDate, nextDayWithSlots, slotsFor } from '../src/lib/booking.ts'
-import { PRODUCTS, SERVICES } from '../src/lib/business.ts'
+import { FAQ, PRODUCTS, SERVICES } from '../src/lib/business.ts'
 import { buildJsonLd } from '../src/lib/seo.ts'
 
 let fails = 0
@@ -187,6 +187,20 @@ check('/loja lista os produtos', produtosDe('/loja').length, PRODUCTS.length)
 check('/agendar não lista produtos', produtosDe('/agendar').length, 0)
 check('rota filha tem trilha de navegação', tipos('/agendar').includes('BreadcrumbList'), true)
 check('home não tem trilha', tipos('/').includes('BreadcrumbList'), false)
+
+// A resposta do FAQ sobre produtos repete os preços da tabela. É uma segunda
+// fonte de verdade, e segunda fonte de verdade envelhece calada: o óleo e o
+// derma roller subiram de 35 para 40 e o FAQ continuaria anunciando 35 para
+// quem lesse a página até o fim.
+const respostaProdutos = FAQ.find((item) => item.q.includes('vendem os produtos'))?.a ?? ''
+const precosCitados = [...respostaProdutos.matchAll(/R\$ (\d+)/g)].map((achado) => Number(achado[1]))
+const precosDaTabela = new Set(PRODUCTS.map((produto) => produto.price))
+check('FAQ cita algum preço', precosCitados.length > 0, true)
+check(
+  'todo preço citado no FAQ existe na tabela',
+  precosCitados.filter((valor) => !precosDaTabela.has(valor)),
+  [],
+)
 
 console.log('')
 console.log(fails === 0 ? '✅ Toda a lógica passou.' : `❌ ${fails} verificação(ões) falharam.`)

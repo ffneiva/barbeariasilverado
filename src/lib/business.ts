@@ -241,20 +241,22 @@ export const PRODUCT_GROUPS: Array<{ title: string; blurb: string; items: Produc
         price: 80,
         description:
           'Manipulado na farmácia Ultra Brasil, não industrializado. Uso externo, na rotina de crescimento de barba — o resultado varia de pessoa para pessoa.',
+        image: 'produto-minoxidil',
       },
       {
         id: 'derma-roller',
         name: 'Derma roller',
         size: 'unidade',
-        price: 35,
+        price: 40,
         description: 'Acompanha o minoxidil: prepara a pele antes da aplicação.',
+        image: 'produto-derma-roller',
       },
       {
         id: 'oleo-classe-a',
         brand: 'Classe A',
         name: 'Óleo para barba Classe A',
         size: '30 ml',
-        price: 35,
+        price: 40,
         description: 'Hidrata o fio e a pele por baixo, e tira a coceira da barba em crescimento.',
         image: 'produto-oleo-classe-a',
       },
@@ -290,6 +292,7 @@ export const PRODUCT_GROUPS: Array<{ title: string; blurb: string; items: Produc
         size: '160 g',
         price: 70,
         description: 'A mesma pomada no pote grande — sai mais barato por grama.',
+        image: 'produto-pomada-infinity',
       },
     ],
   },
@@ -473,7 +476,7 @@ export const FAQ = [
   },
   {
     q: 'Vocês vendem os produtos usados no atendimento?',
-    a: 'Vendemos. Pomada Vision (R$ 30), Pomada Infinity (R$ 40 ou R$ 70), óleo para barba Classe A (R$ 35), minoxidil manipulado (R$ 80) e derma roller (R$ 35). A lista completa está na seção Loja, aqui do site.',
+    a: 'Vendemos. Pomada Vision (R$ 30), Pomada Infinity (R$ 40 ou R$ 70), óleo para barba Classe A (R$ 40), minoxidil manipulado (R$ 80) e derma roller (R$ 40). A lista completa está na seção Loja, aqui do site.',
   },
 ]
 

@@ -25,3 +25,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .aws-tmp/
+
+# Cópia de segurança do scripts/github-reset.sh (contém a config do repo)
+.github-reset-backup.json

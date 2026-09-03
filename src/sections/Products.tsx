@@ -37,8 +37,9 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
     <Reveal delay={0.04 * index} as="li" className="h-full">
       <div
         ref={ref}
+        id={product.id}
         className={cn(
-          'group relative flex h-full gap-4 overflow-hidden rounded-sm border border-steel-900 p-4',
+          'group relative flex h-full scroll-mt-28 gap-4 overflow-hidden rounded-sm border border-steel-900 p-4',
           'bg-white/[0.015] transition-colors duration-500 hover:border-steel-700',
           'sm:flex-col sm:gap-0 sm:p-0',
         )}
@@ -71,7 +72,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
             <span className="label-mono shrink-0 normal-case">{product.size}</span>
           </div>
 
-          <p className="mt-1.5 line-clamp-2 flex-1 text-xs leading-relaxed text-steel-500 sm:mt-3 sm:line-clamp-none sm:text-sm">
+          <p className="mt-1.5 line-clamp-3 flex-1 text-xs leading-relaxed text-steel-500 sm:mt-3 sm:line-clamp-none sm:text-sm">
             {product.description}
           </p>
 

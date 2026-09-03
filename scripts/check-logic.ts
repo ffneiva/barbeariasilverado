@@ -17,7 +17,8 @@
  */
 import { getOpenState, label, nowInShop } from '../src/lib/hours.ts'
 import { buildDays, draftToMessage, humanDate, nextDayWithSlots, slotsFor } from '../src/lib/booking.ts'
-import { SERVICES } from '../src/lib/business.ts'
+import { PRODUCTS, SERVICES } from '../src/lib/business.ts'
+import { buildJsonLd } from '../src/lib/seo.ts'
 
 let fails = 0
 
@@ -139,6 +140,53 @@ check('humanDate', humanDate('2026-08-26'), 'quarta-feira, 26 de agosto')
 const vazio = draftToMessage({ serviceId: '', dayKey: '', time: '', name: '', notes: '' })
 check('rascunho vazio não vaza undefined', vazio.includes('undefined'), false)
 check('rascunho vazio diz "a combinar"', vazio.includes('a combinar'), true)
+
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n── seo.ts (dados estruturados) ──────────────────────────')
+
+/**
+ * O Search Console reprovou os seis produtos com "Especifique offers, review ou
+ * aggregateRating". A causa era de aninhamento, não de conteúdo: o preço estava
+ * um nível acima do nó que o validador lê. É exatamente o tipo de regressão que
+ * volta sem ninguém notar, porque a página continua idêntica na tela e o erro
+ * só aparece semanas depois, no relatório.
+ */
+type No = { '@type': string; [chave: string]: unknown }
+
+const tipos = (caminho: string) => (buildJsonLd(caminho)['@graph'] as No[]).map((no) => no['@type'])
+
+function produtosDe(caminho: string): No[] {
+  const lista = (buildJsonLd(caminho)['@graph'] as No[]).find((no) => no['@type'] === 'ItemList')
+  if (!lista) return []
+  return (lista.itemListElement as Array<{ item: No }>).map((entrada) => entrada.item)
+}
+
+const produtos = produtosDe('/')
+check('home lista todos os produtos', produtos.length, PRODUCTS.length)
+check(
+  'todo produto tem offers com preço em BRL',
+  produtos.every((produto) => {
+    const oferta = produto.offers as { price?: string; priceCurrency?: string } | undefined
+    return Boolean(oferta?.price && oferta.priceCurrency === 'BRL')
+  }),
+  true,
+)
+check(
+  'preço do schema bate com a tabela',
+  produtos.map((produto) => (produto.offers as { price: string }).price),
+  PRODUCTS.map((produto) => produto.price.toFixed(2)),
+)
+check('produto declara venda no balcão', (produtos[0].offers as { availability: string }).availability, 'https://schema.org/InStoreOnly')
+
+// Marcar conteúdo que a página não mostra é violação das diretrizes de dados
+// estruturados, e o preço não é um aviso: é a página perder a elegibilidade.
+check('FAQ marcado na home, que o mostra', tipos('/').includes('FAQPage'), true)
+check('FAQ ausente da /loja, que não o mostra', tipos('/loja').includes('FAQPage'), false)
+check('galeria ausente da /agendar', tipos('/agendar').includes('ImageGallery'), false)
+check('/loja lista os produtos', produtosDe('/loja').length, PRODUCTS.length)
+check('/agendar não lista produtos', produtosDe('/agendar').length, 0)
+check('rota filha tem trilha de navegação', tipos('/agendar').includes('BreadcrumbList'), true)
+check('home não tem trilha', tipos('/').includes('BreadcrumbList'), false)
 
 console.log('')
 console.log(fails === 0 ? '✅ Toda a lógica passou.' : `❌ ${fails} verificação(ões) falharam.`)

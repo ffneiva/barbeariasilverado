@@ -107,12 +107,46 @@ function perRouteHtmlPlugin(): Plugin {
   }
 }
 
+/**
+ * Gera o sitemap.xml a partir das rotas, no build.
+ *
+ * Ele era um arquivo estático em public/ com a data escrita à mão — e data
+ * escrita à mão envelhece: o `lastmod` marcava o dia em que alguém lembrou de
+ * editá-lo, não o dia em que a página mudou. Pior, uma rota nova só entrava no
+ * sitemap se alguém lembrasse de acrescentá-la, e ninguém lembra.
+ *
+ * Saem só `loc` e `lastmod`. `priority` e `changefreq` estão no protocolo, mas
+ * o Google declara publicamente que os ignora — mantê-los seria decoração que
+ * dá a impressão de estar controlando algo.
+ */
+function sitemapPlugin(): Plugin {
+  return {
+    name: 'silverado-sitemap',
+    apply: 'build',
+    generateBundle() {
+      const hoje = new Date().toISOString().slice(0, 10)
+      const urls = ROUTES.filter((route) => !route.noindex)
+        .map(
+          (route) =>
+            `  <url>\n    <loc>${canonicalFor(route)}</loc>\n    <lastmod>${hoje}</lastmod>\n  </url>`,
+        )
+        .join('\n')
+
+      this.emitFile({
+        type: 'asset',
+        fileName: 'sitemap.xml',
+        source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
+      })
+    },
+  }
+}
+
 function escapeHtml(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), jsonLdPlugin(), perRouteHtmlPlugin()],
+  plugins: [react(), tailwindcss(), jsonLdPlugin(), perRouteHtmlPlugin(), sitemapPlugin()],
   resolve: {
     alias: { '@': path.resolve(import.meta.dirname, 'src') },
   },

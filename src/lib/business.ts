@@ -211,6 +211,15 @@ export type Product = {
   price: number
   description: string
   /**
+   * Marca impressa no rótulo.
+   *
+   * Existe para o JSON-LD: `Product` sem marca é um item genérico para o
+   * Google, e é a marca que conecta a página a buscas como "pomada infinity
+   * goiânia" — concorrência muito mais rala que "barbearia goiânia".
+   * Só entra aqui o que está escrito na embalagem e visível na página.
+   */
+  brand?: string
+  /**
    * Slug do arquivo em /images (sem extensão). Opcional: sem foto, o card cai
    * para um tratamento tipográfico em vez de mostrar um buraco.
    */
@@ -226,10 +235,12 @@ export const PRODUCT_GROUPS: Array<{ title: string; blurb: string; items: Produc
     items: [
       {
         id: 'minoxidil',
+        brand: 'Ultra Brasil',
         name: 'Minoxidil manipulado 5%',
         size: '60 ml',
         price: 80,
-        description: 'Manipulado, não industrializado. Usado na rotina de crescimento de barba.',
+        description:
+          'Manipulado na farmácia Ultra Brasil, não industrializado. Uso externo, na rotina de crescimento de barba — o resultado varia de pessoa para pessoa.',
       },
       {
         id: 'derma-roller',
@@ -240,6 +251,7 @@ export const PRODUCT_GROUPS: Array<{ title: string; blurb: string; items: Produc
       },
       {
         id: 'oleo-classe-a',
+        brand: 'Classe A',
         name: 'Óleo para barba Classe A',
         size: '30 ml',
         price: 35,
@@ -255,6 +267,7 @@ export const PRODUCT_GROUPS: Array<{ title: string; blurb: string; items: Produc
     items: [
       {
         id: 'pomada-vision',
+        brand: 'Vision',
         name: 'Pomada Vision',
         size: '70 g',
         price: 30,
@@ -263,6 +276,7 @@ export const PRODUCT_GROUPS: Array<{ title: string; blurb: string; items: Produc
       },
       {
         id: 'pomada-infinity-80',
+        brand: 'Classic Barber',
         name: 'Pomada Infinity Classic',
         size: '80 g',
         price: 40,
@@ -271,6 +285,7 @@ export const PRODUCT_GROUPS: Array<{ title: string; blurb: string; items: Produc
       },
       {
         id: 'pomada-infinity-160',
+        brand: 'Classic Barber',
         name: 'Pomada Infinity Classic',
         size: '160 g',
         price: 70,
@@ -443,6 +458,18 @@ export const FAQ = [
   {
     q: 'Vocês trabalham com plano ou mensalidade?',
     a: 'Não. Cada serviço tem o preço da tabela e você paga o que usou, quando usar.',
+  },
+  {
+    q: 'Onde fica a barbearia?',
+    a: 'Na Avenida C-4, nº 73, no Jardim América, em Goiânia. É a poucos minutos do Setor Bueno, do Marista, do Setor Oeste e do Jardim Goiás. Tem o mapa e a rota aqui embaixo, na seção Onde estamos.',
+  },
+  {
+    q: 'Que horas vocês abrem? Abre no domingo?',
+    a: 'De segunda a sexta, das 9h às 20h, com almoço das 12h às 14h. Sábado das 9h às 19h, com almoço das 12h às 13h. Domingo não abrimos.',
+  },
+  {
+    q: 'Quanto custa o corte?',
+    a: 'O corte de cabelo sai R$ 40 e o corte com barba, R$ 70. A tabela inteira está na seção Serviços, com o preço de cada item.',
   },
   {
     q: 'Vocês vendem os produtos usados no atendimento?',

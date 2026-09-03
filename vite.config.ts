@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
 import { buildJsonLd } from './src/lib/seo.ts'
-import { ROUTES, canonicalFor } from './src/lib/routes.ts'
+import { ROUTES, NAO_ENCONTRADA, canonicalFor } from './src/lib/routes.ts'
 
 /**
  * Injeta o JSON-LD no index.html em tempo de build.
@@ -53,7 +53,10 @@ function perRouteHtmlPlugin(): Plugin {
       if (!index || index.type !== 'asset') return
       const base = String(index.source)
 
-      for (const route of ROUTES) {
+      // A rota de 404 entra junto: vira dist/404.html, que a distribuição
+      // serve com status 404 de verdade (ver CustomErrorResponses no
+      // aws-setup.sh). É o que separa "página inexistente" de *soft 404*.
+      for (const route of [...ROUTES, NAO_ENCONTRADA]) {
         if (route.path === '/') continue
 
         const html = base
@@ -78,6 +81,10 @@ function perRouteHtmlPlugin(): Plugin {
             /(<meta name="twitter:title" content=")[^"]*(")/,
             `$1${escapeHtml(route.title)}$2`,
           )
+          .replace(
+            /(<meta name="robots" content=")[^"]*(")/,
+            `$1${route.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'}$2`,
+          )
           // Dados estruturados próprios: trilha de navegação em todas as
           // rotas filhas, lista de produtos em /loja, ação de reserva em
           // /agendar. Sem isto as três páginas repetiriam o JSON-LD da home.
@@ -86,9 +93,13 @@ function perRouteHtmlPlugin(): Plugin {
             `$1${JSON.stringify(buildJsonLd(route.path))}$2`,
           )
 
+        // O 404 fica na raiz como 404.html, que é o caminho apontado pelo
+        // CustomErrorResponse da distribuição. As demais rotas viram
+        // <rota>/index.html, alcançadas pela reescrita da CloudFront Function.
         this.emitFile({
           type: 'asset',
-          fileName: `${route.path.replace(/^\//, '')}/index.html`,
+          fileName:
+            route.path === '/404' ? '404.html' : `${route.path.replace(/^\//, '')}/index.html`,
           source: html,
         })
       }

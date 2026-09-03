@@ -16,6 +16,7 @@ import { Location } from '@/sections/Location'
 import { Faq } from '@/sections/Faq'
 import { FinalCta } from '@/sections/FinalCta'
 import { Privacy } from '@/pages/Privacy'
+import { NaoEncontrada } from '@/pages/NaoEncontrada'
 import { Agendar } from '@/pages/Agendar'
 import { Loja } from '@/pages/Loja'
 import { routeFor } from '@/lib/routes'
@@ -125,6 +126,7 @@ export default function App() {
       {route.path === '/agendar' && <Agendar onNavigate={navigate} />}
       {route.path === '/loja' && <Loja onNavigate={navigate} />}
       {route.path === '/politica-de-privacidade' && <Privacy onBack={() => navigate('/')} />}
+      {route.path === '/404' && <NaoEncontrada onNavigate={navigate} />}
 
       {isHome && (
         <main id="conteudo">

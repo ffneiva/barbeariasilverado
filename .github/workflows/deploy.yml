@@ -100,9 +100,12 @@ jobs:
       #    o visitante continua vendo a versão antiga do site.
       #
       #    São vários agora — o build gera um por rota (dist/agendar/index.html
-      #    e afins), cada um com título, description e canonical próprios. Um
-      #    laço evita que uma rota nova seja esquecida aqui.
-      - name: 📤 index.html de todas as rotas (sem cache)
+      #    e afins) mais o dist/404.html, cada um com título, description e
+      #    canonical próprios. O laço evita que uma rota nova seja esquecida.
+      #
+      #    Os arquivos de verificação de propriedade também são .html, mas têm
+      #    passo próprio (cache diferente) e ficam de fora daqui.
+      - name: 📤 HTML de todas as rotas (sem cache)
         run: |
           while IFS= read -r f; do
             KEY="${f#dist/}"
@@ -111,7 +114,7 @@ jobs:
               --content-type "text/html; charset=utf-8" \
               --cache-control "no-cache,must-revalidate"
             echo "publicado: /$KEY"
-          done < <(find dist -name 'index.html')
+          done < <(find dist -name '*.html' -not -name 'google*')
 
       - name: 📤 Arquivos de SEO e manifest
         run: |

@@ -29,6 +29,8 @@ export type Route = {
    * campanha.
    */
   adsConversion?: string
+  /** Mantém a página fora do índice do Google (usado só pelo 404). */
+  noindex?: boolean
 }
 
 /**
@@ -89,10 +91,32 @@ export const ROUTES: Route[] = [
 
 export const HOME = ROUTES[0]
 
-/** Casa o pathname com uma rota, ignorando barra final. */
+/**
+ * Rota usada quando o endereço não existe.
+ *
+ * `noindex` é o ponto: sem ele, uma URL errada devolveria a home com status
+ * 200 — o *soft 404* que o Google trata como sinal de site mal cuidado.
+ */
+export const NAO_ENCONTRADA: Route = {
+  path: '/404',
+  title: 'Página não encontrada · Barbearia Silverado',
+  description: 'Este endereço não existe no site da Barbearia Silverado.',
+  noindex: true,
+}
+
+/** Normaliza o pathname (ignora barra final e diferenças de caixa). */
+function limpar(pathname: string): string {
+  return pathname.replace(/\/+$/, '').toLowerCase() || '/'
+}
+
+/** Devolve a rota correspondente, ou a de 404 se o endereço não existir. */
 export function routeFor(pathname: string): Route {
-  const clean = pathname.replace(/\/+$/, '') || '/'
-  return ROUTES.find((r) => r.path === clean) ?? HOME
+  return ROUTES.find((r) => r.path === limpar(pathname)) ?? NAO_ENCONTRADA
+}
+
+/** `true` quando o endereço corresponde a uma página real. */
+export function isKnownRoute(pathname: string): boolean {
+  return ROUTES.some((r) => r.path === limpar(pathname))
 }
 
 export function canonicalFor(route: Route): string {

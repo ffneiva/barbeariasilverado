@@ -34,6 +34,11 @@ export function useRouteMeta(route: Route) {
     setMeta('meta[property="og:url"]', 'content', canonicalFor(route))
     setMeta('meta[name="twitter:title"]', 'content', route.title)
     setMeta('meta[name="twitter:description"]', 'content', route.description)
+    setMeta(
+      'meta[name="robots"]',
+      'content',
+      route.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large',
+    )
 
     trackConversion(route.adsConversion)
   }, [route])

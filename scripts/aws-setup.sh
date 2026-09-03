@@ -373,8 +373,8 @@ if [ -z "$DIST_ID" ]; then
   "CustomErrorResponses": {
     "Quantity": 2,
     "Items": [
-      { "ErrorCode": 403, "ResponsePagePath": "/index.html", "ResponseCode": "200", "ErrorCachingMinTTL": 10 },
-      { "ErrorCode": 404, "ResponsePagePath": "/index.html", "ResponseCode": "200", "ErrorCachingMinTTL": 10 }
+      { "ErrorCode": 403, "ResponsePagePath": "/404.html", "ResponseCode": "404", "ErrorCachingMinTTL": 10 },
+      { "ErrorCode": 404, "ResponsePagePath": "/404.html", "ResponseCode": "404", "ErrorCachingMinTTL": 10 }
     ]
   },
   "ViewerCertificate": $VIEWER_CERT_JSON,

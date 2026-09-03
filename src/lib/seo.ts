@@ -1,4 +1,5 @@
 import { BUSINESS, CUTS, FAQ, PRODUCTS, SCHEDULE, SERVICES } from './business.ts'
+import { canonicalFor, routeFor } from './routes.ts'
 
 /**
  * JSON-LD para o Google entender que isto é uma barbearia física em Goiânia.
@@ -8,7 +9,94 @@ import { BUSINESS, CUTS, FAQ, PRODUCTS, SCHEDULE, SERVICES } from './business.ts
  * e o botão de rota. Serviço, FAQ e site entram como nós irmãos no mesmo @graph
  * para que o Google resolva as referências entre eles.
  */
-export function buildJsonLd() {
+/**
+ * Nós extras de cada rota.
+ *
+ * A home carrega o perfil do negócio inteiro; /agendar e /loja ganham o que é
+ * específico delas. Duas coisas em jogo:
+ *
+ * · **BreadcrumbList** diz ao Google que a página é filha da home. Sem isso,
+ *   /agendar e /loja aparecem na busca como URLs soltas, sem a trilha que
+ *   ajuda a entender a estrutura do site.
+ *
+ * · **ItemList em /loja** transforma seis produtos com preço em itens
+ *   individuais que o Google consegue ler — em vez de um bloco de texto onde
+ *   ele teria que adivinhar o que é nome e o que é valor.
+ */
+function nosDaRota(caminho: string) {
+  const rota = routeFor(caminho)
+  if (rota.path === '/') return []
+
+  const trilha = {
+    '@type': 'BreadcrumbList',
+    '@id': `${canonicalFor(rota)}#trilha`,
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Início', item: `${BUSINESS.url}/` },
+      { '@type': 'ListItem', position: 2, name: rota.title.split('·')[0].trim(), item: canonicalFor(rota) },
+    ],
+  }
+
+  if (rota.path === '/loja') {
+    return [
+      trilha,
+      {
+        '@type': 'ItemList',
+        '@id': `${canonicalFor(rota)}#produtos`,
+        name: 'Produtos à venda na Barbearia Silverado',
+        numberOfItems: PRODUCTS.length,
+        itemListElement: PRODUCTS.map((product, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          item: {
+            '@type': 'Product',
+            name: `${product.name} ${product.size}`,
+            description: product.description,
+            offers: {
+              '@type': 'Offer',
+              price: product.price.toFixed(2),
+              priceCurrency: 'BRL',
+              availability: 'https://schema.org/InStore',
+              seller: { '@id': `${BUSINESS.url}/#barbearia` },
+            },
+          },
+        })),
+      },
+    ]
+  }
+
+  if (rota.path === '/agendar') {
+    return [
+      trilha,
+      {
+        '@type': 'WebPage',
+        '@id': `${canonicalFor(rota)}#pagina`,
+        url: canonicalFor(rota),
+        name: rota.title,
+        description: rota.description,
+        // Declara que daqui se marca horário, e por qual canal. É o que
+        // permite ao Google entender a página como ponto de agendamento.
+        potentialAction: {
+          '@type': 'ReserveAction',
+          target: {
+            '@type': 'EntryPoint',
+            urlTemplate: `https://wa.me/${BUSINESS.whatsapp}`,
+            inLanguage: 'pt-BR',
+            actionPlatform: [
+              'https://schema.org/DesktopWebPlatform',
+              'https://schema.org/MobileWebPlatform',
+            ],
+          },
+          result: { '@type': 'Reservation', name: 'Horário na Barbearia Silverado' },
+          provider: { '@id': `${BUSINESS.url}/#barbearia` },
+        },
+      },
+    ]
+  }
+
+  return [trilha]
+}
+
+export function buildJsonLd(caminho = '/') {
   const id = `${BUSINESS.url}/#barbearia`
 
   const openingHoursSpecification = SCHEDULE.flatMap((day, index) =>
@@ -119,6 +207,7 @@ export function buildJsonLd() {
           acceptedAnswer: { '@type': 'Answer', text: item.a },
         })),
       },
+      ...nosDaRota(caminho),
       {
         '@type': 'ImageGallery',
         '@id': `${BUSINESS.url}/#cortes`,

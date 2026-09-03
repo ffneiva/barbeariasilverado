@@ -86,6 +86,30 @@ export function slotsFor(day: BookingDay, service: Service, base = new Date()): 
   return slots
 }
 
+/**
+ * Primeiro dia, a partir de `depoisDe`, em que o serviço cabe no expediente.
+ *
+ * Existe para o beco sem saída do passo 3: um combo de 70 minutos escolhido às
+ * 19h não cabe em nenhum horário de hoje, e a tela dizia isso e parava ali —
+ * deixando a pessoa adivinhar em qual dia tentar. Agora ela recebe o dia certo
+ * num clique.
+ */
+export function nextDayWithSlots(
+  days: BookingDay[],
+  service: Service,
+  depoisDe: string,
+  base = new Date(),
+): BookingDay | null {
+  const partida = days.findIndex((d) => d.key === depoisDe)
+  if (partida < 0) return null
+
+  for (const day of days.slice(partida + 1)) {
+    if (day.closed) continue
+    if (slotsFor(day, service, base).length > 0) return day
+  }
+  return null
+}
+
 export type BookingDraft = {
   serviceId: string
   dayKey: string

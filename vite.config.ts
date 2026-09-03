@@ -78,6 +78,13 @@ function perRouteHtmlPlugin(): Plugin {
             /(<meta name="twitter:title" content=")[^"]*(")/,
             `$1${escapeHtml(route.title)}$2`,
           )
+          // Dados estruturados próprios: trilha de navegação em todas as
+          // rotas filhas, lista de produtos em /loja, ação de reserva em
+          // /agendar. Sem isto as três páginas repetiriam o JSON-LD da home.
+          .replace(
+            /(<script type="application\/ld\+json">)[\s\S]*?(<\/script>)/,
+            `$1${JSON.stringify(buildJsonLd(route.path))}$2`,
+          )
 
         this.emitFile({
           type: 'asset',

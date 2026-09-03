@@ -16,7 +16,7 @@
  * continuam válidos em qualquer máquina, em qualquer fuso.
  */
 import { getOpenState, label, nowInShop } from '../src/lib/hours.ts'
-import { buildDays, draftToMessage, humanDate, slotsFor } from '../src/lib/booking.ts'
+import { buildDays, draftToMessage, humanDate, nextDayWithSlots, slotsFor } from '../src/lib/booking.ts'
 import { SERVICES } from '../src/lib/business.ts'
 
 let fails = 0
@@ -103,6 +103,21 @@ check('sábado — volta do almoço às 13h', sabCorte.includes('13:00'), true)
 check('sábado — último é 18h', sabCorte.at(-1), '18:00')
 
 check('domingo — nenhum horário', slotsFor(days[6], corte, base).length, 0)
+
+// ── saída para o beco sem saída do passo 3 ──────────────────────────────────
+// Segunda 19h em Goiânia: nem corte nem combo cabem no que resta do dia.
+const tarde = at('2026-08-24T22:00:00Z')
+const diasTarde = buildDays(tarde)
+check('seg 19h — hoje sem vaga para o combo', slotsFor(diasTarde[0], combo, tarde).length, 0)
+check(
+  'seg 19h — sugere amanhã',
+  nextDayWithSlots(diasTarde, combo, diasTarde[0].key, tarde)?.key,
+  '2026-08-25',
+)
+// Sábado à noite: o próximo dia é domingo (fechado), então tem que pular para segunda.
+const sabNoite = at('2026-08-29T22:00:00Z')
+const diasSab = buildDays(sabNoite)
+check('sáb 19h — pula o domingo fechado', nextDayWithSlots(diasSab, corte, diasSab[0].key, sabNoite)?.key, '2026-08-31')
 
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\n── mensagem do WhatsApp ─────────────────────────────────')

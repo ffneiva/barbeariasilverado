@@ -114,6 +114,7 @@ export function Nav({
                 key={link.id}
                 type="button"
                 onClick={() => go(link.id)}
+                aria-current={highlight && active === link.id ? 'true' : undefined}
                 className={cn(
                   'relative rounded-full px-3 py-2 font-mono text-[0.7rem] tracking-[0.16em] uppercase transition-colors duration-300',
                   highlight && active === link.id ? 'text-steel-50' : 'text-steel-500 hover:text-steel-200',

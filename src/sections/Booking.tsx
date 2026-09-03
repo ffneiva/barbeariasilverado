@@ -9,6 +9,7 @@ import {
   buildDays,
   draftToMessage,
   humanDate,
+  nextDayWithSlots,
   priceLabel,
   slotsFor,
   type BookingDay,
@@ -51,6 +52,13 @@ export function Booking({ showHeading = true }: { showHeading?: boolean } = {}) 
   const slots = useMemo(
     () => (day && service ? slotsFor(day, service, now) : []),
     [day, service, now],
+  )
+
+  // Só é calculado quando o dia escolhido não tem vaga — evita varrer catorze
+  // dias a cada render do passo.
+  const proximoDia = useMemo(
+    () => (day && service && slots.length === 0 ? nextDayWithSlots(days, service, day.key, now) : null),
+    [day, service, slots.length, days, now],
   )
 
   const canAdvance = [Boolean(draft.serviceId), Boolean(draft.dayKey), Boolean(draft.time), true][step]
@@ -170,11 +178,28 @@ export function Booking({ showHeading = true }: { showHeading?: boolean } = {}) 
                   </legend>
 
                   {slots.length === 0 ? (
-                    <p className="rounded-sm border border-steel-900 p-5 text-sm leading-relaxed text-steel-400">
-                      Não sobra janela para <strong className="text-steel-200">{service?.name}</strong> nesse
-                      dia — o serviço leva {service?.minutes} minutos e não cabe no que resta do expediente.
-                      Escolha outro dia ou fale direto com o barbeiro.
-                    </p>
+                    <div className="rounded-sm border border-steel-900 p-5">
+                      <p className="text-sm leading-relaxed text-steel-400">
+                        Não sobra janela para <strong className="text-steel-200">{service?.name}</strong> nesse
+                        dia — o serviço leva {service?.minutes} minutos e não cabe no que resta do expediente.
+                      </p>
+
+                      {proximoDia ? (
+                        <button
+                          type="button"
+                          onClick={() => setDraft((p) => ({ ...p, dayKey: proximoDia.key, time: '' }))}
+                          className="mt-4 inline-flex items-center gap-2 border border-steel-700 px-4 py-2.5 font-mono text-[0.7rem] tracking-[0.14em] text-steel-200 uppercase transition-colors hover:border-steel-400 hover:text-white"
+                        >
+                          Ir para {humanDate(proximoDia.key).replace('-feira', '')}
+                          <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.6} />
+                        </button>
+                      ) : (
+                        <p className="mt-4 text-sm leading-relaxed text-steel-500">
+                          Não há vaga para esse serviço nas próximas duas semanas. Fale direto com o
+                          barbeiro pelo WhatsApp.
+                        </p>
+                      )}
+                    </div>
                   ) : (
                     <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
                       {slots.map((slot) => (

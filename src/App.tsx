@@ -20,6 +20,7 @@ import { Agendar } from '@/pages/Agendar'
 import { Loja } from '@/pages/Loja'
 import { routeFor } from '@/lib/routes'
 import { useRouteMeta } from '@/hooks/useRouteMeta'
+import { useRouteAnnounce } from '@/hooks/useRouteAnnounce'
 import { scrollToSection, useSmoothScroll } from '@/hooks/useSmoothScroll'
 
 /**
@@ -59,6 +60,7 @@ export default function App() {
 
   useRouteMeta(route)
   useSmoothScroll()
+  const { alvoRef, aviso } = useRouteAnnounce(route)
 
   /**
    * O preloader só existe para a primeira visita à home.
@@ -110,8 +112,16 @@ export default function App() {
         Pular para o conteúdo
       </a>
 
+      {/* Região viva: só existe para o leitor de tela saber que a rota mudou. */}
+      <p aria-live="polite" role="status" className="sr-only">
+        {aviso}
+      </p>
+
       <Nav onSection={goToSection} path={path} />
 
+      {/* Recebe o foco a cada troca de rota (ver useRouteAnnounce), para a
+          navegação por teclado recomeçar do início do conteúdo novo. */}
+      <div ref={alvoRef} tabIndex={-1} className="outline-none">
       {route.path === '/agendar' && <Agendar onNavigate={navigate} />}
       {route.path === '/loja' && <Loja onNavigate={navigate} />}
       {route.path === '/politica-de-privacidade' && <Privacy onBack={() => navigate('/')} />}
@@ -130,6 +140,7 @@ export default function App() {
           <FinalCta />
         </main>
       )}
+      </div>
 
       <Footer onNavigate={navigate} onSection={goToSection} />
       <WhatsAppFab />

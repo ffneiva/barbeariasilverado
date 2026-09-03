@@ -2,6 +2,7 @@ import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
+import { execFileSync } from 'node:child_process'
 import { buildJsonLd } from './src/lib/seo.ts'
 import { ROUTES, NAO_ENCONTRADA, canonicalFor } from './src/lib/routes.ts'
 
@@ -118,17 +119,32 @@ function perRouteHtmlPlugin(): Plugin {
  * Saem só `loc` e `lastmod`. `priority` e `changefreq` estão no protocolo, mas
  * o Google declara publicamente que os ignora — mantê-los seria decoração que
  * dá a impressão de estar controlando algo.
+ *
+ * A data vem do último commit, não do relógio do build. Um redeploy sem mudança
+ * nenhuma — refazer o build para trocar um certificado, por exemplo — marcaria
+ * as quatro páginas como alteradas hoje, e um sitemap que diz isso toda semana
+ * é um sitemap que o Google aprende a desconsiderar.
  */
+function dataDoUltimoCommit(): string {
+  try {
+    return execFileSync('git', ['log', '-1', '--format=%cI'], { encoding: 'utf8' }).trim().slice(0, 10)
+  } catch {
+    // Build fora de um clone (tarball, container sem git): a data de hoje é um
+    // palpite pior, mas um sitemap sem lastmod é aceito do mesmo jeito.
+    return new Date().toISOString().slice(0, 10)
+  }
+}
+
 function sitemapPlugin(): Plugin {
   return {
     name: 'silverado-sitemap',
     apply: 'build',
     generateBundle() {
-      const hoje = new Date().toISOString().slice(0, 10)
+      const lastmod = dataDoUltimoCommit()
       const urls = ROUTES.filter((route) => !route.noindex)
         .map(
           (route) =>
-            `  <url>\n    <loc>${canonicalFor(route)}</loc>\n    <lastmod>${hoje}</lastmod>\n  </url>`,
+            `  <url>\n    <loc>${canonicalFor(route)}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`,
         )
         .join('\n')
 

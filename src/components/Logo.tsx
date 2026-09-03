@@ -26,7 +26,7 @@ type Props = {
 // Declará-las aqui evita salto de layout: a caixa já nasce com o tamanho certo,
 // antes de o PNG da máscara terminar de baixar.
 const ASSETS = {
-  wordmark: { src: '/images/logo-wordmark.png', aspect: 1400 / 418 },
+  wordmark: { src: '/images/logo-wordmark.png', aspect: 800 / 239 },
   mark: { src: '/images/logo-mark.png', aspect: 212 / 221 },
 }
 

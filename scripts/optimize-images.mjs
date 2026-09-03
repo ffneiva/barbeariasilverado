@@ -39,18 +39,22 @@ function profileFor(name) {
  * "o" final. Com o arquivo de origem certo, o trabalho aqui virou o mínimo:
  * recortar a moldura transparente e redimensionar.
  *
- * O RGB é forçado para branco puro porque o <Logo> usa este arquivo como
- * `mask-image` — ali só o alpha conta, e um RGB previsível evita surpresa se
- * algum dia ele for exibido direto. A versão prateada do kit é preservada
- * separadamente, para o cartão de compartilhamento.
+ * Duas escolhas que derrubaram o arquivo de 51 kB para 10 kB:
+ *
+ * · **RGB uniforme.** O <Logo> usa este PNG como `mask-image`, onde só o canal
+ *   alpha decide o que aparece — a cor vem de um degradê CSS por cima. Forçar
+ *   todo o RGB para branco elimina variação que nunca seria vista e dá ao
+ *   compressor uma imagem quase toda igual.
+ *
+ * · **Paleta em vez de RGBA.** Com o RGB constante, uma paleta de 96 entradas
+ *   é, na prática, 96 níveis de alpha — mais que suficiente para as bordas
+ *   antisserrilhadas continuarem lisas, e um quinto do tamanho.
+ *
+ * A largura também caiu: 800 px cobre o maior uso na tela (384 px no CTA
+ * final) mesmo em telas de densidade dupla. 1400 era detalhe que ninguém vê.
  */
-async function logoToMaskPng(inputPath, outPath, width, { keepColor = false } = {}) {
+async function logoToMaskPng(inputPath, outPath, width) {
   const base = sharp(inputPath).trim({ threshold: 1 }).resize({ width, withoutEnlargement: true })
-
-  if (keepColor) {
-    await base.png({ compressionLevel: 9 }).toFile(outPath)
-    return
-  }
 
   const { data, info } = await base.ensureAlpha().raw().toBuffer({ resolveWithObject: true })
   for (let i = 0; i < data.length; i += 4) {
@@ -60,7 +64,7 @@ async function logoToMaskPng(inputPath, outPath, width, { keepColor = false } = 
   }
 
   await sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } })
-    .png({ compressionLevel: 9 })
+    .png({ compressionLevel: 9, palette: true, colours: 96, effort: 10 })
     .toFile(outPath)
 }
 
@@ -74,12 +78,13 @@ async function main() {
     const input = path.join(SRC, file)
 
     if (name.startsWith('logo-')) {
-      // A variante prateada mantém a cor: ela é composta direto sobre a foto
-      // de couro no cartão de compartilhamento, sem máscara CSS por cima.
-      const keepColor = name.endsWith('-prata')
-      const width = name === 'logo-mark' ? 512 : 1400
-      await logoToMaskPng(input, path.join(OUT, `${name}.png`), width, { keepColor })
-      console.log(`✓ ${name}.png (${keepColor ? 'cor original' : 'máscara'})`)
+      // A variante prateada não vai para public/: ela só é lida em tempo de
+      // build por scripts/generate-og.mjs, direto de assets-src. Publicá-la
+      // seria mandar 190 kB para o bucket que nenhum visitante busca.
+      if (name.endsWith('-prata')) continue
+
+      await logoToMaskPng(input, path.join(OUT, `${name}.png`), name === 'logo-mark' ? 400 : 800)
+      console.log(`✓ ${name}.png (máscara)`)
       continue
     }
 

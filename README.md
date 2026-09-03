@@ -15,7 +15,6 @@ e transforma uma visita numa mensagem de WhatsApp já preenchida.
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-0b0b0d?style=flat-square&logo=typescript&logoColor=8b929e)](https://www.typescriptlang.org)
 [![Vite](https://img.shields.io/badge/Vite-8-0b0b0d?style=flat-square&logo=vite&logoColor=8b929e)](https://vite.dev)
 [![Tailwind](https://img.shields.io/badge/Tailwind-4-0b0b0d?style=flat-square&logo=tailwindcss&logoColor=8b929e)](https://tailwindcss.com)
-[![GSAP](https://img.shields.io/badge/GSAP-3.15-0b0b0d?style=flat-square&logo=greensock&logoColor=8b929e)](https://gsap.com)
 [![three.js](https://img.shields.io/badge/three.js-r185-0b0b0d?style=flat-square&logo=threedotjs&logoColor=8b929e)](https://threejs.org)
 [![AWS](https://img.shields.io/badge/S3_+_CloudFront-0b0b0d?style=flat-square&logo=amazonwebservices&logoColor=8b929e)](https://aws.amazon.com)
 
@@ -195,25 +194,41 @@ para alguém encontrar.
 
 ## Números
 
-| Recurso                    | Transferido (Brotli) |
-| -------------------------- | -------------------: |
-| `index.html`               |              ~3,5 kB |
-| CSS                        |              ~9,2 kB |
-| JS de entrada              |               ~86 kB |
-| GSAP                       |               ~44 kB |
-| **Total do primeiro paint**|          **~143 kB** |
-| Cena WebGL (three.js)      |  ~235 kB — sob demanda |
+Medido no ar, com Brotli, na `/agendar` — que é o destino dos anúncios e a
+página que precisa ser rápida.
 
-A cena 3D só é buscada quando a thread principal fica ociosa
-(`requestIdleCallback`), depois que a página já está interativa — e **nunca** é
-montada para quem tem `prefers-reduced-motion` ligado.
+| Recurso | Transferido |
+| --- | ---: |
+| HTML (já com o JSON-LD da rota) | ~4 kB |
+| CSS | ~11 kB |
+| JavaScript de entrada | ~85 kB |
+| Fontes (Bebas + Inter, subset latin) | ~60 kB |
+| Textura de fundo (AVIF) | ~26 kB |
+| Logotipo (máscara PNG) | ~10 kB |
+| **Total do primeiro paint** | **~196 kB** |
 
-As fontes são auto-hospedadas (só os subsets `latin` e `latin-ext`, ~240 kB no
-total), o que tira o Google Fonts do caminho crítico: menos uma conexão TLS a um
-terceiro antes do primeiro texto pintar. A família de texto é a **Inter** — que
-é, por coincidência feliz, a tipografia oficial do kit da marca.
+Era 640 kB. As três reduções que valeram:
 
----
+**Bibliotecas de animação saíram do caminho crítico (−50 kB).** GSAP e Lenis
+eram carregados em toda página. O GSAP continua onde ganha — texto que acende
+palavra a palavra, galeria pinada, logotipo que cresce — mas entra por import
+dinâmico dentro de um hook, então nenhum módulo o puxa para o chunk de
+entrada. Revelação por scroll, cursor, botões magnéticos, barra de progresso e
+o preloader viraram `IntersectionObserver`, `requestAnimationFrame` e
+`animation-delay`, que é o que sempre foram por baixo.
+
+**Textura de fundo (−242 kB).** Um JPEG de 268 kB exibido a 18% de opacidade
+sobre fundo quase preto. Comparei os dois renders no contexto real:
+indistinguíveis.
+
+**Logotipo (−41 kB).** Ele é usado como `mask-image`, onde só o canal alpha
+importa — a cor vem de um degradê CSS. Com o RGB forçado para branco uniforme,
+uma paleta de 96 entradas vira 96 níveis de alpha: bordas igualmente lisas, um
+quinto do tamanho.
+
+A cena WebGL (~235 kB) fica fora dessa conta: ela só existe na home, só é
+buscada quando a thread principal fica ociosa, e nunca é montada para quem tem
+`prefers-reduced-motion` ligado.
 
 ## Acessibilidade
 
@@ -221,6 +236,9 @@ Nada do que se mexe é necessário para usar o site.
 
 - `prefers-reduced-motion` desliga **tudo**: preloader, scroll suave, cursor
   customizado, parallax, revelações e a cena 3D inteira.
+- Trocar de rota move o foco para o início do conteúdo e anuncia a página nova
+  numa região `aria-live` — com navegação pelo cliente, nada disso acontece
+  sozinho, e sem isso o foco fica preso num menu que já sumiu.
 - A legenda de cada corte fica **abaixo** da foto, nunca por cima: sobreposta,
   o nome caía em cima do cabelo ou da barba, que é o que a pessoa veio ver.
 - A galeria de cortes só sequestra o scroll no desktop. No celular vale a

@@ -36,7 +36,10 @@ async function buildOg() {
 
   // A variante prateada do kit, e não a máscara branca: aqui o logo é composto
   // direto sobre a foto, sem CSS por cima para dar o acabamento metálico.
-  const wordmark = await sharp(path.join(PUB, 'images/logo-wordmark-prata.png'))
+  // Lida de assets-src, não de public/: a variante prateada existe só para
+  // este cartão e não precisa ser publicada no bucket.
+  const wordmark = await sharp(path.join(ROOT, 'assets-src/logo-wordmark-prata.png'))
+    .trim({ threshold: 1 })
     .resize({ width: 660 })
     .toBuffer()
 

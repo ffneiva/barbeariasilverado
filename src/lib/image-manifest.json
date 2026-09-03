@@ -96,5 +96,45 @@
     ],
     "aspect": 1.4982,
     "lqip": "data:image/webp;base64,UklGRkIAAABXRUJQVlA4IDYAAACQAwCdASoUAA0APu1iqk2ppaQiMAgBMB2JaQAAUqt8bYYxfpqYAP65/YEQ8mbqrOjvIigAAAA="
+  },
+  "produto-derma-roller": {
+    "widths": [
+      400,
+      720
+    ],
+    "aspect": 0.8003,
+    "lqip": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAACQBACdASoUABkAPu1mqk2ppaQiMAgBMB2JZwDIXBb4ybV3tt/RkUCZwYFxgAAA+5pyYsxn4GXYBHRbuvBoji/cJJYcV042Ma0kSOvPpP3TYIN/qPUAcDzeFMJJAAAA"
+  },
+  "produto-minoxidil": {
+    "widths": [
+      400,
+      720
+    ],
+    "aspect": 0.8003,
+    "lqip": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAABQBACdASoUABkAPu1cqk4ppKQiMBgMATAdiWkAACnIGYugaPlBYro8tczAAM1FpZ6qMk7BhXiuDBbyqDxWE8I/mSuVbX/DbID1N0DzU965QuigAAA="
+  },
+  "produto-oleo-classe-a": {
+    "widths": [
+      400,
+      720
+    ],
+    "aspect": 0.8003,
+    "lqip": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAAAQBACdASoUABkAPu1iqU2ppaOiMAgBMB2JZwDKtCHfZZOoPw36vRlwgAD+9CkM7kZfK6Gkn2DKNFMcPTtH/urB+ymiU+RRGaVVMvq7yGYekAAA"
+  },
+  "produto-pomada-infinity": {
+    "widths": [
+      400,
+      720
+    ],
+    "aspect": 0.8003,
+    "lqip": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAACwAwCdASoUABkAPu1oq0+ppiOiMBgIATAdiWcAwNwYNIsMYTagAAD+78LfgKY+1tG+issIem1ARVIF9LZpy7ZToPRCC641A4pZC8tuHCbxqAM4tgg3LSAxoAA="
+  },
+  "produto-pomada-vision": {
+    "widths": [
+      400,
+      720
+    ],
+    "aspect": 0.8003,
+    "lqip": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAADQBACdASoUABkAPu1qqlAppiOiqA1RMB2JYwDMNaAAMI9lgkfFafLFA9eUng+P6AD+7ELcZZl6r9ju9HtJz3/ntk/Q22puaAiARDFr4ZF5dIj27suHpA34ejbcsOfYBey9ll+ForgAAA=="
   }
 }

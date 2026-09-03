@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import gsap from 'gsap'
 import { BUSINESS, whatsappUrl, WHATSAPP_DEFAULT_MESSAGE } from '@/lib/business'
 import { getOpenState } from '@/lib/hours'
 import { cn } from '@/lib/utils'
+import { useScrolledPast } from '@/hooks/useScroll'
 import { WhatsAppIcon } from './BrandIcons'
-
-gsap.registerPlugin(ScrollTrigger)
 
 /**
  * Botão flutuante do WhatsApp.
@@ -19,20 +16,14 @@ gsap.registerPlugin(ScrollTrigger)
  * ícones de marca desde a v1.
  */
 export function WhatsAppFab() {
-  const [visible, setVisible] = useState(false)
+  // Aparece depois de ~85% da primeira tela — no topo ele competiria com os
+  // dois CTAs que já estão visíveis.
+  const visible = useScrolledPast(typeof window === 'undefined' ? 600 : window.innerHeight * 0.85)
   const [open, setOpen] = useState(() => getOpenState().open)
 
   useEffect(() => {
-    const trigger = ScrollTrigger.create({
-      start: () => window.innerHeight * 0.85,
-      onEnter: () => setVisible(true),
-      onLeaveBack: () => setVisible(false),
-    })
     const id = window.setInterval(() => setOpen(getOpenState().open), 60_000)
-    return () => {
-      trigger.kill()
-      window.clearInterval(id)
-    }
+    return () => window.clearInterval(id)
   }, [])
 
   return (

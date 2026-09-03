@@ -32,33 +32,52 @@ export type Route = {
 }
 
 /**
- * As três conversões que a conta do Google Ads criou são todas do tipo
- * "visualização de página", e o e-mail de configuração não diz qual é qual.
- * O mapeamento abaixo é a leitura mais provável (a sem número é a primeira,
- * criada junto da conta). Se a campanha mostrar a conversão errada em alguma
- * página, é trocar a linha — nada mais depende disso.
+ * Conversões de "visualização de página" da conta, uma por rota.
+ *
+ * ┌─ COMO CONFERIR SE ESTÃO NA PÁGINA CERTA ────────────────────────────────┐
+ * │ Google Ads → Metas → Conversões → clique na ação → "Configuração da     │
+ * │ tag" → "Instalar a tag manualmente". O rótulo aparece dentro do         │
+ * │ send_to, depois da barra. Compare com a lista abaixo.                   │
+ * └─────────────────────────────────────────────────────────────────────────┘
+ *
+ * O mapeamento veio da ordem de criação (a ação sem número é a mais antiga),
+ * porque o e-mail de configuração não diz qual rótulo é de qual meta. Se
+ * estiver trocado, é uma linha aqui — nada mais no site depende disso.
+ *
+ * Vale dizer o que estas conversões NÃO são: sinal de otimização. Elas
+ * disparam por visitar a página, e quem clicou no anúncio sempre visita — a
+ * taxa é 100% e o Google não aprende nada com isso. Elas servem só para ver o
+ * tráfego separado por página de destino, e devem ficar marcadas como
+ * **secundárias** no Ads. A conversão principal é o clique no WhatsApp
+ * (ver CONVERSIONS em lib/analytics.ts).
  */
+const PAGEVIEW = {
+  home: 'l1coCLmH4OIcELqWhMFE', // "Visualização de página"
+  agendar: 'skq4CMXF0eIcELqWhMFE', // "Visualização de página (1)"
+  loja: 'hQSYCP2w0uIcELqWhMFE', // "Visualização de página (2)"
+} as const
+
 export const ROUTES: Route[] = [
   {
     path: '/',
     title: 'Barbearia Silverado · Barbearia no Jardim América, Goiânia',
     description:
       'Barbearia no Jardim América, em Goiânia. Degradê, fade, barba e sobrancelha com acabamento na navalha. Você explica o corte que quer e sai com ele. Corte a partir de R$ 40 — agende pelo WhatsApp.',
-    adsConversion: 'l1coCLmH4OIcELqWhMFE',
+    adsConversion: PAGEVIEW.home,
   },
   {
     path: '/agendar',
     title: 'Agendar horário · Barbearia Silverado — Jardim América, Goiânia',
     description:
       'Escolha o serviço, o dia e a hora, e a mensagem chega pronta no WhatsApp da Barbearia Silverado. Corte R$ 40, corte + barba R$ 70. Jardim América, Goiânia.',
-    adsConversion: 'skq4CMXF0eIcELqWhMFE',
+    adsConversion: PAGEVIEW.agendar,
   },
   {
     path: '/loja',
     title: 'Loja · Barbearia Silverado — pomadas, minoxidil e óleo de barba',
     description:
       'Pomada Vision e Infinity, minoxidil manipulado 5%, derma roller e óleo para barba Classe A. Os mesmos produtos usados no atendimento, com preço fechado. Jardim América, Goiânia.',
-    adsConversion: 'hQSYCP2w0uIcELqWhMFE',
+    adsConversion: PAGEVIEW.loja,
   },
   {
     path: '/politica-de-privacidade',

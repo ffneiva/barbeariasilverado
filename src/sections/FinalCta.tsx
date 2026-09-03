@@ -1,6 +1,4 @@
-import { useEffect, useRef } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useRef } from 'react'
 import { MessageCircle } from 'lucide-react'
 import { Button } from '@/components/Button'
 import { Logo } from '@/components/Logo'
@@ -8,8 +6,7 @@ import { OpenBadge } from '@/components/OpenBadge'
 import { whatsappUrl, WHATSAPP_DEFAULT_MESSAGE } from '@/lib/business'
 import { scrollToSection } from '@/hooks/useSmoothScroll'
 import { useReducedMotion } from '@/hooks/useMediaQuery'
-
-gsap.registerPlugin(ScrollTrigger)
+import { useGsap } from '@/hooks/useGsap'
 
 /**
  * Último empurrão antes do rodapé.
@@ -21,9 +18,8 @@ export function FinalCta() {
   const ref = useRef<HTMLElement>(null)
   const reduced = useReducedMotion()
 
-  useEffect(() => {
-    if (reduced) return
-    const ctx = gsap.context(() => {
+  useGsap(
+    (gsap) => {
       gsap.fromTo(
         '[data-cta-logo]',
         { scale: 0.82, autoAlpha: 0.35 },
@@ -34,9 +30,11 @@ export function FinalCta() {
           scrollTrigger: { trigger: ref.current, start: 'top 85%', end: 'center center', scrub: 0.7 },
         },
       )
-    }, ref)
-    return () => ctx.revert()
-  }, [reduced])
+    },
+    ref,
+    [],
+    !reduced,
+  )
 
   return (
     <section ref={ref} className="relative overflow-hidden border-t border-steel-900 py-28 sm:py-36">

@@ -1,6 +1,4 @@
-import { useEffect, useRef } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useRef } from 'react'
 import { Section } from '@/components/SectionHeading'
 import { Picture } from '@/components/Picture'
 import { Reveal } from '@/components/Reveal'
@@ -8,8 +6,7 @@ import { Marquee } from '@/components/Marquee'
 import { BladeIcon } from '@/components/Logo'
 import { STATS, CUTS } from '@/lib/business'
 import { useReducedMotion } from '@/hooks/useMediaQuery'
-
-gsap.registerPlugin(ScrollTrigger)
+import { useGsap } from '@/hooks/useGsap'
 
 /**
  * Manifesto: um parágrafo longo em que cada palavra acende conforme o scroll,
@@ -28,10 +25,9 @@ export function Manifesto() {
   const rootRef = useRef<HTMLDivElement>(null)
   const reduced = useReducedMotion()
 
-  useEffect(() => {
-    if (reduced) return
-    const ctx = gsap.context(() => {
-      // Cada palavra sai de 22% para 100% de opacidade dentro de uma janela de
+  useGsap(
+    (gsap) => {
+      // Cada palavra sai de 16% para 100% de opacidade dentro de uma janela de
       // scroll — o texto "acende" da esquerda para a direita.
       gsap.fromTo(
         '[data-manifesto-word]',
@@ -56,7 +52,12 @@ export function Manifesto() {
           yPercent: 8,
           scale: 1.14,
           ease: 'none',
-          scrollTrigger: { trigger: '[data-manifesto-photo]', start: 'top bottom', end: 'bottom top', scrub: true },
+          scrollTrigger: {
+            trigger: '[data-manifesto-photo]',
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+          },
         },
       )
 
@@ -74,10 +75,11 @@ export function Manifesto() {
           },
         })
       }
-    }, rootRef)
-
-    return () => ctx.revert()
-  }, [reduced])
+    },
+    rootRef,
+    [],
+    !reduced,
+  )
 
   return (
     <div ref={rootRef}>

@@ -244,6 +244,10 @@ export function Booking({ showHeading = true }: { showHeading?: boolean } = {}) 
                     size="lg"
                     className="w-full"
                     magnetic={false}
+                    // Marca o clique como "agendamento" para o rastreamento:
+                    // é a intenção mais forte do site e merece separação no
+                    // relatório — e, quando houver rótulo, conversão própria.
+                    data-track="agendamento"
                   >
                     <MessageCircle className="h-4 w-4" strokeWidth={1.6} />
                     Enviar pedido no WhatsApp

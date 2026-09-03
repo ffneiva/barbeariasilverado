@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ArrowRight, ArrowUpRight, X } from 'lucide-react'
 import { Picture } from '@/components/Picture'
 import { Reveal, SplitHeading } from '@/components/Reveal'
@@ -9,8 +7,7 @@ import { CUTS, whatsappUrl, type Cut } from '@/lib/business'
 import { cutMessage } from '@/lib/booking'
 import { cn } from '@/lib/utils'
 import { useIsDesktop, useReducedMotion } from '@/hooks/useMediaQuery'
-
-gsap.registerPlugin(ScrollTrigger)
+import { useGsap } from '@/hooks/useGsap'
 
 /**
  * Galeria dos nove cortes.
@@ -81,31 +78,22 @@ function Lightbox({ cut, onClose }: { cut: Cut; onClose: () => void }) {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', onKey)
 
-    const ctx = gsap.context(() => {
-      gsap
-        .timeline({ defaults: { ease: 'expo.out' } })
-        .fromTo('[data-lightbox-bg]', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 })
-        .fromTo('[data-lightbox-panel]', { autoAlpha: 0, y: 40, scale: 0.97 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.8 }, '-=0.2')
-    }, ref)
-
     return () => {
       document.body.style.overflow = ''
       window.removeEventListener('keydown', onKey)
-      ctx.revert()
     }
   }, [onClose])
 
   return (
     <div ref={ref} className="fixed inset-0 z-[180] flex items-center justify-center p-4 sm:p-8" role="dialog" aria-modal="true" aria-label={`Corte ${cut.name}`}>
       <button
-        data-lightbox-bg
         type="button"
         aria-label="Fechar"
         onClick={onClose}
-        className="absolute inset-0 cursor-default bg-void/92 backdrop-blur-md"
+        className="lightbox-bg absolute inset-0 cursor-default bg-void/92 backdrop-blur-md"
       />
 
-      <div data-lightbox-panel className="relative grid max-h-[88vh] w-full max-w-5xl overflow-hidden border border-steel-800 bg-ink md:grid-cols-[1.05fr_1fr]">
+      <div className="lightbox-panel relative grid max-h-[88vh] w-full max-w-5xl overflow-hidden border border-steel-800 bg-ink md:grid-cols-[1.05fr_1fr]">
         <div className="relative aspect-4/5 md:aspect-auto">
           <Picture
             name={cut.image}
@@ -149,12 +137,12 @@ export function Cuts() {
   const isDesktop = useIsDesktop()
   const reduced = useReducedMotion()
 
-  useEffect(() => {
-    const section = sectionRef.current
-    const track = trackRef.current
-    if (!section || !track || !isDesktop || reduced) return
+  useGsap(
+    (gsap) => {
+      const section = sectionRef.current
+      const track = trackRef.current
+      if (!section || !track) return
 
-    const ctx = gsap.context(() => {
       // A distância a percorrer é recalculada em `end` (função) para sobreviver
       // a mudanças de largura sem precisar de um listener de resize próprio.
       const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + 96)
@@ -182,14 +170,21 @@ export function Cuts() {
             rotateY: -7,
             scale: 1,
             ease: 'none',
-            scrollTrigger: { trigger: card, containerAnimation: horizontal, start: 'left right', end: 'right left', scrub: true },
+            scrollTrigger: {
+              trigger: card,
+              containerAnimation: horizontal,
+              start: 'left right',
+              end: 'right left',
+              scrub: true,
+            },
           },
         )
       })
-    }, section)
-
-    return () => ctx.revert()
-  }, [isDesktop, reduced])
+    },
+    sectionRef,
+    [isDesktop],
+    isDesktop && !reduced,
+  )
 
   return (
     <>

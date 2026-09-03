@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Menu, X } from 'lucide-react'
 import { InstagramIcon } from './BrandIcons'
 import { Logo } from './Logo'
@@ -8,9 +6,7 @@ import { Button } from './Button'
 import { OpenBadge } from './OpenBadge'
 import { BUSINESS } from '@/lib/business'
 import { cn } from '@/lib/utils'
-import { useReducedMotion } from '@/hooks/useMediaQuery'
-
-gsap.registerPlugin(ScrollTrigger)
+import { useScrolledPast } from '@/hooks/useScroll'
 
 const LINKS = [
   { id: 'manifesto', label: 'A casa' },
@@ -30,7 +26,6 @@ export function Nav({
   path: string
 }) {
   const [open, setOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
   const [active, setActive] = useState('inicio')
 
   // Numa rota sem as seções (a política de privacidade), nada deve ficar aceso.
@@ -38,17 +33,9 @@ export function Nav({
   // estado antigo é preservado e volta sozinho quando o visitante retorna.
   const highlight = LINKS.some(({ id }) => id === active) && !path.startsWith('/politica')
   const overlayRef = useRef<HTMLDivElement>(null)
-  const reduced = useReducedMotion()
-
   // Fundo do header só aparece depois que a página sai do topo — sobre o Hero
   // ele atrapalharia a leitura do título.
-  useEffect(() => {
-    const trigger = ScrollTrigger.create({
-      start: 'top -80',
-      onUpdate: (self) => setScrolled(self.scroll() > 80),
-    })
-    return () => trigger.kill()
-  }, [])
+  const scrolled = useScrolledPast(80)
 
   // Marca o link da seção visível. Um observer por seção é mais barato do que
   // recalcular posições a cada quadro de rolagem.
@@ -83,23 +70,14 @@ export function Nav({
     if (!open) return
     document.body.style.overflow = 'hidden'
 
-    const ctx = gsap.context(() => {
-      if (reduced) return
-      gsap
-        .timeline({ defaults: { ease: 'expo.out' } })
-        .fromTo('[data-menu-panel]', { yPercent: -100 }, { yPercent: 0, duration: 0.7 })
-        .fromTo('[data-menu-item]', { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, stagger: 0.06, duration: 0.6 }, '-=0.35')
-    }, overlayRef)
-
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
     window.addEventListener('keydown', onKey)
 
     return () => {
       document.body.style.overflow = ''
       window.removeEventListener('keydown', onKey)
-      ctx.revert()
     }
-  }, [open, reduced])
+  }, [open])
 
   const go = (id: string) => {
     setOpen(false)
@@ -188,7 +166,7 @@ export function Nav({
 
       {open && (
         <div ref={overlayRef} className="fixed inset-0 z-[150] lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
-          <div data-menu-panel className="absolute inset-0 flex flex-col bg-void">
+          <div className="menu-panel absolute inset-0 flex flex-col bg-void">
             <div className="container-x flex items-center justify-between py-6">
               <Logo variant="wordmark" className="w-32" />
               <button
@@ -205,10 +183,9 @@ export function Nav({
               {LINKS.map((link, i) => (
                 <button
                   key={link.id}
-                  data-menu-item
                   type="button"
                   onClick={() => go(link.id)}
-                  className="group flex items-baseline gap-5 border-b border-steel-900 py-5 text-left"
+                  className="menu-item group flex items-baseline gap-5 border-b border-steel-900 py-5 text-left"
                 >
                   <span className="font-mono text-[0.65rem] text-steel-700">
                     {String(i + 1).padStart(2, '0')}
@@ -220,7 +197,7 @@ export function Nav({
               ))}
             </nav>
 
-            <div data-menu-item className="container-x flex flex-col gap-5 py-8">
+            <div className="menu-item container-x flex flex-col gap-5 py-8">
               <OpenBadge />
               <div className="flex items-center justify-between">
                 <a href={BUSINESS.instagram} target="_blank" rel="noopener noreferrer" className="label-mono hover:text-steel-200">

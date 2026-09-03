@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { canonicalFor, type Route } from '@/lib/routes'
-import { loadAds, trackConversion } from '@/lib/analytics'
+import { loadAds, trackConversion, watchOutboundClicks } from '@/lib/analytics'
 
 /**
  * Mantém `<title>`, description e canonical em dia a cada troca de rota — e
@@ -18,9 +18,11 @@ function setMeta(selector: string, attr: string, value: string) {
 }
 
 export function useRouteMeta(route: Route) {
-  // A tag do Ads é carregada uma vez, quando a página fica ociosa.
+  // A tag do Ads é carregada uma vez, quando a página fica ociosa; o
+  // observador de cliques de saída fica ligado enquanto o app viver.
   useEffect(() => {
     loadAds()
+    return watchOutboundClicks()
   }, [])
 
   useEffect(() => {

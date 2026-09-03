@@ -230,6 +230,108 @@
   100% { transform: scale(1.6); opacity: 0; }
 }
 
+/* ── Abertura da página ──────────────────────────────────────────────────
+   A sequência que era um timeline do GSAP. Os atrasos abaixo somam ~2,4s e
+   precisam bater com DURACAO_MS em components/Preloader.tsx.                */
+/* Lightbox da galeria: era um timeline do GSAP só para o fade de entrada. */
+@keyframes lightbox-bg-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes lightbox-panel-in {
+  from { opacity: 0; transform: translateY(40px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.lightbox-bg    { animation: lightbox-bg-in 400ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.lightbox-panel { animation: lightbox-panel-in 800ms cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 0.2s; }
+
+@keyframes preloader-fade-in-out {
+  0%       { opacity: 0; transform: scale(0.94); }
+  22%, 62% { opacity: 1; transform: scale(1); }
+  74%      { opacity: 0; transform: scale(1); }
+  100%     { opacity: 0; transform: scale(1); }
+}
+
+@keyframes preloader-blade {
+  0%, 46% { transform: translateX(-120%); opacity: 0; }
+  55%     { opacity: 1; }
+  76%     { transform: translateX(120%); opacity: 1; }
+  100%    { transform: translateX(120%); opacity: 0; }
+}
+
+@keyframes preloader-curtain-up {
+  0%, 66% { transform: translateY(0); }
+  100%    { transform: translateY(-101%); }
+}
+
+@keyframes preloader-curtain-down {
+  0%, 66% { transform: translateY(0); }
+  100%    { transform: translateY(101%); }
+}
+
+.preloader-fade   { animation: preloader-fade-in-out 2.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.preloader-blade  { animation: preloader-blade 2.4s cubic-bezier(0.65, 0, 0.35, 1) both; }
+.preloader-top    { animation: preloader-curtain-up 2.4s cubic-bezier(0.65, 0, 0.35, 1) both; }
+.preloader-bottom { animation: preloader-curtain-down 2.4s cubic-bezier(0.65, 0, 0.35, 1) both; }
+
+/* ── Entrada do Hero ─────────────────────────────────────────────────────
+   Só começa quando a cortina saiu: o React adiciona `is-ready` na seção.    */
+@keyframes hero-line-up {
+  from { transform: translateY(130%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hero-rule {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.hero-ready [data-hero-line] > span { animation: hero-line-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.hero-ready [data-hero-line]:nth-of-type(2) > span { animation-delay: 0.09s; }
+
+.hero-ready [data-hero-fade] { animation: hero-fade-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 0.45s; }
+.hero-ready [data-hero-fade]:nth-of-type(2) { animation-delay: 0.53s; }
+.hero-ready [data-hero-fade]:nth-of-type(3) { animation-delay: 0.61s; }
+.hero-ready [data-hero-fade]:nth-of-type(4) { animation-delay: 0.69s; }
+
+.hero-ready [data-hero-rule] { animation: hero-rule 1.4s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 0.35s; }
+
+/* Antes de `is-ready`, o título fica escondido atrás da máscara — mas SÓ
+   quando o preloader existe para revelá-lo. Sem a classe `hero-armed`, nada
+   é escondido: é a garantia de que uma falha nunca apaga o <h1>. */
+.hero-armed:not(.hero-ready) [data-hero-line] > span { transform: translateY(130%); }
+.hero-armed:not(.hero-ready) [data-hero-fade] { opacity: 0; }
+.hero-armed:not(.hero-ready) [data-hero-rule] { transform: scaleX(0); }
+
+@keyframes menu-panel-in {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes menu-item-in {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* O escalonamento vira nth-child em vez de stagger do GSAP: são sete itens
+   fixos, e um seletor resolve o que antes exigia uma linha do tempo. */
+.menu-panel { animation: menu-panel-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.menu-item  { animation: menu-item-in 600ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.menu-item:nth-child(1) { animation-delay: 0.35s; }
+.menu-item:nth-child(2) { animation-delay: 0.41s; }
+.menu-item:nth-child(3) { animation-delay: 0.47s; }
+.menu-item:nth-child(4) { animation-delay: 0.53s; }
+.menu-item:nth-child(5) { animation-delay: 0.59s; }
+.menu-item:nth-child(6) { animation-delay: 0.65s; }
+.menu-item:nth-child(7) { animation-delay: 0.71s; }
+
 @keyframes fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }

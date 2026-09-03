@@ -1,9 +1,5 @@
-import { useEffect, useRef } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useReducedMotion } from '@/hooks/useMediaQuery'
-
-gsap.registerPlugin(ScrollTrigger)
+import { useScrollProgressRef } from '@/hooks/useScroll'
 
 /**
  * Grão de filme sobre a página inteira.
@@ -41,25 +37,13 @@ export function Grain() {
 /**
  * Barra de progresso da página desenhada como o fio de uma navalha: uma linha
  * de aço que se estende no topo conforme você desce.
+ *
+ * O `scaleX` é escrito direto no nó (ver useScrollProgressRef) em vez de virar
+ * estado do React — sessenta re-renders por segundo para mover uma linha de um
+ * pixel seria um mau negócio.
  */
 export function ScrollProgress() {
-  const ref = useRef<HTMLDivElement>(null)
-  const reduced = useReducedMotion()
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-
-    const trigger = ScrollTrigger.create({
-      start: 0,
-      end: () => document.documentElement.scrollHeight - window.innerHeight,
-      onUpdate: ({ progress }) => {
-        gsap.set(el, { scaleX: progress })
-      },
-    })
-
-    return () => trigger.kill()
-  }, [reduced])
+  const ref = useScrollProgressRef<HTMLDivElement>()
 
   return (
     <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[110] h-px bg-steel-900/60">
@@ -71,4 +55,3 @@ export function ScrollProgress() {
     </div>
   )
 }
-

@@ -1,6 +1,18 @@
 import { useEffect, useRef, type ReactNode } from 'react'
-import gsap from 'gsap'
 import { useFinePointer, useReducedMotion } from '@/hooks/useMediaQuery'
+
+/**
+ * O elemento "puxa" o cursor quando ele chega perto.
+ *
+ * Só liga em ponteiro fino: no touch não existe hover, e no celular o efeito
+ * viraria um salto estranho no momento do toque.
+ *
+ * Sem GSAP, pelo mesmo motivo do Cursor — era interpolação amortecida e nada
+ * mais. O laço dorme quando o elemento chega no lugar e acorda no próximo
+ * movimento, então não fica consumindo bateria com o mouse parado.
+ */
+
+const VELOCIDADE = 0.18
 
 type Props = {
   children: ReactNode
@@ -9,12 +21,6 @@ type Props = {
   className?: string
 }
 
-/**
- * O elemento "puxa" o cursor quando ele chega perto.
- *
- * Só liga em ponteiro fino: no touch não existe hover, e no celular o efeito
- * viraria um salto estranho no momento do toque.
- */
 export function Magnetic({ children, strength = 0.35, className }: Props) {
   const ref = useRef<HTMLSpanElement>(null)
   const fine = useFinePointer()
@@ -24,25 +30,57 @@ export function Magnetic({ children, strength = 0.35, className }: Props) {
     const el = ref.current
     if (!el || !fine || reduced) return
 
-    const move = gsap.quickTo(el, 'x', { duration: 0.5, ease: 'power3.out' })
-    const moveY = gsap.quickTo(el, 'y', { duration: 0.5, ease: 'power3.out' })
+    const alvo = { x: 0, y: 0 }
+    const atual = { x: 0, y: 0 }
+    let frame = 0
+    let rodando = false
+    let ultimo = 0
+
+    const laco = (agora: number) => {
+      const delta = Math.min(0.064, (agora - ultimo) / 1000)
+      ultimo = agora
+
+      const k = 1 - Math.pow(1 - VELOCIDADE, delta * 60)
+      atual.x += (alvo.x - atual.x) * k
+      atual.y += (alvo.y - atual.y) * k
+      el.style.transform = `translate3d(${atual.x.toFixed(2)}px, ${atual.y.toFixed(2)}px, 0)`
+
+      if (Math.abs(alvo.x - atual.x) < 0.1 && Math.abs(alvo.y - atual.y) < 0.1) {
+        el.style.transform = `translate3d(${alvo.x}px, ${alvo.y}px, 0)`
+        rodando = false
+        return
+      }
+      frame = requestAnimationFrame(laco)
+    }
+
+    const acordar = () => {
+      if (rodando) return
+      rodando = true
+      ultimo = performance.now()
+      frame = requestAnimationFrame(laco)
+    }
 
     const onMove = (e: PointerEvent) => {
       const rect = el.getBoundingClientRect()
-      move((e.clientX - (rect.left + rect.width / 2)) * strength)
-      moveY((e.clientY - (rect.top + rect.height / 2)) * strength)
+      alvo.x = (e.clientX - (rect.left + rect.width / 2)) * strength
+      alvo.y = (e.clientY - (rect.top + rect.height / 2)) * strength
+      acordar()
     }
+
     const onLeave = () => {
-      move(0)
-      moveY(0)
+      alvo.x = 0
+      alvo.y = 0
+      acordar()
     }
 
     el.addEventListener('pointermove', onMove)
     el.addEventListener('pointerleave', onLeave)
+
     return () => {
+      cancelAnimationFrame(frame)
       el.removeEventListener('pointermove', onMove)
       el.removeEventListener('pointerleave', onLeave)
-      gsap.set(el, { x: 0, y: 0 })
+      el.style.transform = ''
     }
   }, [strength, fine, reduced])
 

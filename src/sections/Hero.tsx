@@ -1,6 +1,4 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ArrowDown, MapPin, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/Button'
 import { Logo } from '@/components/Logo'
@@ -9,8 +7,7 @@ import { Picture } from '@/components/Picture'
 import { BUSINESS, whatsappUrl, WHATSAPP_DEFAULT_MESSAGE } from '@/lib/business'
 import { useIsDesktop, useReducedMotion } from '@/hooks/useMediaQuery'
 import { scrollToSection } from '@/hooks/useSmoothScroll'
-
-gsap.registerPlugin(ScrollTrigger)
+import { cn } from '@/lib/utils'
 
 // O bundle do three.js é o maior do site. Mantê-lo atrás de um lazy import faz
 // o texto do Hero pintar sem esperar o WebGL — a navalha entra depois, por cima.
@@ -18,6 +15,7 @@ const BladeScene = lazy(() => import('@/components/BladeScene'))
 
 export function Hero({ ready }: { ready: boolean }) {
   const rootRef = useRef<HTMLElement>(null)
+  const parallaxRef = useRef<HTMLDivElement>(null)
   const reduced = useReducedMotion()
   const isDesktop = useIsDesktop()
   const [showScene, setShowScene] = useState(false)
@@ -37,60 +35,54 @@ export function Hero({ ready }: { ready: boolean }) {
     return () => window.clearTimeout(handle)
   }, [ready, reduced])
 
-  // Entrada coreografada, disparada só quando a cortina do preloader saiu.
+  // A entrada e o parallax do Hero são CSS (ver index.css). O React só decide
+  // QUANDO liberar: `hero-armed` esconde os elementos enquanto o preloader
+  // cobre a tela, e `hero-ready` dispara a coreografia quando ele sai.
   //
-  // Cada tween termina com `clearProps`, devolvendo o elemento ao CSS. Isso
-  // importa mais do que parece: sem isso, o estado "escondido" fica gravado
-  // inline e um revert do contexto — ou qualquer re-execução do efeito —
-  // deixaria o título permanentemente fora da tela.
-  useEffect(() => {
-    if (!ready || reduced) return
-
-    const ctx = gsap.context(() => {
-      gsap
-        .timeline({ defaults: { ease: 'expo.out', duration: 1.2 } })
-        .fromTo(
-          '[data-hero-line] > span',
-          { yPercent: 130 },
-          { yPercent: 0, stagger: 0.09, clearProps: 'transform' },
-        )
-        .fromTo(
-          '[data-hero-fade]',
-          { autoAlpha: 0, y: 22 },
-          { autoAlpha: 1, y: 0, stagger: 0.08, clearProps: 'transform,opacity,visibility' },
-          '-=0.75',
-        )
-        .fromTo(
-          '[data-hero-rule]',
-          { scaleX: 0 },
-          { scaleX: 1, duration: 1.4, clearProps: 'transform' },
-          '-=1',
-        )
-    }, rootRef)
-
-    return () => ctx.revert()
-  }, [ready, reduced])
+  // A ordem importa e já custou um bug: se o estado escondido morasse no
+  // markup sem depender de `hero-armed`, uma falha em liberar deixaria o <h1>
+  // invisível para sempre. Sem a classe, nada é escondido.
+  const heroClasses = reduced ? '' : ready ? 'hero-armed hero-ready' : 'hero-armed'
 
   // Parallax de saída: o conteúdo sobe mais devagar que a página e desvanece,
   // o que faz a próxima seção parecer passar "por trás" do Hero.
   useEffect(() => {
     if (reduced) return
-    const ctx = gsap.context(() => {
-      gsap.to('[data-hero-parallax]', {
-        yPercent: -14,
-        autoAlpha: 0.15,
-        ease: 'none',
-        scrollTrigger: { trigger: rootRef.current, start: 'top top', end: 'bottom top', scrub: 0.6 },
-      })
-    }, rootRef)
-    return () => ctx.revert()
+    const el = parallaxRef.current
+    const section = rootRef.current
+    if (!el || !section) return
+
+    let agendado = false
+    const atualizar = () => {
+      agendado = false
+      const altura = section.offsetHeight || 1
+      const p = Math.min(1, Math.max(0, window.scrollY / altura))
+      el.style.transform = `translateY(${(-14 * p).toFixed(2)}%)`
+      el.style.opacity = String(1 - p * 0.85)
+    }
+    const onScroll = () => {
+      if (agendado) return
+      agendado = true
+      requestAnimationFrame(atualizar)
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    atualizar()
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      el.style.transform = ''
+      el.style.opacity = ''
+    }
   }, [reduced])
 
   return (
     <section
       ref={rootRef}
       id="inicio"
-      className="relative isolate flex min-h-[100svh] flex-col justify-between overflow-hidden pt-28 pb-8"
+      className={cn(
+        'relative isolate flex min-h-[100svh] flex-col justify-between overflow-hidden pt-28 pb-8',
+        heroClasses,
+      )}
     >
       {/* Fundo: couro escurecido + vinheta.
           Via <Picture> para sair em AVIF — a versão .jpg crua pesava 268 kB,
@@ -120,7 +112,7 @@ export function Hero({ ready }: { ready: boolean }) {
         </div>
       )}
 
-      <div data-hero-parallax className="container-x relative flex flex-1 flex-col justify-center">
+      <div ref={parallaxRef} className="container-x relative flex flex-1 flex-col justify-center">
         <div className="max-w-4xl">
           <div data-hero-fade className="mb-7 flex flex-wrap items-center gap-4">
             <OpenBadge />

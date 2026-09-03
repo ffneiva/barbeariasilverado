@@ -9,8 +9,14 @@ import { useIsDesktop, useReducedMotion } from '@/hooks/useMediaQuery'
 import { scrollToSection } from '@/hooks/useSmoothScroll'
 import { cn } from '@/lib/utils'
 
-// O bundle do three.js é o maior do site. Mantê-lo atrás de um lazy import faz
-// o texto do Hero pintar sem esperar o WebGL — a navalha entra depois, por cima.
+// O bundle do three.js é o maior do site: 235 kB comprimidos. Fica atrás de um
+// lazy import para o texto do Hero pintar sem esperar o WebGL.
+//
+// E só é buscado em telas grandes. No celular a navalha aparecia a 28% do
+// tamanho — um detalhe pequeno atrás do título — enquanto custava 235 kB do
+// plano de dados de quem, em geral, chegou por um anúncio. Tree-shaking não
+// resolveria: o @react-three/fiber importa o namespace inteiro do three, então
+// a biblioteca vem completa de qualquer jeito.
 const BladeScene = lazy(() => import('@/components/BladeScene'))
 
 export function Hero({ ready }: { ready: boolean }) {
@@ -23,7 +29,7 @@ export function Hero({ ready }: { ready: boolean }) {
   // A cena 3D só é buscada quando a thread principal fica ociosa — assim ela
   // nunca disputa CPU com a animação de entrada do próprio Hero.
   useEffect(() => {
-    if (!ready || reduced) return
+    if (!ready || reduced || !isDesktop) return
     const show = () => setShowScene(true)
 
     if (typeof window.requestIdleCallback === 'function') {
@@ -33,7 +39,7 @@ export function Hero({ ready }: { ready: boolean }) {
 
     const handle = window.setTimeout(show, 600) // Safari < 17
     return () => window.clearTimeout(handle)
-  }, [ready, reduced])
+  }, [ready, reduced, isDesktop])
 
   // A entrada e o parallax do Hero são CSS (ver index.css). O React só decide
   // QUANDO liberar: `hero-armed` esconde os elementos enquanto o preloader

@@ -191,10 +191,11 @@ cat > "$TMP_DIR/silverado-redirect.js" <<EOF
  *    conteúdo dividem sinal de SEO.
  *
  * 2. Traduz URL de diretório para o objeto real no S3. O build gera
- *    dist/agendar/index.html, mas o anúncio aponta para /agendar. Sem esta
- *    reescrita o S3 devolveria 404 e o CustomErrorResponse serviria o
- *    index.html da home: a página até apareceria, mas com o <head> errado —
- *    título da home, canonical da home, conversão da home.
+ *    dist/agendar/index.html, mas o anúncio aponta para /agendar.
+ *
+ * 3. Normaliza a caixa das URLs de página. O S3 é sensível a maiúsculas, e
+ *    /Agendar não encontraria /agendar/index.html. Vale só para caminhos SEM
+ *    extensão: os nomes dos assets têm hash com maiúsculas.
  */
 function handler(event) {
   var request = event.request;
@@ -220,9 +221,9 @@ function handler(event) {
   var lastSegment = uri.substring(uri.lastIndexOf('/') + 1);
 
   if (uri.charAt(uri.length - 1) === '/') {
-    request.uri = uri + 'index.html';
+    request.uri = uri.toLowerCase() + 'index.html';
   } else if (lastSegment.indexOf('.') === -1) {
-    request.uri = uri + '/index.html';
+    request.uri = uri.toLowerCase() + '/index.html';
   }
 
   return request;
@@ -234,13 +235,13 @@ if aws cloudfront describe-function --name "$FUNCTION_NAME" >/dev/null 2>&1; the
   aws cloudfront update-function \
     --name "$FUNCTION_NAME" \
     --if-match "$ETAG" \
-    --function-config "Comment=Redireciona www e reescreve URL de diretorio,Runtime=cloudfront-js-2.0" \
+    --function-config "Comment=Redireciona www normaliza caixa e reescreve URL de diretorio,Runtime=cloudfront-js-2.0" \
     --function-code fileb://$TMP_DIR/silverado-redirect.js >/dev/null
   warn "Function já existia — código atualizado."
 else
   aws cloudfront create-function \
     --name "$FUNCTION_NAME" \
-    --function-config "Comment=Redireciona www e reescreve URL de diretorio,Runtime=cloudfront-js-2.0" \
+    --function-config "Comment=Redireciona www normaliza caixa e reescreve URL de diretorio,Runtime=cloudfront-js-2.0" \
     --function-code fileb://$TMP_DIR/silverado-redirect.js >/dev/null
   ok "Function criada."
 fi

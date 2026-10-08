@@ -1,0 +1,49 @@
+import { useEffect } from 'react'
+import { canonicalFor, type Route } from '@/lib/routes'
+import { loadAds, trackConversion } from '@/lib/analytics'
+import { loadPixel, trackMetaPageView } from '@/lib/meta'
+import { watchOutboundClicks } from '@/lib/tracking'
+
+/**
+ * Mantém `<title>`, description e canonical em dia a cada troca de rota — e
+ * dispara a conversão do Google Ads e o PageView da Meta daquela rota.
+ *
+ * Num site de várias páginas isso viria de graça do servidor. Aqui a navegação
+ * é do cliente, então o `<head>` precisa ser atualizado na mão: sem isso, quem
+ * chega em /loja pela navegação interna compartilharia o link com o título da
+ * home. O HTML inicial de cada rota já vem correto do build (ver o plugin em
+ * vite.config.ts); este hook cobre as navegações que acontecem depois.
+ */
+function setMeta(selector: string, attr: string, value: string) {
+  const el = document.head.querySelector(selector)
+  if (el) el.setAttribute(attr, value)
+}
+
+export function useRouteMeta(route: Route) {
+  // As duas tags são carregadas uma vez, quando a página fica ociosa; o
+  // observador de cliques de saída fica ligado enquanto o app viver.
+  useEffect(() => {
+    loadAds()
+    loadPixel()
+    return watchOutboundClicks()
+  }, [])
+
+  useEffect(() => {
+    document.title = route.title
+    setMeta('meta[name="description"]', 'content', route.description)
+    setMeta('link[rel="canonical"]', 'href', canonicalFor(route))
+    setMeta('meta[property="og:title"]', 'content', route.title)
+    setMeta('meta[property="og:description"]', 'content', route.description)
+    setMeta('meta[property="og:url"]', 'content', canonicalFor(route))
+    setMeta('meta[name="twitter:title"]', 'content', route.title)
+    setMeta('meta[name="twitter:description"]', 'content', route.description)
+    setMeta(
+      'meta[name="robots"]',
+      'content',
+      route.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large',
+    )
+
+    trackConversion(route.adsConversion)
+    trackMetaPageView()
+  }, [route])
+}

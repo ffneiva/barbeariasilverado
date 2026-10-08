@@ -1,0 +1,39 @@
+MIT License
+
+Copyright (c) 2026 Felipe Neiva
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---------------------------------------------------------------------------
+
+A licença acima cobre o CÓDIGO-FONTE deste repositório.
+
+Não estão cobertos por ela, e permanecem propriedade da Barbearia Silverado
+(68.366.916 LUCAS HENRIQUE COSTA SILVA — CNPJ 68.366.916/0001-01):
+
+  · a marca "Silverado" e o logotipo, em qualquer variação;
+  · as fotografias em assets-src/ e public/images/;
+  · os textos institucionais e comerciais do site.
+
+Estes materiais são usados aqui sob autorização do titular, exclusivamente
+para operar o site da barbearia. Reutilizá-los em outro projeto exige
+autorização por escrito.
+
+As fontes Bebas Neue, Inter e JetBrains Mono, em public/fonts/, são
+distribuídas sob a SIL Open Font License 1.1 pelos seus respectivos autores.

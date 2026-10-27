@@ -364,3 +364,9 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Conteúdo gravado no build para robôs (scripts/prerender.mjs): invisível até o
+   React montar o conteúdo vivo e tirar o atributo (main.tsx). */
+#root[data-pre] {
+  visibility: hidden;
+}

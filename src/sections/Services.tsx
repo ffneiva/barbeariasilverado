@@ -121,6 +121,20 @@ export function Services() {
           ))}
         </ul>
 
+        {/* Os cards levam ao WhatsApp (conversão); aqui, a página de cada
+            serviço, para quem quer os detalhes e para o Google descobrir. */}
+        <p className="mt-6 text-xs leading-relaxed text-steel-600 sm:text-sm">
+          Detalhes de cada serviço:{' '}
+          {SERVICES.map((s, i) => (
+            <span key={s.id}>
+              {i > 0 && ' · '}
+              <a href={`/servicos/${s.id}`} className="text-steel-400 transition-colors hover:text-steel-100">
+                {s.name}
+              </a>
+            </span>
+          ))}
+        </p>
+
         {/*
           Pilares.
 

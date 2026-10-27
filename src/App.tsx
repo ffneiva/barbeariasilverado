@@ -20,6 +20,7 @@ import { Privacy } from '@/pages/Privacy'
 import { NaoEncontrada } from '@/pages/NaoEncontrada'
 import { Agendar } from '@/pages/Agendar'
 import { Loja } from '@/pages/Loja'
+import { Corte, Cortes, Perguntas, Servico, Servicos } from '@/pages/Conteudo'
 import { routeFor } from '@/lib/routes'
 import { sem } from '@/lib/utils'
 
@@ -71,6 +72,22 @@ function usePath() {
     setPath(next)
     window.scrollTo({ top: 0, behavior: 'instant' })
   }, [])
+
+  // Links internos são <a href> de verdade (robôs seguem); aqui o clique vira
+  // navegação sem recarregar. Âncoras, nova aba e teclas modificadoras passam.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+      const a = (e.target as HTMLElement | null)?.closest?.('a[href]') as HTMLAnchorElement | null
+      if (!a || a.target || a.hasAttribute('download')) return
+      const url = new URL(a.href, window.location.href)
+      if (url.origin !== window.location.origin || url.hash || url.pathname.startsWith('/painel')) return
+      e.preventDefault()
+      navigate(url.pathname)
+    }
+    document.addEventListener('click', onClick)
+    return () => document.removeEventListener('click', onClick)
+  }, [navigate])
 
   return { path, navigate }
 }
@@ -148,6 +165,11 @@ export default function App() {
       {route.path === '/agendar' && <Agendar onNavigate={navigate} />}
       {(route.path === '/produtos' || route.path === '/loja') && <Loja onNavigate={navigate} />}
       {route.path === '/politica-de-privacidade' && <Privacy onBack={() => navigate('/')} />}
+      {route.path === '/servicos' && <Servicos />}
+      {route.path.startsWith('/servicos/') && <Servico path={route.path} />}
+      {route.path === '/cortes' && <Cortes />}
+      {route.path.startsWith('/cortes/') && <Corte path={route.path} />}
+      {route.path === '/perguntas-frequentes' && <Perguntas />}
       {route.path === '/404' && <NaoEncontrada onNavigate={navigate} />}
 
       {isHome && montarMarca && (

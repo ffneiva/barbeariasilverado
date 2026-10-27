@@ -1,4 +1,5 @@
-import { BUSINESS, CUTS, FAQ, PRODUCTS, SCHEDULE, SERVICES, type Product } from './business.ts'
+import { BUSINESS, CUTS, FAQ, GOOGLE_PROFILE, PRODUCTS, SCHEDULE, SERVICES, type Product } from './business.ts'
+import { PAGINAS_CORTE, PAGINAS_SERVICO, PERGUNTAS_GERAIS, type Pergunta } from './paginas.ts'
 import { canonicalFor, routeFor } from './routes.ts'
 
 /**
@@ -105,6 +106,121 @@ function nosDaRota(caminho: string) {
 
   if (rota.path === '/produtos' || rota.path === '/loja') return [trilha, ...produtos]
 
+  // Páginas de conteúdo: cada uma marca o que mostra (serviço com preço,
+  // corte com foto, perguntas abertas na tela).
+  const url = canonicalFor(rota)
+  const pagina = (extra: Record<string, unknown> = {}) => ({
+    '@type': 'WebPage',
+    '@id': `${url}#pagina`,
+    url,
+    name: rota.title,
+    description: rota.description,
+    inLanguage: 'pt-BR',
+    isPartOf: { '@id': `${BUSINESS.url}/#site` },
+    about: { '@id': ID_NEGOCIO },
+    breadcrumb: { '@id': `${url}#trilha` },
+    ...extra,
+  })
+  const faq = (itens: Pergunta[]) => ({
+    '@type': 'FAQPage',
+    '@id': `${url}#faq`,
+    mainEntity: itens.map((p) => ({ '@type': 'Question', name: p.q, acceptedAnswer: { '@type': 'Answer', text: p.a } })),
+  })
+  const trilha3 = (meio: [string, string], fim: string) => ({
+    '@type': 'BreadcrumbList',
+    '@id': `${url}#trilha`,
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Início', item: `${BUSINESS.url}/` },
+      { '@type': 'ListItem', position: 2, name: meio[0], item: `${BUSINESS.url}${meio[1]}` },
+      { '@type': 'ListItem', position: 3, name: fim, item: url },
+    ],
+  })
+
+  const ps = PAGINAS_SERVICO.find((p) => p.path === rota.path)
+  if (ps) {
+    const s = ps.servico
+    return [
+      trilha3(['Serviços', '/servicos'], s.name),
+      pagina({ mainEntity: { '@id': `${url}#servico` } }),
+      {
+        '@type': 'Service',
+        '@id': `${url}#servico`,
+        name: s.name,
+        serviceType: s.name,
+        description: ps.detalhe,
+        provider: { '@id': ID_NEGOCIO },
+        areaServed: { '@type': 'City', name: 'Goiânia' },
+        ...(s.price !== null && {
+          offers: {
+            '@type': 'Offer',
+            url,
+            priceCurrency: 'BRL',
+            ...(s.fromPrice
+              ? { priceSpecification: { '@type': 'PriceSpecification', minPrice: s.price.toFixed(2), priceCurrency: 'BRL' } }
+              : { price: s.price.toFixed(2) }),
+            seller: { '@id': ID_NEGOCIO },
+          },
+        }),
+      },
+      faq(ps.perguntas),
+    ]
+  }
+
+  const pc = PAGINAS_CORTE.find((p) => p.path === rota.path)
+  if (pc) {
+    return [
+      trilha3(['Cortes', '/cortes'], pc.corte.name),
+      pagina({ primaryImageOfPage: { '@id': `${url}#foto` } }),
+      {
+        '@type': 'ImageObject',
+        '@id': `${url}#foto`,
+        contentUrl: `${BUSINESS.url}/images/${pc.corte.image}-1280.webp`,
+        caption: `Corte ${pc.corte.name} feito na ${BUSINESS.name}`,
+        creditText: BUSINESS.name,
+      },
+      faq(pc.perguntas),
+    ]
+  }
+
+  if (rota.path === '/servicos') {
+    return [
+      trilha,
+      pagina(),
+      {
+        '@type': 'ItemList',
+        '@id': `${url}#lista`,
+        name: 'Serviços da Barbearia Silverado',
+        itemListElement: PAGINAS_SERVICO.map((p, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          url: `${BUSINESS.url}${p.path}`,
+          name: p.servico.name,
+        })),
+      },
+      faq(PERGUNTAS_GERAIS.slice(-3)),
+    ]
+  }
+
+  if (rota.path === '/cortes') {
+    return [
+      trilha,
+      pagina(),
+      {
+        '@type': 'ItemList',
+        '@id': `${url}#lista`,
+        name: 'Cortes feitos na Barbearia Silverado',
+        itemListElement: PAGINAS_CORTE.map((p, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          url: `${BUSINESS.url}${p.path}`,
+          name: p.corte.name,
+        })),
+      },
+    ]
+  }
+
+  if (rota.path === '/perguntas-frequentes') return [trilha, pagina(), faq(PERGUNTAS_GERAIS)]
+
   if (rota.path === '/agendar') {
     return [
       trilha,
@@ -166,9 +282,14 @@ export function buildJsonLd(caminho = '/') {
         slogan: BUSINESS.tagline,
         description: BUSINESS.description,
         url: BUSINESS.url,
-        telephone: `+${BUSINESS.whatsapp}`,
+        // E.164 legível: +55 62 99857-5858.
+        telephone: `+${BUSINESS.whatsapp.slice(0, 2)} ${BUSINESS.whatsapp.slice(2, 4)} ${BUSINESS.whatsapp.slice(4, 9)}-${BUSINESS.whatsapp.slice(9)}`,
         email: BUSINESS.email,
-        image: `${BUSINESS.url}/og.jpg`,
+        image: [
+          `${BUSINESS.url}/og.jpg`,
+          `${BUSINESS.url}/images/hero-shop.jpg`,
+          ...CUTS.slice(0, 3).map((c) => `${BUSINESS.url}/images/${c.image}-1280.webp`),
+        ],
         logo: `${BUSINESS.url}/images/logo-wordmark.png`,
         priceRange: 'R$ 10 a R$ 90',
         currenciesAccepted: 'BRL',
@@ -188,7 +309,7 @@ export function buildJsonLd(caminho = '/') {
         },
         hasMap: BUSINESS.mapsLink,
         openingHoursSpecification,
-        sameAs: [BUSINESS.instagram, BUSINESS.threads],
+        sameAs: [BUSINESS.instagram, BUSINESS.threads, GOOGLE_PROFILE],
         // O bairro entra junto com a cidade: quase toda busca que importa aqui
         // é "barbearia + bairro", e "Goiânia" sozinho é largo demais para dizer
         // alguma coisa sobre uma barbearia de rua.
@@ -270,7 +391,9 @@ export function buildJsonLd(caminho = '/') {
                 '@type': 'ImageObject',
                 name: cut.name,
                 caption: cut.blurb,
-                contentUrl: `${BUSINESS.url}/images/${cut.image}.jpg`,
+                // Só existem as versões otimizadas (o .jpg nunca foi publicado).
+                contentUrl: `${BUSINESS.url}/images/${cut.image}-1280.webp`,
+                url: `${BUSINESS.url}/cortes/${cut.id}`,
               })),
             },
           ]

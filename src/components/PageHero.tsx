@@ -17,15 +17,18 @@ export function PageHero({
   lead,
   children,
   showStatus = true,
+  compacto = false,
 }: {
   eyebrow: string
   title: string
   lead: ReactNode
   children?: ReactNode
   showStatus?: boolean
+  /** Logo abaixo de uma trilha de navegação: menos espaço em cima. */
+  compacto?: boolean
 }) {
   return (
-    <header className="relative overflow-hidden pt-32 pb-10 sm:pt-40 sm:pb-14">
+    <header className={`relative overflow-hidden pb-10 sm:pb-14 ${compacto ? 'pt-6 sm:pt-8' : 'pt-32 sm:pt-40'}`}>
       {/* Mesma textura do Hero, bem mais discreta: identidade sem competir
           com o conteúdo que vem logo abaixo. */}
       <div aria-hidden className="absolute inset-0 -z-10">

@@ -5,6 +5,8 @@ import path from 'node:path'
 import { execFileSync } from 'node:child_process'
 import { buildJsonLd } from './src/lib/seo.ts'
 import { ROUTES, NAO_ENCONTRADA, canonicalFor } from './src/lib/routes.ts'
+import { BUSINESS } from './src/lib/business.ts'
+import { gerarLlmsFullTxt, gerarLlmsTxt } from './src/lib/llms.ts'
 
 /**
  * Injeta o JSON-LD no index.html em tempo de build.
@@ -81,6 +83,24 @@ function perRouteHtmlPlugin(): Plugin {
           .replace(
             /(<meta name="twitter:title" content=")[^"]*(")/,
             `$1${escapeHtml(route.title)}$2`,
+          )
+          // Faltavam: a prévia no WhatsApp de /agendar e /produtos mostrava a
+          // descrição da home.
+          .replace(
+            /(<meta\s+property="og:description"\s+content=")[^"]*(")/,
+            `$1${escapeHtml(route.description)}$2`,
+          )
+          .replace(
+            /(<meta\s+name="twitter:description"\s+content=")[^"]*(")/,
+            `$1${escapeHtml(route.description)}$2`,
+          )
+          .replace(
+            /(<meta property="og:image" content=")[^"]*(")/,
+            `$1${BUSINESS.url}${route.og ?? '/og.jpg'}$2`,
+          )
+          .replace(
+            /(<meta name="twitter:image" content=")[^"]*(")/,
+            `$1${BUSINESS.url}${route.og ?? '/og.jpg'}$2`,
           )
           .replace(
             /(<meta name="robots" content=")[^"]*(")/,
@@ -161,8 +181,50 @@ function escapeHtml(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
+/**
+ * robots.txt, llms.txt e llms-full.txt gerados no build, da mesma fonte que a
+ * página (business.ts / paginas.ts): preço e horário nunca divergem.
+ *
+ * Os robôs de IA são liberados de propósito: quem pergunta ao ChatGPT ou ao
+ * Perplexity "barbearia no Jardim América" só recebe a Silverado como resposta
+ * se o robô deles puder ler o site. O painel fica fora de tudo.
+ */
+function arquivosParaRobosPlugin(): Plugin {
+  const IAS = [
+    'GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-SearchBot', 'Claude-User',
+    'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Applebot-Extended', 'Bingbot', 'DuckAssistBot', 'meta-externalagent',
+  ]
+  return {
+    name: 'silverado-robos',
+    apply: 'build',
+    generateBundle() {
+      const robots = [
+        '# Barbearia Silverado: buscadores e assistentes de IA são bem-vindos.',
+        'User-agent: *',
+        'Allow: /',
+        'Disallow: /painel/',
+        '',
+        ...IAS.flatMap((ia) => [`User-agent: ${ia}`, 'Allow: /', 'Disallow: /painel/', '']),
+        `Sitemap: ${BUSINESS.url}/sitemap.xml`,
+        `# Resumo para IAs: ${BUSINESS.url}/llms.txt`,
+        '',
+      ].join('\n')
+      this.emitFile({ type: 'asset', fileName: 'robots.txt', source: robots })
+      this.emitFile({ type: 'asset', fileName: 'llms.txt', source: gerarLlmsTxt() })
+      this.emitFile({ type: 'asset', fileName: 'llms-full.txt', source: gerarLlmsFullTxt() })
+    },
+  }
+}
+
 export default defineConfig({
-  plugins: [react(), tailwindcss(), jsonLdPlugin(), perRouteHtmlPlugin(), sitemapPlugin()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    jsonLdPlugin(),
+    perRouteHtmlPlugin(),
+    sitemapPlugin(),
+    arquivosParaRobosPlugin(),
+  ],
   resolve: {
     alias: { '@': path.resolve(import.meta.dirname, 'src') },
   },

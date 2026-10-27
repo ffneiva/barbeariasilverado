@@ -31,6 +31,12 @@ export function Faq() {
             >
               Não achou sua dúvida? Pergunte no WhatsApp →
             </a>
+            <a
+              href="/perguntas-frequentes"
+              className="mt-3 block text-sm text-steel-500 underline decoration-steel-800 underline-offset-4 transition-colors hover:text-steel-100"
+            >
+              Ver todas as perguntas e respostas
+            </a>
           </Reveal>
         </div>
 

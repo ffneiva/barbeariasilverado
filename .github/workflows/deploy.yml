@@ -55,8 +55,15 @@ jobs:
       - name: 🖥️ Smoke test do dev server
         run: npm run check:dev
 
+      # O build pré-renderiza cada página num Chromium (scripts/prerender.mjs):
+      # é o que põe o texto no HTML para robôs que não rodam JavaScript.
+      - name: 🌐 Chromium para o pré-render
+        run: npx playwright install --with-deps chromium
+
       - name: 🏗️ Build
         run: npm run build
+        env:
+          PRERENDER_OBRIGATORIO: '1'
 
       # As credenciais são temporárias (1h) e emitidas na hora pelo STS a partir
       # do token OIDC do GitHub. Não existe access key guardada em lugar nenhum.
@@ -76,6 +83,7 @@ jobs:
             --no-progress \
             --exclude "*index.html" \
             --exclude "robots.txt" \
+            --exclude "llms*.txt" \
             --exclude "sitemap.xml" \
             --exclude "site.webmanifest" \
             --exclude "google*.html" \
@@ -125,6 +133,13 @@ jobs:
           aws s3 cp dist/robots.txt "s3://${{ vars.S3_BUCKET_NAME }}/robots.txt" \
             --no-progress --content-type "text/plain; charset=utf-8" \
             --cache-control "public,max-age=3600"
+
+          # Resumos para assistentes de IA: mudam com preço e horário.
+          for f in llms.txt llms-full.txt; do
+            aws s3 cp "dist/$f" "s3://${{ vars.S3_BUCKET_NAME }}/$f" \
+              --no-progress --content-type "text/plain; charset=utf-8" \
+              --cache-control "public,max-age=3600"
+          done
 
           aws s3 cp dist/sitemap.xml "s3://${{ vars.S3_BUCKET_NAME }}/sitemap.xml" \
             --no-progress --content-type "application/xml; charset=utf-8" \

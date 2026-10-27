@@ -1,4 +1,5 @@
 import { StrictMode } from 'react'
+import { Montado } from './components/Montado'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -12,6 +13,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
       <App />
+      <Montado />
     </ErrorBoundary>
   </StrictMode>,
 )

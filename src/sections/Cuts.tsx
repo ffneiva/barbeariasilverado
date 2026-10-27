@@ -115,6 +115,9 @@ function Lightbox({ cut, onClose }: { cut: Cut; onClose: () => void }) {
             Quero este corte
             <ArrowRight className="h-4 w-4" strokeWidth={1.6} />
           </Button>
+          <a href={`/cortes/${cut.id}`} className="text-sm text-steel-500 underline decoration-steel-800 underline-offset-4 transition-colors hover:text-steel-200">
+            Ver a página do {cut.name}
+          </a>
         </div>
 
         <button
@@ -235,6 +238,9 @@ export function Cuts() {
               <Button href={whatsappUrl('Olá! Tenho uma foto de referência de corte. Consigo fazer na Silverado?')} magnetic={false}>
                 Enviar referência
               </Button>
+              <a href="/cortes" className="text-sm text-steel-500 underline decoration-steel-800 underline-offset-4 transition-colors hover:text-steel-200">
+                Ver todos os cortes
+              </a>
             </div>
           </div>
         </div>

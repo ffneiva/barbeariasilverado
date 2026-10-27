@@ -1,4 +1,5 @@
 import { BUSINESS } from './business.ts'
+import { PAGINAS_CORTE, PAGINAS_SERVICO } from './paginas.ts'
 
 /**
  * As rotas do site, com os metadados de cada uma.
@@ -29,8 +30,10 @@ export type Route = {
    * campanha.
    */
   adsConversion?: string
-  /** Mantém a página fora do índice do Google (usado só pelo 404). */
+  /** Mantém a página fora do índice do Google (404 e painel). */
   noindex?: boolean
+  /** Imagem de prévia própria (WhatsApp, Instagram), relativa ao site. */
+  og?: string
   /**
    * Endereço antigo que mostra a mesma página de outra rota: a canônica aponta
    * para ela e o endereço fica fora do sitemap. /loja continua abrindo (links
@@ -70,30 +73,55 @@ export const ROUTES: Route[] = [
     path: '/',
     title: 'Barbearia Silverado · Barbearia no Jardim América, Goiânia',
     description:
-      'Barbearia no Jardim América, em Goiânia. Degradê, fade, barba e sobrancelha com acabamento na navalha. Você explica o corte que quer e sai com ele. Corte a partir de R$ 40. Agende pelo WhatsApp.',
+      'Barbearia no Jardim América, Goiânia: degradê, fade, barba e sobrancelha com acabamento na navalha. Corte R$ 40. Seg a sáb, 9h às 19h. Agende pelo WhatsApp.',
     adsConversion: PAGEVIEW.home,
   },
   {
     path: '/agendar',
-    title: 'Agendar horário · Barbearia Silverado, Jardim América, Goiânia',
+    title: 'Agendar horário · Barbearia Silverado, Goiânia',
     description:
       'Escolha o serviço, o dia e a hora, e a mensagem chega pronta no WhatsApp da Barbearia Silverado. Corte R$ 40, corte + barba R$ 70. Jardim América, Goiânia.',
     adsConversion: PAGEVIEW.agendar,
   },
   {
     path: '/produtos',
-    title: 'Produtos · Barbearia Silverado: pomadas, minoxidil e óleo de barba',
+    title: 'Produtos: pomadas, minoxidil e óleo · Barbearia Silverado',
     description:
-      'Pomada Vision e Infinity, minoxidil manipulado 5%, derma roller e óleo para barba Classe A. Os mesmos produtos usados no atendimento, com preço fechado. Jardim América, Goiânia.',
+      'Pomadas Vision e Infinity, minoxidil manipulado 5%, derma roller e óleo de barba Classe A, com preço fechado, na Barbearia Silverado, Jardim América, Goiânia.',
     adsConversion: PAGEVIEW.loja,
   },
   {
     path: '/loja',
-    title: 'Produtos · Barbearia Silverado: pomadas, minoxidil e óleo de barba',
+    title: 'Produtos: pomadas, minoxidil e óleo · Barbearia Silverado',
     description:
-      'Pomada Vision e Infinity, minoxidil manipulado 5%, derma roller e óleo para barba Classe A. Os mesmos produtos usados no atendimento, com preço fechado. Jardim América, Goiânia.',
+      'Pomadas Vision e Infinity, minoxidil manipulado 5%, derma roller e óleo de barba Classe A, com preço fechado, na Barbearia Silverado, Jardim América, Goiânia.',
     adsConversion: PAGEVIEW.loja,
     canonical: '/produtos',
+  },
+  {
+    path: '/servicos',
+    title: 'Serviços e preços · Barbearia Silverado, Goiânia',
+    description:
+      'Tabela de serviços e preços da Barbearia Silverado no Jardim América, Goiânia: corte R$ 40, barba R$ 40, corte + barba R$ 70, sobrancelha, pintura e mais.',
+  },
+  ...PAGINAS_SERVICO.map((p) => ({ path: p.path, title: p.titulo, description: limitar(p.descricao) })),
+  {
+    path: '/cortes',
+    title: 'Cortes masculinos · Barbearia Silverado, Goiânia',
+    description:
+      'Degradê, low fade, mid fade, skin fade, militar, social, americano, mullet e degradê com V: os cortes feitos na Barbearia Silverado, no Jardim América.',
+  },
+  ...PAGINAS_CORTE.map((p) => ({
+    path: p.path,
+    title: p.titulo,
+    description: limitar(p.descricao),
+    og: `/images/${p.corte.image}-1280.webp`,
+  })),
+  {
+    path: '/perguntas-frequentes',
+    title: 'Perguntas frequentes · Barbearia Silverado, Goiânia',
+    description:
+      'Preço do corte, horário, se precisa agendar, onde fica, formas de pagamento: as respostas diretas sobre a Barbearia Silverado, no Jardim América.',
   },
   {
     path: '/politica-de-privacidade',
@@ -104,6 +132,12 @@ export const ROUTES: Route[] = [
 ]
 
 export const HOME = ROUTES[0]
+
+/** Meta description cabe em ~160 caracteres; corta na última palavra inteira. */
+function limitar(texto: string, max = 158): string {
+  if (texto.length <= max) return texto
+  return `${texto.slice(0, texto.lastIndexOf(' ', max - 1)).replace(/[,.:;]$/, '')}.`
+}
 
 /**
  * Rota usada quando o endereço não existe.

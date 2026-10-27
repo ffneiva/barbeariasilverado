@@ -27,11 +27,11 @@ import { scrollToSection, useSmoothScroll } from '@/hooks/useSmoothScroll'
 /**
  * Roteador de ~30 linhas.
  *
- * São quatro telas — a landing, /agendar, /loja e a política de privacidade —,
+ * São quatro telas (a landing, /agendar, /produtos e a política de privacidade),
  * o que ainda não justifica os ~15 kB do react-router. A History API resolve.
  *
  * As rotas e seus metadados vivem em lib/routes.ts, que também é lido pelo
- * build para gerar um HTML estático por rota: assim /agendar e /loja chegam ao
+ * build para gerar um HTML estático por rota: assim /agendar e /produtos chegam ao
  * robô do Google Ads e ao leitor de link do WhatsApp já com título e descrição
  * próprios, sem depender de a aplicação rodar.
  */
@@ -124,7 +124,7 @@ export default function App() {
           navegação por teclado recomeçar do início do conteúdo novo. */}
       <div ref={alvoRef} tabIndex={-1} className="outline-none">
       {route.path === '/agendar' && <Agendar onNavigate={navigate} />}
-      {route.path === '/loja' && <Loja onNavigate={navigate} />}
+      {(route.path === '/produtos' || route.path === '/loja') && <Loja onNavigate={navigate} />}
       {route.path === '/politica-de-privacidade' && <Privacy onBack={() => navigate('/')} />}
       {route.path === '/404' && <NaoEncontrada onNavigate={navigate} />}
 

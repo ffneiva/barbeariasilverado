@@ -141,7 +141,7 @@ function sitemapPlugin(): Plugin {
     apply: 'build',
     generateBundle() {
       const lastmod = dataDoUltimoCommit()
-      const urls = ROUTES.filter((route) => !route.noindex)
+      const urls = ROUTES.filter((route) => !route.noindex && !route.canonical)
         .map(
           (route) =>
             `  <url>\n    <loc>${canonicalFor(route)}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`,

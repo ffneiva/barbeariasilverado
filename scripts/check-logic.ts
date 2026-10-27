@@ -41,10 +41,10 @@ check('seg 10h — fecha ao meio-dia', getOpenState(at('2026-08-24T13:00:00Z')).
 
 // 15:30 UTC = 12:30 → intervalo de almoço
 check('seg 12h30 — fechado', getOpenState(at('2026-08-24T15:30:00Z')).open, false)
-check('seg 12h30 — volta do almoço', getOpenState(at('2026-08-24T15:30:00Z')).detail, 'Volta do almoço às 14h')
+check('seg 12h30 — volta do almoço', getOpenState(at('2026-08-24T15:30:00Z')).detail, 'Volta do almoço às 13h')
 
 // 20:00 UTC = 17:00 → segundo turno
-check('seg 17h — aberto até 20h', getOpenState(at('2026-08-24T20:00:00Z')).detail, 'Aberto até 20h')
+check('seg 17h — aberto até 19h', getOpenState(at('2026-08-24T20:00:00Z')).detail, 'Aberto até 19h')
 
 // 23:30 UTC = 20:30 → expediente encerrado
 check('seg 20h30 — fechado', getOpenState(at('2026-08-24T23:30:00Z')).open, false)
@@ -87,12 +87,12 @@ check('corte NÃO é "a partir de"', corte.fromPrice, undefined)
 
 const hojeCorte = slotsFor(days[0], corte, base)
 check('hoje/corte — respeita 1h de antecedência', hojeCorte[0], '11:00')
-check('hoje/corte — nada durante o almoço', hojeCorte.some((t) => t >= '12:00' && t < '14:00'), false)
-check('hoje/corte — último cabe antes de fechar', hojeCorte.at(-1), '19:00')
+check('hoje/corte — nada durante o almoço', hojeCorte.some((t) => t >= '12:00' && t < '13:00'), false)
+check('hoje/corte — último cabe antes de fechar', hojeCorte.at(-1), '18:00')
 
 const hojeCombo = slotsFor(days[0], combo, base)
 check('hoje/combo 70min — não cabe na manhã', hojeCombo.some((t) => t < '12:00'), false)
-check('hoje/combo 70min — último é 18h30', hojeCombo.at(-1), '18:30')
+check('hoje/combo 70min — último é 17h30', hojeCombo.at(-1), '17:30')
 
 const amanhaCorte = slotsFor(days[1], corte, base)
 check('amanhã/corte — começa às 9h', amanhaCorte[0], '09:00')
@@ -182,9 +182,10 @@ check('produto declara venda no balcão', (produtos[0].offers as { availability:
 // Marcar conteúdo que a página não mostra é violação das diretrizes de dados
 // estruturados, e o preço não é um aviso: é a página perder a elegibilidade.
 check('FAQ marcado na home, que o mostra', tipos('/').includes('FAQPage'), true)
-check('FAQ ausente da /loja, que não o mostra', tipos('/loja').includes('FAQPage'), false)
+check('FAQ ausente da /produtos, que não o mostra', tipos('/produtos').includes('FAQPage'), false)
 check('galeria ausente da /agendar', tipos('/agendar').includes('ImageGallery'), false)
-check('/loja lista os produtos', produtosDe('/loja').length, PRODUCTS.length)
+check('/produtos lista os produtos', produtosDe('/produtos').length, PRODUCTS.length)
+check('/loja (endereço antigo) também lista', produtosDe('/loja').length, PRODUCTS.length)
 check('/agendar não lista produtos', produtosDe('/agendar').length, 0)
 check('rota filha tem trilha de navegação', tipos('/agendar').includes('BreadcrumbList'), true)
 check('home não tem trilha', tipos('/').includes('BreadcrumbList'), false)

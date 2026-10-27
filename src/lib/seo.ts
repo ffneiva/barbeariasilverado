@@ -18,7 +18,7 @@ import { canonicalFor, routeFor } from './routes.ts'
 const ID_NEGOCIO = `${BUSINESS.url}/#barbearia`
 
 /** Rotas que renderizam a seção de produtos (ver App.tsx e pages/Loja.tsx). */
-const ROTAS_COM_PRODUTOS = new Set(['/', '/loja'])
+const ROTAS_COM_PRODUTOS = new Set(['/', '/produtos', '/loja'])
 
 /**
  * Um produto como o Google espera ler.
@@ -36,11 +36,11 @@ function produtoJsonLd(product: Product) {
   // Âncora do próprio card (ver sections/Products.tsx), não da seção. Uma URL
   // que leva ao item exato é o que o Google espera em `Offer.url` — e de quebra
   // dá um link para mandar no WhatsApp quando alguém pergunta o preço de um.
-  const url = `${BUSINESS.url}/loja#${product.id}`
+  const url = `${BUSINESS.url}/produtos#${product.id}`
 
   return {
     '@type': 'Product',
-    '@id': `${BUSINESS.url}/loja#produto-${product.id}`,
+    '@id': `${BUSINESS.url}/produtos#produto-${product.id}`,
     name: `${product.name} ${product.size}`,
     description: product.description,
     sku: product.id,
@@ -79,7 +79,7 @@ function nosDaRota(caminho: string) {
     ? [
         {
           '@type': 'ItemList',
-          '@id': `${BUSINESS.url}/loja#produtos`,
+          '@id': `${BUSINESS.url}/produtos#produtos`,
           name: 'Produtos à venda na Barbearia Silverado',
           numberOfItems: PRODUCTS.length,
           itemListOrder: 'https://schema.org/ItemListUnordered',
@@ -103,7 +103,7 @@ function nosDaRota(caminho: string) {
     ],
   }
 
-  if (rota.path === '/loja') return [trilha, ...produtos]
+  if (rota.path === '/produtos' || rota.path === '/loja') return [trilha, ...produtos]
 
   if (rota.path === '/agendar') {
     return [

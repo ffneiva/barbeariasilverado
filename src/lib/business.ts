@@ -59,17 +59,16 @@ export type DaySchedule = { label: string; short: string; shifts: Shift[] }
 
 export const SCHEDULE: DaySchedule[] = [
   { label: 'Domingo', short: 'Dom', shifts: [] },
-  { label: 'Segunda-feira', short: 'Seg', shifts: [{ open: '09:00', close: '12:00' }, { open: '14:00', close: '20:00' }] },
-  { label: 'Terça-feira', short: 'Ter', shifts: [{ open: '09:00', close: '12:00' }, { open: '14:00', close: '20:00' }] },
-  { label: 'Quarta-feira', short: 'Qua', shifts: [{ open: '09:00', close: '12:00' }, { open: '14:00', close: '20:00' }] },
-  { label: 'Quinta-feira', short: 'Qui', shifts: [{ open: '09:00', close: '12:00' }, { open: '14:00', close: '20:00' }] },
-  { label: 'Sexta-feira', short: 'Sex', shifts: [{ open: '09:00', close: '12:00' }, { open: '14:00', close: '20:00' }] },
+  { label: 'Segunda-feira', short: 'Seg', shifts: [{ open: '09:00', close: '12:00' }, { open: '13:00', close: '19:00' }] },
+  { label: 'Terça-feira', short: 'Ter', shifts: [{ open: '09:00', close: '12:00' }, { open: '13:00', close: '19:00' }] },
+  { label: 'Quarta-feira', short: 'Qua', shifts: [{ open: '09:00', close: '12:00' }, { open: '13:00', close: '19:00' }] },
+  { label: 'Quinta-feira', short: 'Qui', shifts: [{ open: '09:00', close: '12:00' }, { open: '13:00', close: '19:00' }] },
+  { label: 'Sexta-feira', short: 'Sex', shifts: [{ open: '09:00', close: '12:00' }, { open: '13:00', close: '19:00' }] },
   { label: 'Sábado', short: 'Sáb', shifts: [{ open: '09:00', close: '12:00' }, { open: '13:00', close: '19:00' }] },
 ]
 
 export const SCHEDULE_SUMMARY = [
-  { days: 'Segunda a sexta', hours: '9h — 20h', lunch: 'almoço 12h — 14h' },
-  { days: 'Sábado', hours: '9h — 19h', lunch: 'almoço 12h — 13h' },
+  { days: 'Segunda a sábado', hours: '9h às 19h', lunch: 'almoço das 12h às 13h' },
   { days: 'Domingo', hours: 'Fechado', lunch: '' },
 ]
 
@@ -368,8 +367,8 @@ export const PILLARS = [
 export const GOOGLE_REVIEWS = { count: 30, rating: 5 }
 
 /**
- * As 54h/semana saem da soma do SCHEDULE acima: 9h por dia útil (3h de manhã +
- * 6h à tarde) × 5, mais 9h no sábado. Não é número redondo de marketing.
+ * As 54h/semana saem da soma do SCHEDULE acima: 9h por dia (3h de manhã +
+ * 6h à tarde) × 6, de segunda a sábado (horário novo, Lucas, 24/10/2026). Não é número redondo de marketing.
  */
 export const STATS = [
   { value: 9, prefix: '', suffix: '', label: 'modelos de corte no cardápio' },
@@ -503,7 +502,7 @@ export const FAQ = [
   },
   {
     q: 'Que horas vocês abrem? Abre no domingo?',
-    a: 'De segunda a sexta, das 9h às 20h, com almoço das 12h às 14h. Sábado das 9h às 19h, com almoço das 12h às 13h. Domingo não abrimos.',
+    a: 'De segunda a sábado, das 9h às 12h e das 13h às 19h. Domingo não abrimos.',
   },
   {
     q: 'Quanto custa o corte?',
@@ -511,7 +510,7 @@ export const FAQ = [
   },
   {
     q: 'Vocês vendem os produtos usados no atendimento?',
-    a: 'Vendemos. Pomada Vision (R$ 30), Pomada Infinity (R$ 40 ou R$ 70), óleo para barba Classe A (R$ 40), minoxidil manipulado (R$ 80) e derma roller (R$ 40). A lista completa está na seção Loja, aqui do site.',
+    a: 'Vendemos. Pomada Vision (R$ 30), Pomada Infinity (R$ 40 ou R$ 70), óleo para barba Classe A (R$ 40), minoxidil manipulado (R$ 80) e derma roller (R$ 40). A lista completa está na página de produtos: barbeariasilverado.com.br/produtos.',
   },
 ]
 

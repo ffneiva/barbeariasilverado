@@ -12,7 +12,7 @@ import { BUSINESS, SCHEDULE_SUMMARY } from '@/lib/business'
  */
 const PAGES = [
   { path: '/agendar', label: 'Agendar horário' },
-  { path: '/loja', label: 'Loja' },
+  { path: '/produtos', label: 'Produtos' },
 ]
 
 const NAV = [
@@ -21,7 +21,7 @@ const NAV = [
   { id: 'cortes', label: 'Cortes' },
   { id: 'agendar', label: 'Agendar' },
   { id: 'depoimentos', label: 'Depoimentos' },
-  { id: 'loja', label: 'Loja' },
+  { id: 'loja', label: 'Produtos' },
   { id: 'duvidas', label: 'Dúvidas' },
   { id: 'localizacao', label: 'Onde estamos' },
 ]

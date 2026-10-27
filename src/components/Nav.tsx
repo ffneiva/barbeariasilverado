@@ -13,7 +13,7 @@ const LINKS = [
   { id: 'servicos', label: 'Serviços' },
   { id: 'cortes', label: 'Cortes' },
   { id: 'agendar', label: 'Agendar' },
-  { id: 'loja', label: 'Loja' },
+  { id: 'loja', label: 'Produtos' },
   { id: 'localizacao', label: 'Onde estamos' },
 ]
 

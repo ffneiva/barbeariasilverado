@@ -9,7 +9,7 @@ import { BUSINESS } from './business.ts'
  * nada de DOM.
  *
  * Por que HTML por rota, e não só trocar o `document.title` no cliente: as
- * páginas /agendar e /loja são destino de anúncio pago. O robô do Google Ads
+ * páginas /agendar e /produtos são destino de anúncio pago. O robô do Google Ads
  * avalia a página de destino, e um leitor de link (WhatsApp, Instagram) lê só o
  * HTML inicial — nenhum dos dois executa a aplicação inteira antes de decidir
  * o que mostrar.
@@ -31,6 +31,12 @@ export type Route = {
   adsConversion?: string
   /** Mantém a página fora do índice do Google (usado só pelo 404). */
   noindex?: boolean
+  /**
+   * Endereço antigo que mostra a mesma página de outra rota: a canônica aponta
+   * para ela e o endereço fica fora do sitemap. /loja continua abrindo (links
+   * e anúncios antigos), mas o endereço oficial é /produtos.
+   */
+  canonical?: string
 }
 
 /**
@@ -75,11 +81,19 @@ export const ROUTES: Route[] = [
     adsConversion: PAGEVIEW.agendar,
   },
   {
-    path: '/loja',
-    title: 'Loja · Barbearia Silverado — pomadas, minoxidil e óleo de barba',
+    path: '/produtos',
+    title: 'Produtos · Barbearia Silverado: pomadas, minoxidil e óleo de barba',
     description:
       'Pomada Vision e Infinity, minoxidil manipulado 5%, derma roller e óleo para barba Classe A. Os mesmos produtos usados no atendimento, com preço fechado. Jardim América, Goiânia.',
     adsConversion: PAGEVIEW.loja,
+  },
+  {
+    path: '/loja',
+    title: 'Produtos · Barbearia Silverado: pomadas, minoxidil e óleo de barba',
+    description:
+      'Pomada Vision e Infinity, minoxidil manipulado 5%, derma roller e óleo para barba Classe A. Os mesmos produtos usados no atendimento, com preço fechado. Jardim América, Goiânia.',
+    adsConversion: PAGEVIEW.loja,
+    canonical: '/produtos',
   },
   {
     path: '/politica-de-privacidade',
@@ -120,5 +134,6 @@ export function isKnownRoute(pathname: string): boolean {
 }
 
 export function canonicalFor(route: Route): string {
-  return route.path === '/' ? `${BUSINESS.url}/` : `${BUSINESS.url}${route.path}`
+  const path = route.canonical ?? route.path
+  return path === '/' ? `${BUSINESS.url}/` : `${BUSINESS.url}${path}`
 }

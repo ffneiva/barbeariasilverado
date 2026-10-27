@@ -66,7 +66,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <br />
           {BUSINESS.address.district} · {BUSINESS.address.city}/{BUSINESS.address.state}
           <br />
-          <span className="text-steel-600">Seg a sex 9h–20h · Sáb 9h–19h</span>
+          <span className="text-steel-600">Seg a sáb 9h às 19h</span>
         </address>
       </main>
     )

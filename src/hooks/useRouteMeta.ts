@@ -3,6 +3,7 @@ import { canonicalFor, type Route } from '@/lib/routes'
 import { loadAds, trackConversion } from '@/lib/analytics'
 import { loadPixel, trackMetaPageView } from '@/lib/meta'
 import { watchOutboundClicks } from '@/lib/tracking'
+import { registrar } from '@/lib/rastro'
 
 /**
  * Mantém `<title>`, description e canonical em dia a cada troca de rota — e
@@ -45,5 +46,7 @@ export function useRouteMeta(route: Route) {
 
     trackConversion(route.adsConversion)
     trackMetaPageView()
+    // Contagem própria, para o painel (anônima; ver lib/rastro.ts).
+    registrar({ t: 'visita' })
   }, [route])
 }

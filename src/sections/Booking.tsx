@@ -273,6 +273,9 @@ export function Booking({ showHeading = true }: { showHeading?: boolean } = {}) 
                     // é a intenção mais forte do site e merece separação no
                     // relatório — e, quando houver rótulo, conversão própria.
                     data-track="agendamento"
+                    data-servico={service?.name}
+                    data-dia={draft.dayKey}
+                    data-hora={draft.time}
                   >
                     <MessageCircle className="h-4 w-4" strokeWidth={1.6} />
                     Enviar pedido no WhatsApp

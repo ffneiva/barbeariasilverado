@@ -25,7 +25,10 @@ const obrigatorio = process.env.PRERENDER_OBRIGATORIO === '1'
 function paginas(dir = DIST, saida = []) {
   for (const nome of readdirSync(dir)) {
     const c = path.join(dir, nome)
-    if (statSync(c).isDirectory()) paginas(c, saida)
+    // O painel é página interna (login): nada a gravar para robôs.
+    if (statSync(c).isDirectory()) {
+      if (nome !== 'painel') paginas(c, saida)
+    }
     else if (nome === 'index.html') saida.push(c)
   }
   return saida

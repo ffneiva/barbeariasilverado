@@ -1,5 +1,6 @@
 import { CONVERSIONS, trackConversion, trackEvent } from './analytics'
 import { trackMeta } from './meta'
+import { registrar } from './rastro'
 
 /**
  * Um único observador de cliques, dois destinos.
@@ -17,6 +18,19 @@ import { trackMeta } from './meta'
  * Roda na fase de captura, para acontecer antes de qualquer `preventDefault`, e
  * usa `closest` para funcionar quando o clique cai num ícone dentro do link.
  */
+/**
+ * Onde o link estava: a seção da home (id) ou a página. É o "de onde chamaram"
+ * do painel: botão do topo, card de serviço, galeria, rodapé…
+ */
+function secaoDe(link: HTMLElement): string {
+  if (link.closest('header, nav')) return 'topo'
+  if (link.closest('footer')) return 'rodapé'
+  if (link.closest('[data-fab]')) return 'botão flutuante'
+  const secao = link.closest('section[id], main[id]')?.id
+  if (secao && secao !== 'conteudo') return secao
+  return window.location.pathname === '/' ? 'início' : window.location.pathname
+}
+
 export function watchOutboundClicks(): () => void {
   const onClick = (event: MouseEvent) => {
     const alvo = event.target as HTMLElement | null
@@ -41,6 +55,13 @@ export function watchOutboundClicks(): () => void {
       trackMeta(agendamento ? 'Schedule' : 'Contact', { contexto })
 
       if (agendamento) trackConversion(CONVERSIONS.agendamento)
+
+      // Painel: o pedido do agendador leva serviço, dia e hora (sem o nome).
+      registrar(
+        agendamento
+          ? { t: 'agendamento', c: contexto, s: link.dataset.servico, d: link.dataset.dia, h: link.dataset.hora }
+          : { t: 'whatsapp', c: link.dataset.track ?? secaoDe(link) },
+      )
       return
     }
 
@@ -48,6 +69,7 @@ export function watchOutboundClicks(): () => void {
       trackConversion(CONVERSIONS.telefone)
       trackEvent('contato_telefone')
       trackMeta('Contact', { contexto: 'telefone' })
+      registrar({ t: 'telefone', c: secaoDe(link) })
       return
     }
 
@@ -57,6 +79,12 @@ export function watchOutboundClicks(): () => void {
     if (href.includes('google.com/maps') || href.includes('maps.google.com')) {
       trackEvent('abrir_mapa')
       trackMeta('FindLocation')
+      registrar({ t: 'mapa', c: secaoDe(link) })
+      return
+    }
+
+    if (href.includes('instagram.com')) {
+      registrar({ t: 'instagram', c: secaoDe(link) })
     }
   }
 

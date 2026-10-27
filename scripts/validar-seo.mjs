@@ -18,7 +18,7 @@ const avisos = []
 function htmls(dir) {
   return readdirSync(dir).flatMap((nome) => {
     const p = path.join(dir, nome)
-    if (statSync(p).isDirectory()) return htmls(p)
+    if (statSync(p).isDirectory()) return nome === 'painel' ? [] : htmls(p)
     return nome.endsWith('.html') && !nome.startsWith('google') ? [p] : []
   })
 }

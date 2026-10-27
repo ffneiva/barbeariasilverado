@@ -29,6 +29,7 @@ export function WhatsAppFab() {
   return (
     <a
       href={whatsappUrl(WHATSAPP_DEFAULT_MESSAGE)}
+      data-fab
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`Falar com a ${BUSINESS.name} no WhatsApp`}

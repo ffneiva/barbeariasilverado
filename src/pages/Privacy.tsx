@@ -51,9 +51,19 @@ export function Privacy({ onBack }: { onBack: () => void }) {
         <section>
           <h2 className="text-2xl text-steel-100">2. Quais dados coletamos</h2>
           <p className="mt-4 leading-relaxed">
-            <strong className="text-steel-200">Nós, diretamente, nenhum.</strong> Este é um site
-            estático: não há formulário que envie dados para nós, não há cadastro, não há área
-            logada e não usamos cookies próprios.
+            <strong className="text-steel-200">Nenhum dado pessoal.</strong> Não há formulário que
+            envie dados para nós, não há cadastro e não usamos cookies próprios.
+          </p>
+          <p className="mt-4 leading-relaxed">
+            Para saber quantas pessoas visitam o site e quantas entram em contato, o site conta
+            visitas e cliques de forma <strong className="text-steel-200">anônima</strong>: um
+            número aleatório guardado no seu navegador (no armazenamento local, não em cookie)
+            identifica o aparelho, sem nome, telefone, e-mail ou endereço IP. Registramos a
+            página vista, de onde a visita veio (por exemplo, busca do Google ou Instagram), o
+            tipo de aparelho e os toques em WhatsApp, telefone, rota e Instagram. No pedido de
+            horário, guardamos só o serviço, o dia e a hora escolhidos. Esses registros são
+            apagados automaticamente em 13 meses. Para não ser contado, basta limpar os dados do
+            site no seu navegador.
           </p>
           <p className="mt-4 leading-relaxed">
             Existem, porém, duas exceções que precisam ficar claras: o site carrega a{' '}
@@ -65,9 +75,9 @@ export function Privacy({ onBack }: { onBack: () => void }) {
             escrito. Os detalhes estão na seção seguinte.
           </p>
           <p className="mt-4 leading-relaxed">
-            O que você digita no agendador (serviço, dia, horário, nome e observação) nunca sai do
-            seu navegador. Esses campos só servem para montar o texto da mensagem; quando você
-            toca em “Enviar pedido no WhatsApp”, é o seu próprio aplicativo que envia, não o site.
+            O seu nome e a observação que você digita no agendador nunca saem do seu navegador:
+            servem só para montar o texto da mensagem, e quem envia é o seu próprio aplicativo de
+            WhatsApp, não o site.
           </p>
         </section>
 

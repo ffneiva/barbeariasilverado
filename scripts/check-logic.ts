@@ -269,6 +269,40 @@ if (politica) {
   console.log('  --   CSP: aws-setup.sh fora do repositório — conferência pulada')
 }
 
+// ─── API do painel (api/painel/index.mjs) ───────────────────────────────────
+{
+  const api = await import('../api/painel/index.mjs')
+  console.log('\n── painel (API) ─────────────────────────────────────────')
+  check('origem: gclid é anúncio Google', api.origemDe('', { gclid: '1' }), 'Anúncio Google')
+  check('origem: busca Google', api.origemDe('https://www.google.com/'), 'Busca Google')
+  check('origem: Instagram', api.origemDe('https://l.instagram.com/'), 'Instagram/Facebook')
+  check('origem: ChatGPT', api.origemDe('https://chatgpt.com/'), 'Assistentes de IA')
+  check('origem: sem referrer é direto', api.origemDe(''), 'Direto')
+  check('aparelho: iPhone', api.aparelhoDe('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0)'), 'Celular')
+  const ua = 'Mozilla/5.0 (Windows NT 10.0) Chrome/120'
+  check('evento: robô é descartado', api.validarEvento({ t: 'visita', v: 'abcdefgh12' }, 'Googlebot/2.1'), null)
+  check('evento: tipo inválido é descartado', api.validarEvento({ t: 'xss', v: 'abcdefgh12' }, ua), null)
+  const ag = api.validarEvento({ t: 'agendamento', v: 'abcdefgh12', s: 'Corte', d: '2026-10-30', h: '10:00', n: true }, ua, '2026-10-28T02:30:00.000Z')
+  check('evento: dia no horário de Goiânia (UTC-3)', ag?.dia, '2026-10-27')
+  check('evento: agendamento guarda serviço e hora', [ag?.servico, ag?.horaPedido], ['Corte', '10:00'])
+  check('evento: sem nome nem IP gravados', Object.keys(ag ?? {}).some((k) => ['nome', 'ip', 'telefone', 'email'].includes(k)), false)
+  const tk = api.assinar({ sub: 'a@b.c', v: 1 }, 'segredo')
+  check('sessão: token válido confere', api.verificar(tk, 'segredo')?.sub, 'a@b.c')
+  check('sessão: token com outro segredo falha', api.verificar(tk, 'outro'), null)
+  const { sal, hash } = api.hashSenha('senha-de-teste')
+  check('senha: confere a certa', api.confere('senha-de-teste', sal, hash), true)
+  check('senha: recusa a errada', api.confere('errada', sal, hash), false)
+  const ev = [
+    { tipo: 'visita', visitante: 'a', dia: '2026-10-27', em: '2026-10-27T13:00:00.000Z#1', origem: 'Busca Google', pagina: '/', aparelho: 'Celular', novo: true },
+    { tipo: 'visita', visitante: 'b', dia: '2026-10-27', em: '2026-10-27T14:00:00.000Z#2', origem: 'Direto', pagina: '/', aparelho: 'Computador' },
+    { tipo: 'whatsapp', visitante: 'a', dia: '2026-10-27', em: '2026-10-27T13:05:00.000Z#3', origem: 'Direto', contexto: 'topo' },
+  ]
+  const ind = api.indicadores(ev, 7, '2026-10-27T20:00:00.000Z')
+  check('indicadores: 2 pessoas, 1 contato, 50%', [ind.totais.visitantes, ind.totais.contatos, ind.totais.conversao], [2, 1, 0.5])
+  check('indicadores: contato atribuído à origem da 1ª visita', ind.origensContato[0]?.nome, 'Busca Google')
+  check('indicadores: série com 7 dias', ind.serie.length, 7)
+}
+
 console.log('')
 console.log(fails === 0 ? '✅ Toda a lógica passou.' : `❌ ${fails} verificação(ões) falharam.`)
 process.exit(fails === 0 ? 0 : 1)

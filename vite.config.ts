@@ -19,7 +19,9 @@ import { gerarLlmsFullTxt, gerarLlmsTxt } from './src/lib/llms.ts'
 function jsonLdPlugin(): Plugin {
   return {
     name: 'silverado-jsonld',
-    transformIndexHtml() {
+    transformIndexHtml(_html, ctx) {
+      // O painel (/painel) é página interna: sem dados estruturados.
+      if (ctx.path.includes('painel')) return []
       return [
         {
           tag: 'script',
@@ -236,6 +238,11 @@ export default defineConfig({
     // aqui seria ruído — mas o teto continua existindo para pegar regressões.
     chunkSizeWarningLimit: 950,
     rollupOptions: {
+      // Duas páginas: o site e o painel administrativo (/painel).
+      input: {
+        site: path.resolve(import.meta.dirname, 'index.html'),
+        painel: path.resolve(import.meta.dirname, 'painel/index.html'),
+      },
       output: {
         // O three.js NÃO entra aqui de propósito.
         //

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { CHAVE_NAO_CONTAR } from '@/lib/rastro'
-import { api, type Contato, type Resumo, SessaoExpirada, type Totais, token } from './api'
+import { api, type Contato, type Resumo, SessaoExpirada, type Totais, token, type Usuario } from './api'
 import { Barras, Calor, Serie } from './graficos'
 
 /**
@@ -279,7 +279,7 @@ function PainelConta({ sair }: { sair: () => void }) {
       setAtual('')
       setNova('')
     } catch (err) {
-      setMsg((err as Error).message === 'senha-curta' ? 'A senha nova precisa de pelo menos 10 caracteres.' : 'Senha atual incorreta.')
+      setMsg((err as Error).message === 'senha-curta' ? 'A senha nova precisa de pelo menos 8 caracteres.' : 'Senha atual incorreta.')
     }
   }
   const campo = 'mt-1.5 w-full border border-steel-800 bg-void px-4 py-2.5 text-steel-100 focus:border-steel-400 focus:outline-none'
@@ -296,7 +296,7 @@ function PainelConta({ sair }: { sair: () => void }) {
       <Cartao titulo="Trocar senha">
         <form onSubmit={trocar} className="space-y-3">
           <label className="block text-sm text-steel-400">Senha atual<input type="password" autoComplete="current-password" value={atual} onChange={(e) => setAtual(e.target.value)} className={campo} required /></label>
-          <label className="block text-sm text-steel-400">Senha nova (mínimo 10 caracteres)<input type="password" autoComplete="new-password" minLength={10} value={nova} onChange={(e) => setNova(e.target.value)} className={campo} required /></label>
+          <label className="block text-sm text-steel-400">Senha nova (mínimo 8 caracteres)<input type="password" autoComplete="new-password" minLength={8} value={nova} onChange={(e) => setNova(e.target.value)} className={campo} required /></label>
           <button className="rounded-full bg-steel-100 px-5 py-2.5 font-mono text-xs tracking-[0.18em] text-void uppercase">Trocar</button>
           {msg && <p className="text-sm text-steel-300">{msg}</p>}
         </form>
@@ -308,9 +308,141 @@ function PainelConta({ sair }: { sair: () => void }) {
   )
 }
 
+// ── Usuários (só admin) ─────────────────────────────────────────────────────
+
+const ERROS_USUARIO: Record<string, string> = {
+  existe: 'Já existe um usuário com esse e-mail.',
+  email: 'E-mail inválido.',
+  'senha-curta': 'A senha precisa de pelo menos 8 caracteres.',
+  'si-mesmo': 'Você não pode remover o próprio acesso.',
+  permissao: 'Só administradores gerenciam usuários.',
+}
+
+function PainelUsuarios({ eu }: { eu: Usuario }) {
+  const [lista, setLista] = useState<Usuario[] | null>(null)
+  const [email, setEmail] = useState('')
+  const [nome, setNome] = useState('')
+  const [papel, setPapel] = useState<'leitura' | 'admin'>('leitura')
+  const [senha, setSenha] = useState('')
+  const [aviso, setAviso] = useState<ReactNode>('')
+
+  const recarregar = useCallback(async () => {
+    try {
+      setLista((await api.usuarios()).usuarios)
+    } catch {
+      setAviso('Não foi possível carregar os usuários.')
+    }
+  }, [])
+  useEffect(() => {
+    const id = setTimeout(recarregar, 0)
+    return () => clearTimeout(id)
+  }, [recarregar])
+
+  const mostrarSenha = (quem: string, s: string) =>
+    setAviso(
+      <span>
+        Senha de <strong className="text-steel-100">{quem}</strong>:{' '}
+        <code className="rounded bg-steel-900 px-2 py-0.5 text-steel-50 select-all">{s}</code>. Copie e envie para a
+        pessoa agora: ela não aparece de novo. Dá para trocar depois em Conta.
+      </span>,
+    )
+  const erro = (e: unknown) => setAviso(ERROS_USUARIO[(e as Error).message] ?? 'Não deu certo. Tente de novo.')
+
+  const criar = async (e: FormEvent) => {
+    e.preventDefault()
+    try {
+      const r = await api.criarUsuario({ email, nome, papel, ...(senha ? { senha } : {}) })
+      mostrarSenha(r.email, r.senha)
+      setEmail('')
+      setNome('')
+      setSenha('')
+      recarregar()
+    } catch (err) {
+      erro(err)
+    }
+  }
+  const redefinir = async (u: Usuario) => {
+    if (!confirm(`Gerar uma senha nova para ${u.email}? A atual deixa de funcionar.`)) return
+    try {
+      mostrarSenha(u.email, (await api.redefinir(u.email)).senha)
+    } catch (err) {
+      erro(err)
+    }
+  }
+  const remover = async (u: Usuario) => {
+    if (!confirm(`Remover o acesso de ${u.email}?`)) return
+    try {
+      await api.remover(u.email)
+      setAviso(`Acesso de ${u.email} removido.`)
+      recarregar()
+    } catch (err) {
+      erro(err)
+    }
+  }
+
+  const campo = 'mt-1.5 w-full border border-steel-800 bg-void px-4 py-2.5 text-steel-100 focus:border-steel-400 focus:outline-none'
+  return (
+    <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+      <Cartao titulo="Quem tem acesso">
+        {aviso && <p className="mb-4 rounded-sm border border-steel-800 bg-white/[0.03] p-3 text-sm leading-relaxed text-steel-300">{aviso}</p>}
+        {!lista ? (
+          <p className="text-steel-500">Carregando…</p>
+        ) : (
+          <ul className="divide-y divide-steel-900">
+            {lista.map((u) => (
+              <li key={u.email} className="flex flex-wrap items-center gap-3 py-3">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-steel-100">{u.nome || u.email}</p>
+                  <p className="truncate text-xs text-steel-500">
+                    {u.email} · {u.papel === 'admin' ? 'Administrador' : 'Só leitura'}
+                    {u.email === eu.email ? ' · você' : ''}
+                  </p>
+                </div>
+                <button onClick={() => redefinir(u)} className="rounded-full border border-steel-800 px-3 py-1.5 text-xs text-steel-300 hover:text-steel-50">
+                  Nova senha
+                </button>
+                {u.email !== eu.email && (
+                  <button onClick={() => remover(u)} className="rounded-full border border-rose-900/70 px-3 py-1.5 text-xs text-rose-300 hover:text-rose-200">
+                    Remover
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Cartao>
+      <Cartao titulo="Adicionar usuário">
+        <form onSubmit={criar} className="space-y-3">
+          <label className="block text-sm text-steel-400">
+            Nome
+            <input value={nome} onChange={(e) => setNome(e.target.value)} className={campo} placeholder="Ex.: Lucas" />
+          </label>
+          <label className="block text-sm text-steel-400">
+            E-mail (é o login)
+            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={campo} />
+          </label>
+          <label className="block text-sm text-steel-400">
+            Acesso
+            <select value={papel} onChange={(e) => setPapel(e.target.value as 'leitura' | 'admin')} className={campo}>
+              <option value="leitura">Só leitura: vê os números</option>
+              <option value="admin">Administrador: vê tudo e gerencia usuários</option>
+            </select>
+          </label>
+          <label className="block text-sm text-steel-400">
+            Senha (opcional, mínimo 8)
+            <input type="text" minLength={8} value={senha} onChange={(e) => setSenha(e.target.value)} className={campo} placeholder="Em branco: o painel gera uma" />
+          </label>
+          <button className="rounded-full bg-steel-100 px-5 py-2.5 font-mono text-xs tracking-[0.18em] text-void uppercase">Adicionar</button>
+        </form>
+      </Cartao>
+    </div>
+  )
+}
+
 // ── App ─────────────────────────────────────────────────────────────────────
 
-type Aba = 'resumo' | 'contatos' | 'conta'
+type Aba = 'resumo' | 'contatos' | 'usuarios' | 'conta'
+const NOME_ABA: Record<Aba, string> = { resumo: 'Resumo', contatos: 'Contatos', usuarios: 'Usuários', conta: 'Conta' }
 
 export function Painel() {
   const [logado, setLogado] = useState(() => Boolean(token.ler()))
@@ -319,6 +451,7 @@ export function Painel() {
   const [resumo, setResumo] = useState<Resumo | null>(null)
   const [contatos, setContatos] = useState<Contato[] | null>(null)
   const [erro, setErro] = useState('')
+  const [eu, setEu] = useState<Usuario | null>(null)
 
   const sair = useCallback(() => {
     token.gravar(null)
@@ -327,6 +460,7 @@ export function Painel() {
 
   const carregar = useCallback(async () => {
     try {
+      if (!eu) setEu(await api.eu())
       if (aba === 'resumo') setResumo(await api.resumo(dias))
       if (aba === 'contatos') setContatos((await api.contatos(dias)).contatos)
       setErro('')
@@ -334,7 +468,7 @@ export function Painel() {
       if (e instanceof SessaoExpirada) setLogado(false)
       else setErro('Não foi possível carregar. Tente de novo em instantes.')
     }
-  }, [aba, dias])
+  }, [aba, dias, eu])
 
   useEffect(() => {
     // Busca fora do corpo do efeito (o setState acontece depois do await).
@@ -354,13 +488,15 @@ export function Painel() {
       <header className="flex flex-wrap items-center gap-4 border-b border-steel-900 py-5">
         <img src="/images/logo-wordmark.png" alt="Barbearia Silverado" className="w-32" />
         <nav className="flex gap-1">
-          {(['resumo', 'contatos', 'conta'] as Aba[]).map((a) => (
-            <button key={a} onClick={() => setAba(a)} className={`rounded-full px-4 py-2 text-sm capitalize ${aba === a ? 'bg-steel-100 text-void' : 'text-steel-400 hover:text-steel-100'}`}>
-              {a === 'resumo' ? 'Resumo' : a === 'contatos' ? 'Contatos' : 'Conta'}
-            </button>
-          ))}
+          {(['resumo', 'contatos', 'usuarios', 'conta'] as Aba[])
+            .filter((a) => a !== 'usuarios' || eu?.papel === 'admin')
+            .map((a) => (
+              <button key={a} onClick={() => setAba(a)} className={`rounded-full px-4 py-2 text-sm ${aba === a ? 'bg-steel-100 text-void' : 'text-steel-400 hover:text-steel-100'}`}>
+                {NOME_ABA[a]}
+              </button>
+            ))}
         </nav>
-        {aba !== 'conta' && (
+        {(aba === 'resumo' || aba === 'contatos') && (
           <div className="ml-auto flex gap-1">
             {[7, 30, 90].map((d) => (
               <button key={d} onClick={() => setDias(d)} className={`rounded-full border px-3.5 py-1.5 text-xs ${dias === d ? 'border-steel-300 text-steel-100' : 'border-steel-800 text-steel-500'}`}>
@@ -375,6 +511,7 @@ export function Painel() {
         {erro && <p className="mb-4 text-sm text-rose-400">{erro}</p>}
         {aba === 'resumo' && (resumo ? <PainelResumo r={resumo} /> : <p className="text-steel-500">Carregando…</p>)}
         {aba === 'contatos' && (contatos ? <PainelContatos lista={contatos} /> : <p className="text-steel-500">Carregando…</p>)}
+        {aba === 'usuarios' && eu?.papel === 'admin' && <PainelUsuarios eu={eu} />}
         {aba === 'conta' && <PainelConta sair={sair} />}
       </main>
       <footer className="mt-12 text-xs text-steel-700">

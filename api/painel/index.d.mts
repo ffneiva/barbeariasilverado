@@ -16,3 +16,5 @@ export function verificar(token: string, segredo?: string): Record<string, unkno
 export function hashSenha(senha: string, sal?: string): { sal: string; hash: string }
 export function confere(senha: string, sal: string, hash: string): boolean
 export function handler(evento: unknown): Promise<{ statusCode: number; body?: string }>
+export const PAPEIS: Set<string>
+export function senhaAleatoria(): string

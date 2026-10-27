@@ -49,6 +49,8 @@ export type Contato = {
   horaPedido?: string
 }
 
+export type Usuario = { email: string; nome: string; papel: 'admin' | 'leitura' }
+
 export const token = {
   ler: () => {
     try {
@@ -91,4 +93,11 @@ export const api = {
   contatos: (dias: number) => chamar<{ contatos: Contato[] }>(`/contatos?dias=${dias}`),
   senha: (atual: string, nova: string) =>
     chamar<{ token: string }>('/senha', { method: 'POST', body: JSON.stringify({ atual, nova }) }),
+  eu: () => chamar<Usuario>('/eu'),
+  usuarios: () => chamar<{ usuarios: Usuario[] }>('/usuarios'),
+  criarUsuario: (u: { email: string; nome: string; papel: string; senha?: string }) =>
+    chamar<{ email: string; senha: string }>('/usuarios', { method: 'POST', body: JSON.stringify(u) }),
+  redefinir: (email: string) =>
+    chamar<{ email: string; senha: string }>('/usuarios/redefinir', { method: 'POST', body: JSON.stringify({ email }) }),
+  remover: (email: string) => chamar<{ email: string }>('/usuarios/remover', { method: 'POST', body: JSON.stringify({ email }) }),
 }

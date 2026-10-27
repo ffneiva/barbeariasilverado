@@ -11,6 +11,13 @@
  *   GET  /resumo     ?dias=7|30|90  indicadores do período (autenticado)
  *   GET  /contatos   ?dias=…        contatos, do mais novo ao mais velho
  *   POST /senha      { atual, nova } troca a senha
+ *   GET  /eu         quem está logado (nome, papel)
+ *   GET  /usuarios                        lista (só admin)
+ *   POST /usuarios   { email, nome, papel, senha? } cria; sem senha, gera uma
+ *   POST /usuarios/redefinir { email }    nova senha aleatória (derruba sessões)
+ *   POST /usuarios/remover   { email }    remove (não a si mesmo)
+ *
+ * Papéis: admin (tudo, inclusive usuários) e leitura (só os números).
  *
  * Privacidade: nada de nome, telefone, IP ou cookie. O visitante é um número
  * aleatório gerado no navegador; o pedido de agendamento guarda só serviço,
@@ -24,6 +31,8 @@ const SEGREDO = process.env.SEGREDO_JWT ?? ''
 const TREZE_MESES = 60 * 60 * 24 * 396
 const TIPOS = new Set(['visita', 'whatsapp', 'agendamento', 'telefone', 'mapa', 'instagram'])
 export const CONTATOS = new Set(['whatsapp', 'agendamento', 'telefone'])
+export const PAPEIS = new Set(['admin', 'leitura'])
+const SENHA_MINIMA = 8
 const ROBO = /bot|crawl|spider|slurp|headless|lighthouse|pagespeed|preview|facebookexternalhit|whatsapp\/|curl|wget|python|axios|node-fetch|playwright|puppeteer/i
 
 // ── Utilidades puras (testadas) ────────────────────────────────────────────
@@ -253,6 +262,25 @@ async function usuario(email) {
   return r.Item ? unmarshall(r.Item) : null
 }
 
+async function listarUsuarios() {
+  const { cli, ScanCommand, unmarshall } = await aws()
+  const r = await cli.send(new ScanCommand({ TableName: TABELA_USUARIOS }))
+  return (r.Items ?? []).map((i) => unmarshall(i))
+}
+
+async function removerUsuario(email) {
+  const { cli, DeleteItemCommand } = await aws()
+  await cli.send(new DeleteItemCommand({ TableName: TABELA_USUARIOS, Key: { email: { S: email } } }))
+}
+
+/** Senha legível para passar por mensagem: 12 caracteres sem ambíguos. */
+export function senhaAleatoria() {
+  const letras = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  return Array.from(randomBytes(12), (b) => letras[b % letras.length]).join('')
+}
+
+const publico = (u) => ({ email: u.email, nome: u.nome ?? '', papel: u.papel ?? 'admin' })
+
 async function salvarUsuario(u) {
   const { cli, PutItemCommand, marshall } = await aws()
   await cli.send(new PutItemCommand({ TableName: TABELA_USUARIOS, Item: marshall(u, { removeUndefinedValues: true }) }))
@@ -315,7 +343,7 @@ export async function handler(evento) {
       u.tentativas = 0
       await salvarUsuario(u)
     }
-    return resposta(200, { token: assinar({ sub: u.email, v: u.versao }), nome: u.nome ?? '' })
+    return resposta(200, { token: assinar({ sub: u.email, v: u.versao }), ...publico(u) })
   }
 
   const u = await autenticado(evento)
@@ -345,10 +373,50 @@ export async function handler(evento) {
   if (metodo === 'POST' && rota === '/senha') {
     if (!confere(String(corpo.atual ?? ''), u.sal, u.hash)) return resposta(401, { erro: 'senha-atual' })
     const nova = String(corpo.nova ?? '')
-    if (nova.length < 10) return resposta(400, { erro: 'senha-curta' })
+    if (nova.length < SENHA_MINIMA) return resposta(400, { erro: 'senha-curta' })
     Object.assign(u, hashSenha(nova), { versao: (u.versao ?? 1) + 1 })
     await salvarUsuario(u)
     return resposta(200, { token: assinar({ sub: u.email, v: u.versao }) })
+  }
+
+  if (metodo === 'GET' && rota === '/eu') return resposta(200, publico(u))
+
+  // ── Usuários: só admin ──
+  if (rota.startsWith('/usuarios')) {
+    if ((u.papel ?? 'admin') !== 'admin') return resposta(403, { erro: 'permissao' })
+
+    if (metodo === 'GET' && rota === '/usuarios') {
+      const lista = (await listarUsuarios()).map(publico).sort((a, b) => a.email.localeCompare(b.email))
+      return resposta(200, { usuarios: lista })
+    }
+
+    const email = limpar(corpo.email, 120).toLowerCase()
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return resposta(400, { erro: 'email' })
+
+    if (metodo === 'POST' && rota === '/usuarios') {
+      if (await usuario(email)) return resposta(409, { erro: 'existe' })
+      const papel = PAPEIS.has(corpo.papel) ? corpo.papel : 'leitura'
+      const senha = String(corpo.senha ?? '') || senhaAleatoria()
+      if (senha.length < SENHA_MINIMA) return resposta(400, { erro: 'senha-curta' })
+      await salvarUsuario({ email, nome: limpar(corpo.nome, 80), papel, versao: 1, tentativas: 0, ...hashSenha(senha) })
+      return resposta(201, { email, senha })
+    }
+
+    const alvo = await usuario(email)
+    if (!alvo) return resposta(404, { erro: 'nao-existe' })
+
+    if (metodo === 'POST' && rota === '/usuarios/redefinir') {
+      const senha = senhaAleatoria()
+      Object.assign(alvo, hashSenha(senha), { versao: (alvo.versao ?? 1) + 1, tentativas: 0, bloqueadoAte: undefined })
+      await salvarUsuario(alvo)
+      return resposta(200, { email, senha })
+    }
+
+    if (metodo === 'POST' && rota === '/usuarios/remover') {
+      if (email === u.email) return resposta(400, { erro: 'si-mesmo' })
+      await removerUsuario(email)
+      return resposta(200, { email })
+    }
   }
 
   return resposta(404, { erro: 'rota' })

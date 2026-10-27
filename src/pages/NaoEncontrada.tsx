@@ -24,7 +24,7 @@ export function NaoEncontrada({ onNavigate }: { onNavigate: (path: string) => vo
         Esse endereço não existe
       </h1>
       <p className="mt-5 max-w-md text-base leading-relaxed text-steel-400">
-        O link pode ter mudado de lugar. A barbearia continua no mesmo — Avenida C-4, Jardim
+        O link pode ter mudado de lugar. A barbearia continua no mesmo lugar: Avenida C-4, Jardim
         América.
       </p>
 

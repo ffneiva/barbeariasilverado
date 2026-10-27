@@ -23,7 +23,7 @@ export const BUSINESS = {
   email: 'barbeariasilverado@gmail.com',
 
   address: {
-    street: 'Avenida C-4, nº 73 — Qd. 490, Lt. 09',
+    street: 'Avenida C-4, nº 73, Qd. 490, Lt. 09',
     district: 'Jardim América',
     city: 'Goiânia',
     state: 'GO',
@@ -45,7 +45,7 @@ export const BUSINESS = {
     cnpj: '68.366.916/0001-01',
     razaoSocial: '68.366.916 LUCAS HENRIQUE COSTA SILVA',
     regime: 'Microempreendedor Individual (MEI)',
-    cnae: '9602-5/01 — Cabeleireiros, manicure e pedicure',
+    cnae: '9602-5/01, Cabeleireiros, manicure e pedicure',
   },
 } as const
 
@@ -102,7 +102,7 @@ export const SERVICES: Service[] = [
     id: 'corte',
     name: 'Corte',
     description:
-      'Degradê, fade, social — ou o modelo da foto que você trouxer. Máquina, tesoura e o contorno finalizado na navalha.',
+      'Degradê, fade, social ou o modelo da foto que você trouxer. Máquina, tesoura e o contorno finalizado na navalha.',
     price: 40,
     minutes: 40,
     tag: 'Mais pedido',
@@ -136,7 +136,7 @@ export const SERVICES: Service[] = [
   {
     id: 'sobrancelha',
     name: 'Sobrancelha',
-    description: 'Alinhamento no traço natural — limpa o excesso sem tirar a sua expressão.',
+    description: 'Alinhamento no traço natural: limpa o excesso sem tirar a sua expressão.',
     price: 10,
     minutes: 15,
   },
@@ -270,7 +270,7 @@ export const PRODUCT_GROUPS: Array<{ title: string; blurb: string; items: Produc
         size: '60 ml',
         price: 80,
         description:
-          'Manipulado na farmácia Ultra Brasil, não industrializado. Uso externo, na rotina de crescimento de barba — o resultado varia de pessoa para pessoa.',
+          'Manipulado na farmácia Ultra Brasil, não industrializado. Uso externo, na rotina de crescimento de barba. O resultado varia de pessoa para pessoa.',
         image: 'produto-minoxidil',
       },
       {
@@ -321,7 +321,7 @@ export const PRODUCT_GROUPS: Array<{ title: string; blurb: string; items: Produc
         name: 'Pomada Infinity Classic',
         size: '160 g',
         price: 70,
-        description: 'A mesma pomada no pote grande — sai mais barato por grama.',
+        description: 'A mesma pomada no pote grande: sai mais barato por grama.',
         image: 'produto-pomada-infinity',
       },
     ],
@@ -338,7 +338,7 @@ export const PILLARS = [
   {
     icon: 'eye',
     title: 'Sai do jeito que você pediu',
-    text: 'Você explica com uma foto, com a mão na cabeça ou do jeito que der. O que sai é o que foi combinado — não a versão que o barbeiro preferia fazer.',
+    text: 'Você explica com uma foto, com a mão na cabeça ou do jeito que der. O que sai é o que foi combinado, não a versão que o barbeiro preferia fazer.',
   },
   {
     icon: 'blade',
@@ -374,7 +374,8 @@ export const STATS = [
   { value: 9, prefix: '', suffix: '', label: 'modelos de corte no cardápio' },
   { value: 54, prefix: '', suffix: 'h', label: 'de atendimento por semana' },
   { value: 40, prefix: 'R$ ', suffix: '', label: 'a partir de' },
-  { value: GOOGLE_REVIEWS.count, prefix: '', suffix: '', label: 'avaliações 5 estrelas no Google' },
+  // Sem número de avaliações: é dado que envelhece (fica errado em meses).
+  { value: 6, prefix: '', suffix: '', label: 'dias por semana, de segunda a sábado' },
 ]
 
 /**
@@ -474,7 +475,7 @@ export const FAQ = [
   },
   {
     q: 'Não sei explicar o corte que eu quero. Tem problema?',
-    a: 'Nenhum. Traga uma foto de referência — ou nem isso. A gente olha o formato do seu rosto, o seu tipo de cabelo e quanto você quer manter, e sugere o que combina.',
+    a: 'Nenhum. Traga uma foto de referência, ou nem isso. A gente olha o formato do seu rosto, o seu tipo de cabelo e quanto você quer manter, e sugere o que combina.',
   },
   {
     q: 'Quanto tempo demora?',
@@ -482,7 +483,7 @@ export const FAQ = [
   },
   {
     q: 'Vocês atendem criança?',
-    a: 'Sim. Avise ao agendar para reservarmos um horário mais tranquilo — normalmente logo na abertura ou no começo da tarde.',
+    a: 'Sim. Avise ao agendar para reservarmos um horário mais tranquilo, normalmente logo na abertura ou no começo da tarde.',
   },
   {
     q: 'E se eu precisar remarcar?',
@@ -490,7 +491,7 @@ export const FAQ = [
   },
   {
     q: 'Vocês fazem pigmentação?',
-    a: 'Fazemos pintura de barba e de cabelo — tinta que cobre o branco e fecha as falhas. R$ 20 cada uma, ou R$ 30 as duas na mesma sessão. O que não fazemos é o pó que disfarça o degradê: aqui o degradê sai com o efeito natural, sem nada por cima.',
+    a: 'Fazemos pintura de barba e de cabelo: tinta que cobre o branco e fecha as falhas. R$ 20 cada uma, ou R$ 30 as duas na mesma sessão. O que não fazemos é o pó que disfarça o degradê: aqui o degradê sai com o efeito natural, sem nada por cima.',
   },
   {
     q: 'Vocês trabalham com plano ou mensalidade?',

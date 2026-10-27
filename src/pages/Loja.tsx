@@ -25,7 +25,7 @@ export function Loja({ onNavigate }: { onNavigate: (path: string) => void }) {
         title="A loja da Silverado"
         lead={
           <>
-            Pomada, minoxidil manipulado, derma roller e óleo de barba — os mesmos produtos que o
+            Pomada, minoxidil manipulado, derma roller e óleo de barba: os mesmos produtos que o
             barbeiro usa na cadeira, de R$ {menorPreco} a R$ {maiorPreco}. Preço fechado, sem
             pacote e sem mensalidade.
           </>
@@ -55,7 +55,7 @@ export function Loja({ onNavigate }: { onNavigate: (path: string) => void }) {
           <Reveal className="border border-steel-800 bg-white/[0.02] p-7 sm:p-10">
             <span className="label-mono">Como comprar</span>
             <h2 className="mt-4 max-w-2xl text-3xl text-steel-100 sm:text-4xl">
-              Não tem carrinho — tem balcão
+              Não tem carrinho, tem balcão
             </h2>
             <p className="mt-5 max-w-2xl text-sm leading-relaxed text-steel-400">
               Os produtos saem na hora do atendimento, sem precisar agendar nada a mais. Se quiser

@@ -81,7 +81,7 @@ export function Booking({ showHeading = true }: { showHeading?: boolean } = {}) 
       <div className="container-x">
         {showHeading && (
         <SectionHeading
-          eyebrow="03 — Agendamento"
+          eyebrow="03 · Agendamento"
           title="Escolha e mande no WhatsApp"
           lead="Monte o pedido aqui e a mensagem chega pronta no WhatsApp do barbeiro. Ele confirma o horário e está fechado."
           align="center"
@@ -181,7 +181,7 @@ export function Booking({ showHeading = true }: { showHeading?: boolean } = {}) 
                     <div className="rounded-sm border border-steel-900 p-5">
                       <p className="text-sm leading-relaxed text-steel-400">
                         Não sobra janela para <strong className="text-steel-200">{service?.name}</strong> nesse
-                        dia — o serviço leva {service?.minutes} minutos e não cabe no que resta do expediente.
+                        dia: o serviço leva {service?.minutes} minutos e não cabe no que resta do expediente.
                       </p>
 
                       {proximoDia ? (
@@ -258,10 +258,10 @@ export function Booking({ showHeading = true }: { showHeading?: boolean } = {}) 
                   </div>
 
                   <dl className="grid gap-3 border border-steel-900 bg-void/60 p-5 text-sm">
-                    <Row label="Serviço" value={service ? `${service.name} · ${service.minutes} min` : '—'} />
-                    <Row label="Dia" value={draft.dayKey ? humanDate(draft.dayKey) : '—'} />
-                    <Row label="Horário" value={draft.time || '—'} />
-                    <Row label="Valor" value={service ? priceLabel(service) : '—'} />
+                    <Row label="Serviço" value={service ? `${service.name} · ${service.minutes} min` : 'a escolher'} />
+                    <Row label="Dia" value={draft.dayKey ? humanDate(draft.dayKey) : 'a escolher'} />
+                    <Row label="Horário" value={draft.time || 'a escolher'} />
+                    <Row label="Valor" value={service ? priceLabel(service) : 'a escolher'} />
                   </dl>
 
                   <Button
@@ -327,7 +327,7 @@ function DayCell({ day, selected, onSelect }: { day: BookingDay; selected: boole
       type="button"
       onClick={onSelect}
       disabled={day.closed}
-      aria-label={`${day.weekdayShort} ${day.dayNumber} de ${day.monthShort}${day.closed ? ' — fechado' : ''}`}
+      aria-label={`${day.weekdayShort} ${day.dayNumber} de ${day.monthShort}${day.closed ? ', fechado' : ''}`}
       className={cn(
         'flex flex-col items-center gap-1 border py-3 transition-colors duration-300',
         day.closed && 'cursor-not-allowed border-steel-900/60 text-steel-800',

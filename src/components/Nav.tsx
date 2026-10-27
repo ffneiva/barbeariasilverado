@@ -99,7 +99,7 @@ export function Nav({
           <button
             type="button"
             onClick={() => go('inicio')}
-            aria-label={`${BUSINESS.name} — ir para o topo`}
+            aria-label={`${BUSINESS.name}: ir para o topo`}
             className="shrink-0"
           >
             <Logo

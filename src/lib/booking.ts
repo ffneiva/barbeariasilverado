@@ -153,7 +153,7 @@ export function draftToMessage(draft: BookingDraft): string {
     `• Serviço: ${service ? service.name : 'a combinar'}${service ? ` (${service.minutes} min · ${priceLabel(service)})` : ''}`,
     `• Dia: ${draft.dayKey ? humanDate(draft.dayKey) : 'a combinar'}`,
     `• Horário: ${draft.time || 'a combinar'}`,
-    `• Nome: ${draft.name.trim() || '—'}`,
+    `• Nome: ${draft.name.trim() || 'não informado'}`,
   ]
 
   if (draft.notes.trim()) lines.push(`• Observação: ${draft.notes.trim()}`)

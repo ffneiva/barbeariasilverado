@@ -23,7 +23,7 @@ export function Location() {
     <Section id="localizacao">
       <div className="container-x">
         <SectionHeading
-          eyebrow="08 — Onde estamos"
+          eyebrow="08 · Onde estamos"
           title="Jardim América, Goiânia"
           lead="Na Avenida C-4, a poucos minutos do Setor Bueno e do Setor Oeste."
         />
@@ -32,7 +32,7 @@ export function Location() {
           {/* Mapa */}
           <Reveal className="relative min-h-[22rem] border border-steel-800 lg:min-h-[30rem]">
             <iframe
-              title={`Mapa — ${BUSINESS.name}`}
+              title={`Mapa: ${BUSINESS.name}`}
               src={BUSINESS.mapsEmbed}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -107,7 +107,7 @@ export function Location() {
                     <span className="text-right font-mono text-xs">
                       {day.shifts.length === 0
                         ? 'Fechado'
-                        : day.shifts.map((s) => `${label(s.open)}–${label(s.close)}`).join(' · ')}
+                        : day.shifts.map((s) => `${label(s.open)} às ${label(s.close)}`).join(' · ')}
                     </span>
                   </li>
                 ))}

@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { ArrowDown, MapPin, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/Button'
 import { Logo } from '@/components/Logo'
@@ -9,37 +9,12 @@ import { useIsDesktop, useReducedMotion } from '@/hooks/useMediaQuery'
 import { scrollToSection } from '@/hooks/useSmoothScroll'
 import { cn } from '@/lib/utils'
 
-// O bundle do three.js é o maior do site: 235 kB comprimidos. Fica atrás de um
-// lazy import para o texto do Hero pintar sem esperar o WebGL.
-//
-// E só é buscado em telas grandes. No celular a navalha aparecia a 28% do
-// tamanho — um detalhe pequeno atrás do título — enquanto custava 235 kB do
-// plano de dados de quem, em geral, chegou por um anúncio. Tree-shaking não
-// resolveria: o @react-three/fiber importa o namespace inteiro do three, então
-// a biblioteca vem completa de qualquer jeito.
-const BladeScene = lazy(() => import('@/components/BladeScene'))
-
 export function Hero({ ready }: { ready: boolean }) {
   const rootRef = useRef<HTMLElement>(null)
   const parallaxRef = useRef<HTMLDivElement>(null)
+  const letreiroRef = useRef<HTMLDivElement>(null)
   const reduced = useReducedMotion()
   const isDesktop = useIsDesktop()
-  const [showScene, setShowScene] = useState(false)
-
-  // A cena 3D só é buscada quando a thread principal fica ociosa — assim ela
-  // nunca disputa CPU com a animação de entrada do próprio Hero.
-  useEffect(() => {
-    if (!ready || reduced || !isDesktop) return
-    const show = () => setShowScene(true)
-
-    if (typeof window.requestIdleCallback === 'function') {
-      const handle = window.requestIdleCallback(show, { timeout: 1500 })
-      return () => window.cancelIdleCallback(handle)
-    }
-
-    const handle = window.setTimeout(show, 600) // Safari < 17
-    return () => window.clearTimeout(handle)
-  }, [ready, reduced, isDesktop])
 
   // A entrada e o parallax do Hero são CSS (ver index.css). O React só decide
   // QUANDO liberar: `hero-armed` esconde os elementos enquanto o preloader
@@ -56,6 +31,7 @@ export function Hero({ ready }: { ready: boolean }) {
     if (reduced) return
     const el = parallaxRef.current
     const section = rootRef.current
+    const letreiro = letreiroRef.current
     if (!el || !section) return
 
     let agendado = false
@@ -65,6 +41,7 @@ export function Hero({ ready }: { ready: boolean }) {
       const p = Math.min(1, Math.max(0, window.scrollY / altura))
       el.style.transform = `translateY(${(-14 * p).toFixed(2)}%)`
       el.style.opacity = String(1 - p * 0.85)
+      if (letreiro) letreiro.style.transform = `translate3d(${(-22 * p).toFixed(2)}%, 0, 0)`
     }
     const onScroll = () => {
       if (agendado) return
@@ -78,6 +55,7 @@ export function Hero({ ready }: { ready: boolean }) {
       window.removeEventListener('scroll', onScroll)
       el.style.transform = ''
       el.style.opacity = ''
+      if (letreiro) letreiro.style.transform = ''
     }
   }, [reduced])
 
@@ -86,7 +64,7 @@ export function Hero({ ready }: { ready: boolean }) {
       ref={rootRef}
       id="inicio"
       className={cn(
-        'relative isolate flex min-h-[100svh] flex-col justify-between overflow-hidden pt-28 pb-8',
+        'relative flex min-h-[100svh] flex-col justify-between overflow-hidden pt-28 pb-8',
         heroClasses,
       )}
     >
@@ -107,16 +85,24 @@ export function Hero({ ready }: { ready: boolean }) {
         />
       </div>
 
-      {/* Navalha em WebGL, centrada atrás do título. */}
-      {showScene && (
-        <div aria-hidden className="absolute inset-0 -z-10">
-          <Suspense fallback={null}>
-            <div className="h-full w-full opacity-0 [animation:fade-in_1.4s_var(--ease-blade)_forwards]">
-              <BladeScene />
-            </div>
-          </Suspense>
+      {/* Sem `isolate` de propósito: o fundo (-z-20) fica ABAIXO da navalha 3D
+          fixa (-z-10, components/MarcaFixa) e o texto, acima dela. O pouso da
+          navalha no desktop é este quadro à direita. */}
+      {/* Letreiro vazado gigante, atrás de tudo: desliza com a rolagem. */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-[6%] z-[-15] overflow-hidden">
+        <div
+          ref={letreiroRef}
+          className="font-display text-[31vw] leading-[0.8] whitespace-nowrap text-transparent uppercase select-none [-webkit-text-stroke:1px_rgba(178,184,194,0.13)]"
+        >
+          Silverado
         </div>
-      )}
+      </div>
+
+      <div
+        aria-hidden
+        data-marca-alvo="inicio"
+        className="pointer-events-none absolute top-[17%] right-[4%] hidden aspect-[0.955] h-[60vh] lg:block"
+      />
 
       <div ref={parallaxRef} className="container-x relative flex flex-1 flex-col justify-center">
         <div className="max-w-4xl">
@@ -129,9 +115,17 @@ export function Hero({ ready }: { ready: boolean }) {
               esconde para animar. Se a animação não rodar, o pior caso é um
               título estático — nunca um título invisível. */}
           <h1 className="text-[clamp(3.2rem,12.5vw,10.5rem)] leading-[0.85]">
+            {/* O cromo é texto com background-clip: o fundo acabava antes do
+                acento e o "Ê" de "você" sumia. O padding em cima (anulado pela
+                margem negativa, sem mexer no layout) estende o fundo até o acento. */}
             {['Do jeito', 'que você pediu'].map((line, i) => (
-              <span key={line} data-hero-line className="-mt-[0.18em] block overflow-hidden pt-[0.18em] pb-[0.06em]">
-                <span className={i === 0 ? 'chrome inline-block' : 'chrome animate-sheen inline-block'}>
+              <span key={line} data-hero-line className="-mt-[0.32em] block overflow-hidden pt-[0.32em] pb-[0.06em]">
+                <span
+                  className={cn(
+                    '-mt-[0.3em] inline-block pt-[0.3em]',
+                    i === 0 ? 'chrome' : 'chrome animate-sheen',
+                  )}
+                >
                   {line}
                 </span>
               </span>
@@ -142,7 +136,7 @@ export function Hero({ ready }: { ready: boolean }) {
 
           <p data-hero-fade className="mt-7 max-w-xl text-base leading-relaxed text-steel-400 sm:text-lg">
             Degradê, fade, barba e sobrancelha no Jardim América. Você chega com a
-            referência na cabeça — ou só com uma ideia — e sai com o corte que pediu.
+            referência na cabeça, ou só com uma ideia, e sai com o corte que pediu.
           </p>
 
           <div data-hero-fade className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">

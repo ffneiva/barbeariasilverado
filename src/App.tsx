@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { Preloader } from '@/components/Preloader'
 import { Nav } from '@/components/Nav'
 import { Footer } from '@/components/Footer'
@@ -7,6 +7,7 @@ import { Grain, ScrollProgress } from '@/components/Atmosphere'
 import { WhatsAppFab } from '@/components/WhatsAppFab'
 import { Hero } from '@/sections/Hero'
 import { Manifesto } from '@/sections/Manifesto'
+import { Portal } from '@/sections/Portal'
 import { Services } from '@/sections/Services'
 import { Cuts } from '@/sections/Cuts'
 import { Booking } from '@/sections/Booking'
@@ -20,6 +21,26 @@ import { NaoEncontrada } from '@/pages/NaoEncontrada'
 import { Agendar } from '@/pages/Agendar'
 import { Loja } from '@/pages/Loja'
 import { routeFor } from '@/lib/routes'
+import { sem } from '@/lib/utils'
+
+// three.js só chega depois da abertura, quando a thread fica livre: o texto do
+// herói pinta antes. Fora da home não é baixado.
+const MarcaFixa = lazy(() => import('@/components/MarcaFixa'))
+
+function useOcioso(liberado: boolean) {
+  const [ok, setOk] = useState(false)
+  useEffect(() => {
+    if (!liberado) return
+    const ir = () => setOk(true)
+    if (typeof window.requestIdleCallback === 'function') {
+      const h = window.requestIdleCallback(ir, { timeout: 1200 })
+      return () => window.cancelIdleCallback(h)
+    }
+    const h = window.setTimeout(ir, 400)
+    return () => window.clearTimeout(h)
+  }, [liberado])
+  return ok
+}
 import { useRouteMeta } from '@/hooks/useRouteMeta'
 import { useRouteAnnounce } from '@/hooks/useRouteAnnounce'
 import { scrollToSection, useSmoothScroll } from '@/hooks/useSmoothScroll'
@@ -77,6 +98,7 @@ export default function App() {
   // esperar — e sem isto o <h1> ficaria preso no translateY inicial, invisível.
   const [ready, setReady] = useState(!showPreloader)
   const onDone = useCallback(() => setReady(true), [])
+  const montarMarca = useOcioso(ready && isHome && !sem('marca'))
 
   /**
    * Leva a uma seção da home a partir de qualquer rota.
@@ -128,9 +150,16 @@ export default function App() {
       {route.path === '/politica-de-privacidade' && <Privacy onBack={() => navigate('/')} />}
       {route.path === '/404' && <NaoEncontrada onNavigate={navigate} />}
 
+      {isHome && montarMarca && (
+        <Suspense fallback={null}>
+          <MarcaFixa />
+        </Suspense>
+      )}
+
       {isHome && (
         <main id="conteudo">
           <Hero ready={ready} />
+          <Portal />
           <Manifesto />
           <Services />
           <Booking />

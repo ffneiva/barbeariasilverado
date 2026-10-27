@@ -31,7 +31,7 @@ export function useRouteAnnounce(route: Route) {
     }
 
     // O título completo inclui a marca; para o anúncio basta a primeira parte.
-    setAviso(`${route.title.split('·')[0].trim()} — página carregada`)
+    setAviso(`${route.title.split('·')[0].trim()}: página carregada`)
     alvoRef.current?.focus({ preventScroll: true })
   }, [route])
 

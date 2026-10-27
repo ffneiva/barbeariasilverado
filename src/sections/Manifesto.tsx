@@ -18,7 +18,7 @@ import { useGsap } from '@/hooks/useGsap'
  */
 const MANIFESTO =
   'Uma barbearia não vive de máquina nova nem de cadeira bonita. Vive de barbeiro que ' +
-  'escuta o que você quer antes de ligar qualquer máquina — e que entrega exatamente ' +
+  'escuta o que você quer antes de ligar qualquer máquina, e que entrega exatamente ' +
   'aquilo. É isso que a gente faz no Jardim América, um corte de cada vez.'
 
 export function Manifesto() {
@@ -88,7 +88,7 @@ export function Manifesto() {
           <Reveal>
             <div className="flex items-center gap-4">
               <BladeIcon className="h-6 w-9 text-steel-600" />
-              <span className="label-mono">01 — A casa</span>
+              <span className="label-mono">01 · A casa</span>
             </div>
           </Reveal>
 
@@ -110,6 +110,7 @@ export function Manifesto() {
       <Marquee
         items={CUTS.map((c) => c.name)}
         duration={44}
+        entorta
         className="border-y border-steel-900 py-5 font-display text-2xl tracking-wide text-steel-700 uppercase sm:text-3xl"
         separator={<BladeIcon className="h-3 w-5 text-steel-800" />}
       />
@@ -143,7 +144,7 @@ export function Manifesto() {
               <p className="mt-6 max-w-xl leading-relaxed text-steel-400">
                 Tem barbeiro que ouve o pedido e faz do jeito que ele gosta. Aqui é o
                 contrário: a referência que você trouxe é o combinado, e o corte só termina
-                quando bate com ela. Se você não souber explicar, a gente sugere — mas quem
+                quando bate com ela. Se você não souber explicar, a gente sugere, mas quem
                 decide é você.
               </p>
             </Reveal>

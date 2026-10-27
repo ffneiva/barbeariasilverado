@@ -104,12 +104,12 @@ export function Services() {
     <Section id="servicos">
       <div className="container-x">
         <SectionHeading
-          eyebrow="02 — Serviços"
+          eyebrow="02 · Serviços"
           title="O que a gente faz"
           lead={
             <>
               Preço fechado, igual ao da tabela na parede. Só selagem, progressiva e botox
-              variam com o comprimento — e nesses o valor é combinado{' '}
+              variam com o comprimento, e nesses o valor é combinado{' '}
               <em className="text-steel-200 not-italic">antes</em> de começar.
             </>
           }

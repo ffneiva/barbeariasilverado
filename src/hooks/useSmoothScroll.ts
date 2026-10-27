@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type Lenis from 'lenis'
-import { prefersReducedMotion } from '@/lib/utils'
+import { prefersReducedMotion, sem } from '@/lib/utils'
 
 /**
  * Scroll suave, com a biblioteca carregada sob demanda.
@@ -48,7 +48,7 @@ export function conectarAoLenis(update: () => void): () => void {
 
 export function useSmoothScroll() {
   useEffect(() => {
-    if (prefersReducedMotion()) return
+    if (prefersReducedMotion() || sem('lenis')) return
     // Sem roda de mouse não há o que suavizar: o scroll por toque já tem
     // inércia nativa, e sequestrá-lo só piora.
     if (!window.matchMedia('(pointer: fine)').matches) return

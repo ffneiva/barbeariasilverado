@@ -60,14 +60,14 @@ export function Privacy({ onBack }: { onBack: () => void }) {
             <strong className="text-steel-200">tag do Google Ads</strong> e o{' '}
             <strong className="text-steel-200">Pixel da Meta</strong>, usados para medir se quem
             clicou num anúncio da barbearia chegou até aqui. Os dois gravam cookies de terceiro
-            no seu navegador e informam a página visitada, a data e o horário — e também quando
+            no seu navegador e informam a página visitada, a data e o horário, e também quando
             você toca num botão de WhatsApp, de telefone ou de rota, sem o conteúdo do que for
             escrito. Os detalhes estão na seção seguinte.
           </p>
           <p className="mt-4 leading-relaxed">
             O que você digita no agendador (serviço, dia, horário, nome e observação) nunca sai do
             seu navegador. Esses campos só servem para montar o texto da mensagem; quando você
-            toca em “Enviar pedido no WhatsApp”, é o seu próprio aplicativo que envia — não o site.
+            toca em “Enviar pedido no WhatsApp”, é o seu próprio aplicativo que envia, não o site.
           </p>
         </section>
 
@@ -82,8 +82,8 @@ export function Privacy({ onBack }: { onBack: () => void }) {
             </li>
             <li>
               <strong className="text-steel-200">Google Maps.</strong> A seção de localização
-              embute um mapa do Google. Ele é carregado de forma preguiçosa — só quando você
-              rola até ele —, mas a partir daí o Google poderá registrar seu IP e seus dados
+              embute um mapa do Google. Ele é carregado de forma preguiçosa (só quando você
+              rola até ele), mas a partir daí o Google poderá registrar seu IP e seus dados
               de navegação, conforme a política de privacidade dele.
             </li>
             <li>
@@ -101,7 +101,7 @@ export function Privacy({ onBack }: { onBack: () => void }) {
               >
                 myadcenter.google.com
               </a>
-              , ou bloquear cookies de terceiros nas configurações do seu navegador — o site
+              , ou bloquear cookies de terceiros nas configurações do seu navegador; o site
               continua funcionando igual.
             </li>
             <li>
@@ -119,7 +119,7 @@ export function Privacy({ onBack }: { onBack: () => void }) {
               >
                 accountscenter.facebook.com
               </a>
-              , ou bloquear cookies de terceiros no navegador — o site continua funcionando igual.
+              , ou bloquear cookies de terceiros no navegador; o site continua funcionando igual.
             </li>
             <li>
               <strong className="text-steel-200">Instagram (Meta).</strong> Os links levam ao perfil

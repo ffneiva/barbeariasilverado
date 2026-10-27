@@ -42,7 +42,7 @@ export class ErrorBoundary extends Component<Props, State> {
             O site deu um nó
           </h1>
           <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-steel-400">
-            Alguma coisa quebrou por aqui. O atendimento continua normal — é só chamar.
+            Alguma coisa quebrou por aqui. O atendimento continua normal: é só chamar.
           </p>
         </div>
 

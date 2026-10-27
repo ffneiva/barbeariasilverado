@@ -57,7 +57,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
           <div className="relative aspect-square w-20 shrink-0 overflow-hidden rounded-sm sm:aspect-4/3 sm:w-full sm:rounded-none sm:border-b sm:border-steel-900">
             <Picture
               name={product.image!}
-              alt={`${product.name} — ${product.size}`}
+              alt={`${product.name}, ${product.size}`}
               className="h-full w-full"
               imgClassName="transition-transform duration-[900ms] ease-[var(--ease-blade)] group-hover:scale-105"
               sizes="(min-width: 640px) 22rem, 5rem"
@@ -101,7 +101,7 @@ export function Products({ showHeading = true }: { showHeading?: boolean } = {})
       <div className="container-x">
         {showHeading && (
           <SectionHeading
-            eyebrow="06 — Na loja"
+            eyebrow="06 · Produtos"
             title="Leve o que passou no seu cabelo"
             lead="Os mesmos produtos que o barbeiro usa na cadeira ficam à venda no balcão. Preço fechado, sem pacote e sem mensalidade."
           />

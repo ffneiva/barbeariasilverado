@@ -1,43 +1,20 @@
-import { useRef } from 'react'
 import { MessageCircle } from 'lucide-react'
 import { Button } from '@/components/Button'
 import { Logo } from '@/components/Logo'
 import { OpenBadge } from '@/components/OpenBadge'
 import { whatsappUrl, WHATSAPP_DEFAULT_MESSAGE } from '@/lib/business'
 import { scrollToSection } from '@/hooks/useSmoothScroll'
-import { useReducedMotion } from '@/hooks/useMediaQuery'
-import { useGsap } from '@/hooks/useGsap'
 
 /**
  * Último empurrão antes do rodapé.
  *
- * O logotipo cresce conforme a seção sobe — um encerramento que "assina" a
- * página, ecoando a abertura do preloader.
+ * A navalha 3D que acompanhou a página se monta aqui, no pouso acima do
+ * título: o encerramento "assina" a página (ver components/MarcaFixa).
  */
 export function FinalCta() {
-  const ref = useRef<HTMLElement>(null)
-  const reduced = useReducedMotion()
-
-  useGsap(
-    (gsap) => {
-      gsap.fromTo(
-        '[data-cta-logo]',
-        { scale: 0.82, autoAlpha: 0.35 },
-        {
-          scale: 1,
-          autoAlpha: 1,
-          ease: 'none',
-          scrollTrigger: { trigger: ref.current, start: 'top 85%', end: 'center center', scrub: 0.7 },
-        },
-      )
-    },
-    ref,
-    [],
-    !reduced,
-  )
 
   return (
-    <section ref={ref} className="relative overflow-hidden border-t border-steel-900 py-28 sm:py-36">
+    <section id="fecho" className="relative overflow-hidden border-t border-steel-900 py-28 sm:py-36">
       <div
         aria-hidden
         className="absolute inset-0 -z-10"
@@ -45,8 +22,13 @@ export function FinalCta() {
       />
 
       <div className="container-x flex flex-col items-center gap-10 text-center">
-        <div data-cta-logo className="w-64 sm:w-96">
-          <Logo variant="wordmark" animated />
+        {/* Pouso da navalha 3D: ela vem rolando pela página e se monta aqui.
+            Sem WebGL, fica a marca em 2D no mesmo lugar. */}
+        <div data-cta-logo className="flex flex-col items-center gap-6">
+          <div data-marca-alvo="fecho" className="aspect-[0.955] h-40 sm:h-56">
+            <Logo variant="mark" animated className="h-full [.marca-3d_&]:invisible" />
+          </div>
+          <Logo variant="wordmark" className="w-52 opacity-80 sm:w-72" />
         </div>
 
         <h2 className="max-w-3xl text-[clamp(2.2rem,6vw,4.25rem)] text-steel-100">

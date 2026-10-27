@@ -170,7 +170,7 @@ export function buildJsonLd(caminho = '/') {
         email: BUSINESS.email,
         image: `${BUSINESS.url}/og.jpg`,
         logo: `${BUSINESS.url}/images/logo-wordmark.png`,
-        priceRange: 'R$ 10 – R$ 90',
+        priceRange: 'R$ 10 a R$ 90',
         currenciesAccepted: 'BRL',
         paymentAccepted: 'Pix, Dinheiro, Cartão de débito, Cartão de crédito',
         address: {

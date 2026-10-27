@@ -70,12 +70,12 @@ export const ROUTES: Route[] = [
     path: '/',
     title: 'Barbearia Silverado · Barbearia no Jardim América, Goiânia',
     description:
-      'Barbearia no Jardim América, em Goiânia. Degradê, fade, barba e sobrancelha com acabamento na navalha. Você explica o corte que quer e sai com ele. Corte a partir de R$ 40 — agende pelo WhatsApp.',
+      'Barbearia no Jardim América, em Goiânia. Degradê, fade, barba e sobrancelha com acabamento na navalha. Você explica o corte que quer e sai com ele. Corte a partir de R$ 40. Agende pelo WhatsApp.',
     adsConversion: PAGEVIEW.home,
   },
   {
     path: '/agendar',
-    title: 'Agendar horário · Barbearia Silverado — Jardim América, Goiânia',
+    title: 'Agendar horário · Barbearia Silverado, Jardim América, Goiânia',
     description:
       'Escolha o serviço, o dia e a hora, e a mensagem chega pronta no WhatsApp da Barbearia Silverado. Corte R$ 40, corte + barba R$ 70. Jardim América, Goiânia.',
     adsConversion: PAGEVIEW.agendar,

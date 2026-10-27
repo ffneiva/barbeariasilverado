@@ -2,7 +2,7 @@ import { ArrowUpRight, Quote, Star } from 'lucide-react'
 import { Section, SectionHeading } from '@/components/SectionHeading'
 import { Reveal } from '@/components/Reveal'
 import { Button } from '@/components/Button'
-import { BUSINESS, GOOGLE_PROFILE, GOOGLE_REVIEWS, TESTIMONIALS } from '@/lib/business'
+import { BUSINESS, GOOGLE_PROFILE, TESTIMONIALS } from '@/lib/business'
 import { cn } from '@/lib/utils'
 
 /**
@@ -29,12 +29,12 @@ export function Testimonials() {
     <Section id="depoimentos" className="overflow-hidden">
       <div className="container-x">
         <SectionHeading
-          eyebrow="05 — Quem senta na cadeira"
+          eyebrow="05 · Quem senta na cadeira"
           title={hasReviews ? 'O que dizem depois do espelho' : 'A régua é o espelho'}
           lead={
             hasReviews ? (
               <>
-                {GOOGLE_REVIEWS.count} avaliações no{' '}
+                Avaliações reais do{' '}
                 <a
                   href={GOOGLE_PROFILE}
                   target="_blank"
@@ -43,10 +43,10 @@ export function Testimonials() {
                 >
                   perfil do Google
                 </a>
-                , todas com nota máxima. Estas são algumas — copiadas palavra por palavra.
+                , copiadas palavra por palavra.
               </>
             ) : (
-              'A barbearia é nova e as avaliações estão sendo escritas agora — no Google, por quem já sentou na cadeira. Depois do seu corte, conte como foi.'
+              'A barbearia é nova e as avaliações estão sendo escritas agora, no Google, por quem já sentou na cadeira. Depois do seu corte, conte como foi.'
             )
           }
         />

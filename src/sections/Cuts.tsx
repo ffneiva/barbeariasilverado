@@ -194,7 +194,7 @@ export function Cuts() {
             <Reveal>
               <span className="label-mono flex items-center gap-3">
                 <span aria-hidden className="h-px w-8 bg-steel-700" />
-                04 — Repertório
+                04 · Repertório
               </span>
             </Reveal>
             <div className="mt-5 flex flex-wrap items-end justify-between gap-6">

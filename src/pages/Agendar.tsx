@@ -27,7 +27,7 @@ export function Agendar({ onNavigate }: { onNavigate: (path: string) => void }) 
         title="Agende seu horário"
         lead={
           <>
-            Escolha o serviço, o dia e a hora. A mensagem chega pronta no WhatsApp do barbeiro —
+            Escolha o serviço, o dia e a hora. A mensagem chega pronta no WhatsApp do barbeiro:
             ele confirma e está fechado. Corte R$ 40, corte + barba R$ 70.
           </>
         }
@@ -74,7 +74,7 @@ export function Agendar({ onNavigate }: { onNavigate: (path: string) => void }) 
                   <span className="text-right font-mono text-xs">
                     {day.shifts.length === 0
                       ? 'Fechado'
-                      : day.shifts.map((s) => `${label(s.open)}–${label(s.close)}`).join(' · ')}
+                      : day.shifts.map((s) => `${label(s.open)} às ${label(s.close)}`).join(' · ')}
                   </span>
                 </li>
               ))}
@@ -96,7 +96,7 @@ export function Agendar({ onNavigate }: { onNavigate: (path: string) => void }) 
 
             <p className="mt-4 text-sm leading-relaxed text-steel-400">
               Na Avenida C-4, a poucos minutos do Setor Bueno e do Setor Oeste. Dá para chegar sem
-              agendar e fazer o encaixe — mandar mensagem antes só evita que você espere.
+              agendar e fazer o encaixe. Mandar mensagem antes só evita que você espere.
             </p>
 
             <div className="mt-auto flex flex-wrap gap-3 pt-7">

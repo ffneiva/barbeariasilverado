@@ -364,7 +364,7 @@ export const PILLARS = [
  * é aqui que se atualiza — a régua de números e o texto da seção de
  * depoimentos leem daqui.
  */
-export const GOOGLE_REVIEWS = { count: 30, rating: 5 }
+export const GOOGLE_REVIEWS = { count: 71, rating: 5 }
 
 /**
  * As 54h/semana saem da soma do SCHEDULE acima: 9h por dia (3h de manhã +

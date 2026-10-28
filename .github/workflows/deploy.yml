@@ -173,6 +173,25 @@ jobs:
             --distribution-id "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" \
             --id "$ID"
 
+      # IndexNow: com o site já no ar, avisa Bing, Yandex e cia. das URLs do
+      # sitemap (o Bing alimenta o ChatGPT e o Copilot). A chave é pública por
+      # desenho (public/<chave>.txt). Falhar aqui não derruba o deploy.
+      - name: 📣 Avisar buscadores (IndexNow)
+        continue-on-error: true
+        run: |
+          HOST=barbeariasilverado.com.br
+          CHAVE=e85b8f0df860ea9d95cebf836dd9472b
+          JSON=$(python3 - <<EOF
+          import json, re
+          urls = re.findall(r'<loc>([^<]+)</loc>', open('dist/sitemap.xml').read())
+          print(json.dumps({'host': '$HOST', 'key': '$CHAVE', 'keyLocation': 'https://$HOST/$CHAVE.txt', 'urlList': urls}))
+          EOF
+          )
+          COD=$(curl -s -o /dev/null -w '%{http_code}' -X POST https://api.indexnow.org/indexnow \
+            -H 'Content-Type: application/json; charset=utf-8' -d "$JSON")
+          echo "IndexNow respondeu $COD"
+          [ "$COD" = "200" ] || [ "$COD" = "202" ]
+
       # Confere que o site respondeu 200 antes de declarar sucesso — um deploy
       # verde com o site fora do ar é pior do que um deploy vermelho.
       #

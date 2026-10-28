@@ -212,16 +212,18 @@ jobs:
             echo "✅ https://barbeariasilverado.com.br/ → 200"
             echo "SITE_URL=https://barbeariasilverado.com.br" >> "$GITHUB_ENV"
 
-            # As páginas de anúncio precisam responder com o título DELAS. Se a
-            # reescrita da CloudFront Function quebrar, a URL ainda devolve 200
-            # — só que com a home inteira dentro. Conferir o título pega isso.
-            for rota in agendar loja; do
+            # Cada página precisa responder com o título DELA. Se a reescrita da
+            # CloudFront Function quebrar, a URL ainda devolve 200, só que com a
+            # home inteira dentro. O título esperado vem do próprio build
+            # (dist/<rota>/index.html): não quebra quando um título muda.
+            for rota in agendar produtos loja servicos servicos/corte cortes/degrade perguntas-frequentes; do
+              ESPERADO=$(grep -o '<title>[^<]*</title>' "dist/$rota/index.html")
               TITULO=$(curl -s --max-time 20 "https://barbeariasilverado.com.br/$rota" | grep -o '<title>[^<]*</title>')
               echo "  /$rota → $TITULO"
-              case "$TITULO" in
-                *"$rota"*|*Agendar*|*Loja*) ;;
-                *) echo "::error::/$rota não está servindo o HTML próprio da rota"; exit 1 ;;
-              esac
+              if [ "$TITULO" != "$ESPERADO" ]; then
+                echo "::error::/$rota não está servindo o HTML próprio da rota (esperado $ESPERADO)"
+                exit 1
+              fi
             done
             exit 0
           fi

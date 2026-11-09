@@ -108,13 +108,19 @@ export function Hero({ ready }: { ready: boolean }) {
         <div className="max-w-4xl">
           <div data-hero-fade className="mb-7 flex flex-wrap items-center gap-4">
             <OpenBadge />
-            <span className="label-mono hidden sm:inline">Barbearia · Jardim América, Goiânia</span>
           </div>
 
           {/* Sem transform inline: o título nasce visível e é o GSAP que o
               esconde para animar. Se a animação não rodar, o pior caso é um
               título estático — nunca um título invisível. */}
           <h1 className="text-[clamp(3.2rem,12.5vw,10.5rem)] leading-[0.85]">
+            {/* O que a casa é e onde fica, dentro do <h1>: é a frase que as
+                pessoas digitam no Google. A linha de cromo sozinha não dizia. */}
+            <span data-hero-fade className="label-mono mb-6 block leading-normal sm:mb-7">
+              Barbearia no Jardim América,{' '}
+              {/* No celular a cidade desce: a linha inteira passava por baixo da navalha. */}
+              <span className="block sm:inline">Goiânia</span>
+            </span>
             {/* O cromo é texto com background-clip: o fundo acabava antes do
                 acento e o "Ê" de "você" sumia. O padding em cima (anulado pela
                 margem negativa, sem mexer no layout) estende o fundo até o acento. */}

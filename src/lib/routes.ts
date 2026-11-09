@@ -71,7 +71,7 @@ const PAGEVIEW = {
 export const ROUTES: Route[] = [
   {
     path: '/',
-    title: 'Barbearia Silverado · Barbearia no Jardim América, Goiânia',
+    title: 'Barbearia no Jardim América, Goiânia · Barbearia Silverado',
     description:
       'Barbearia no Jardim América, Goiânia: degradê, fade, barba e sobrancelha com acabamento na navalha. Corte R$ 40. Seg a sáb, 9h às 19h. Agende pelo WhatsApp.',
     adsConversion: PAGEVIEW.home,

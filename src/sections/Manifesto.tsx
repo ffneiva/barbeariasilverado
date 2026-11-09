@@ -65,6 +65,9 @@ export function Manifesto() {
       for (const el of gsap.utils.toArray<HTMLElement>('[data-counter]')) {
         const target = Number(el.dataset.counter)
         const counter = { v: 0 }
+        // O número real mora no markup (pré-render e movimento reduzido leem
+        // dali); só quem vai ver a contagem começa do zero.
+        el.textContent = '0'
         gsap.to(counter, {
           v: target,
           duration: 1.6,
@@ -155,7 +158,7 @@ export function Manifesto() {
                   <div className="border-t border-steel-800 pt-4">
                     <div className="font-display text-4xl text-steel-100 sm:text-5xl">
                       {stat.prefix}
-                      <span data-counter={stat.value}>0</span>
+                      <span data-counter={stat.value}>{stat.value}</span>
                       {stat.suffix}
                     </div>
                     <div className="label-mono mt-2 leading-relaxed normal-case">{stat.label}</div>

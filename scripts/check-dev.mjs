@@ -81,7 +81,10 @@ try {
     check(`${mod} está no grafo`, seen.has(mod), 'não foi alcançado a partir da entrada')
   }
 } finally {
-  await server.close()
+  // No CI o close() às vezes não resolve (conexão presa) e o Node encerrava
+  // com código 13 depois de tudo ter passado. O resultado já está decidido
+  // aqui: espera no máximo 5 s e segue para o process.exit lá embaixo.
+  await Promise.race([server.close(), new Promise((r) => setTimeout(r, 5000))])
 }
 
 console.log('')

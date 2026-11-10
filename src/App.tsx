@@ -20,7 +20,7 @@ import { Privacy } from '@/pages/Privacy'
 import { NaoEncontrada } from '@/pages/NaoEncontrada'
 import { Agendar } from '@/pages/Agendar'
 import { Loja } from '@/pages/Loja'
-import { Corte, Cortes, Perguntas, Servico, Servicos } from '@/pages/Conteudo'
+import { ComoChegar, Corte, Cortes, Perguntas, Servico, Servicos } from '@/pages/Conteudo'
 import { routeFor } from '@/lib/routes'
 import { sem } from '@/lib/utils'
 
@@ -170,6 +170,7 @@ export default function App() {
       {route.path === '/cortes' && <Cortes />}
       {route.path.startsWith('/cortes/') && <Corte path={route.path} />}
       {route.path === '/perguntas-frequentes' && <Perguntas />}
+      {route.path === '/como-chegar' && <ComoChegar />}
       {route.path === '/404' && <NaoEncontrada onNavigate={navigate} />}
 
       {isHome && montarMarca && (

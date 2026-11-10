@@ -499,7 +499,11 @@ export const FAQ = [
   },
   {
     q: 'Onde fica a barbearia?',
-    a: 'Na Avenida C-4, nº 73, no Jardim América, em Goiânia. É a poucos minutos do Setor Bueno, do Marista, do Setor Oeste e do Jardim Goiás. Tem o mapa e a rota aqui embaixo, na seção Onde estamos.',
+    a: 'Na Avenida C-4, nº 73, no Jardim América, em Goiânia, na divisa com o Setor Bueno: a C-4 é a continuação da Avenida T-7. Fica a cerca de 300 metros da Igreja Videira do Setor Bueno e a poucos minutos do Marista, do Setor Oeste e do Jardim Goiás. Tem o mapa e a rota aqui embaixo, na seção Onde estamos.',
+  },
+  {
+    q: 'Tem barbearia perto da Igreja Videira do Setor Bueno?',
+    a: 'Tem: a Barbearia Silverado fica a cerca de 300 metros da Videira Bueno, uns 4 minutos a pé seguindo a Avenida T-7, que vira Avenida C-4 quando entra no Jardim América. O número é o 73.',
   },
   {
     q: 'Que horas vocês abrem? Abre no domingo?',

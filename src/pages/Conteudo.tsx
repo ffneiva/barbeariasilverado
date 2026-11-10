@@ -8,6 +8,7 @@ import { cutMessage } from '@/lib/booking'
 import {
   PAGINAS_CORTE,
   PAGINAS_SERVICO,
+  PERGUNTAS_CHEGAR,
   PERGUNTAS_GERAIS,
   type Pergunta,
   precoTexto,
@@ -324,6 +325,69 @@ export function Perguntas() {
           <a href="/cortes" className={cls.link}>modelos de corte</a>.
         </p>
       </section>
+    </main>
+  )
+}
+
+// ── Como chegar ─────────────────────────────────────────────────────────────
+
+/**
+ * Página de referência: quem procura "barbearia perto da Videira Bueno" ou
+ * "barbearia no Setor Bueno" não digita Jardim América, e a casa fica a 300 m.
+ */
+export function ComoChegar() {
+  const passos = [
+    {
+      titulo: 'Vindo do Setor Bueno',
+      texto:
+        'Siga a Avenida T-7 no sentido do Jardim América. Depois da Igreja Videira Bueno a avenida muda de nome para C-4, e a barbearia aparece cerca de 300 metros adiante, no número 73.',
+    },
+    {
+      titulo: 'A pé, da Videira Bueno',
+      texto:
+        'São uns 4 minutos de caminhada, sem sair da mesma avenida. A barbearia abre de segunda a sábado.',
+    },
+    {
+      titulo: 'Vindo do Jardim América',
+      texto:
+        'A Avenida C-4 corta o bairro. A barbearia fica na Quadra 490, Lote 09, no trecho encostado no Setor Bueno.',
+    },
+  ]
+  return (
+    <main id="conteudo">
+      <Trilha itens={[['Início', '/'], ['Como chegar']]} />
+      <PageHero
+        compacto
+        eyebrow="Barbearia Silverado · Jardim América e Setor Bueno, Goiânia"
+        title="Barbearia perto do Setor Bueno e da Videira"
+        lead="A Silverado fica na Avenida C-4, nº 73, na divisa do Jardim América com o Setor Bueno, a cerca de 300 metros da Igreja Videira Bueno."
+      >
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Button href={BUSINESS.mapsLink} size="lg" magnetic={false}>
+            <MapPin className="h-4 w-4" strokeWidth={1.6} />
+            Abrir a rota no mapa
+          </Button>
+          <Button href="/agendar" variant="outline" size="lg" magnetic={false} external={false}>
+            Escolher dia e horário
+          </Button>
+        </div>
+      </PageHero>
+      <section className={cls.secao}>
+        <ul className="container-x grid gap-px border border-steel-900 bg-steel-900 lg:grid-cols-3">
+          {passos.map((p) => (
+            <li key={p.titulo} className="bg-void p-6 sm:p-7">
+              <h2 className="font-display text-2xl text-steel-100 uppercase">{p.titulo}</h2>
+              <p className="mt-3 text-sm leading-relaxed text-steel-400 sm:text-base">{p.texto}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="container-x mt-8 text-sm leading-relaxed text-steel-500">
+          Endereço completo: {BUSINESS.address.street}, {BUSINESS.address.district}, {BUSINESS.address.city}/
+          {BUSINESS.address.state}. Veja também a <a href="/servicos" className={cls.link}>tabela de serviços</a> e os{' '}
+          <a href="/cortes" className={cls.link}>modelos de corte</a>.
+        </p>
+      </section>
+      <Respostas itens={PERGUNTAS_CHEGAR} titulo="Antes de sair de casa" />
     </main>
   )
 }

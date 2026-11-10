@@ -16,6 +16,7 @@ const PAGES = [
   { path: '/cortes', label: 'Cortes' },
   { path: '/produtos', label: 'Produtos' },
   { path: '/perguntas-frequentes', label: 'Perguntas frequentes' },
+  { path: '/como-chegar', label: 'Como chegar' },
 ]
 
 const NAV = [

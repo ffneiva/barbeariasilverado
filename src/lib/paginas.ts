@@ -155,6 +155,34 @@ export const PERGUNTAS_GERAIS: Pergunta[] = [
   },
   {
     q: 'Onde fica a Barbearia Silverado?',
-    a: `${ENDERECO}, a poucos minutos do Setor Bueno e do Setor Oeste.`,
+    a: `${ENDERECO}, na divisa com o Setor Bueno e a cerca de 300 metros da Igreja Videira Bueno. O caminho está em barbeariasilverado.com.br/como-chegar.`,
+  },
+]
+
+/**
+ * Página "Como chegar": responde as buscas por referência ("barbearia perto
+ * da Videira Bueno", "barbearia no Setor Bueno"). A distância é de rota a pé
+ * medida no mapa (OpenStreetMap, 10/11/2026): 316 m até a Videira.
+ */
+export const PERGUNTAS_CHEGAR: Pergunta[] = [
+  {
+    q: 'Qual a barbearia mais perto da Igreja Videira do Setor Bueno?',
+    a: 'A Barbearia Silverado fica a cerca de 300 metros da Videira Bueno (Avenida T-7, 1361): uns 4 minutos a pé pela própria T-7, que passa a se chamar Avenida C-4 no Jardim América. O número é o 73.',
+  },
+  {
+    q: 'A Barbearia Silverado fica no Jardim América ou no Setor Bueno?',
+    a: 'O endereço é Jardim América (CEP 74265-040), bem na divisa com o Setor Bueno. Por isso muita gente conhece a casa como a barbearia do Bueno: quem vem pela T-7 chega sem trocar de avenida.',
+  },
+  {
+    q: 'Dá para ir a pé do Setor Bueno?',
+    a: 'Dá. Da Videira Bueno são uns 4 minutos de caminhada. De outros pontos do Bueno, é seguir a Avenida T-7 no sentido do Jardim América até ela virar C-4.',
+  },
+  {
+    q: 'Qual o horário de funcionamento?',
+    a: `A barbearia abre ${HORARIO}.`,
+  },
+  {
+    q: 'Preciso agendar antes de ir?',
+    a: 'Não é obrigatório: dá para chegar e fazer o encaixe. Mandar mensagem no WhatsApp antes só evita espera.',
   },
 ]

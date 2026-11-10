@@ -95,7 +95,7 @@ export function Agendar({ onNavigate }: { onNavigate: (path: string) => void }) 
             </address>
 
             <p className="mt-4 text-sm leading-relaxed text-steel-400">
-              Na Avenida C-4, a poucos minutos do Setor Bueno e do Setor Oeste. Dá para chegar sem
+              Na Avenida C-4, na divisa com o Setor Bueno, a 300 metros da Videira Bueno. Dá para chegar sem
               agendar e fazer o encaixe. Mandar mensagem antes só evita que você espere.
             </p>
 

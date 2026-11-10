@@ -1,5 +1,5 @@
 import { BUSINESS, CUTS, FAQ, GOOGLE_PROFILE, PRODUCTS, SCHEDULE, SERVICES, type Product } from './business.ts'
-import { PAGINAS_CORTE, PAGINAS_SERVICO, PERGUNTAS_GERAIS, type Pergunta } from './paginas.ts'
+import { PAGINAS_CORTE, PAGINAS_SERVICO, PERGUNTAS_CHEGAR, PERGUNTAS_GERAIS, type Pergunta } from './paginas.ts'
 import { canonicalFor, routeFor } from './routes.ts'
 
 /**
@@ -220,6 +220,8 @@ function nosDaRota(caminho: string) {
   }
 
   if (rota.path === '/perguntas-frequentes') return [trilha, pagina(), faq(PERGUNTAS_GERAIS)]
+
+  if (rota.path === '/como-chegar') return [trilha, pagina(), faq(PERGUNTAS_CHEGAR)]
 
   if (rota.path === '/agendar') {
     return [

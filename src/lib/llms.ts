@@ -1,5 +1,5 @@
 import { BUSINESS, CUTS, PRODUCTS, SCHEDULE_SUMMARY, SERVICES } from './business.ts'
-import { PAGINAS_CORTE, PAGINAS_SERVICO, PERGUNTAS_GERAIS, precoTexto } from './paginas.ts'
+import { PAGINAS_CORTE, PAGINAS_SERVICO, PERGUNTAS_CHEGAR, PERGUNTAS_GERAIS, precoTexto } from './paginas.ts'
 
 /**
  * llms.txt: o resumo que assistentes de IA (ChatGPT, Claude, Perplexity,
@@ -45,6 +45,7 @@ export function gerarLlmsTxt(): string {
     `- [Agendar](${U}/agendar): escolher serviço, dia e hora e enviar o pedido no WhatsApp`,
     `- [Produtos](${U}/produtos): pomadas, minoxidil manipulado, derma roller e óleo de barba`,
     `- [Perguntas frequentes](${U}/perguntas-frequentes): respostas diretas sobre preço, horário e atendimento`,
+    `- [Como chegar](${U}/como-chegar): na divisa do Jardim América com o Setor Bueno, a cerca de 300 metros da Igreja Videira Bueno`,
     '',
     '## Serviços',
     '',
@@ -87,6 +88,6 @@ export function gerarLlmsFullTxt(): string {
     '',
     '## Perguntas frequentes',
     '',
-    ...PERGUNTAS_GERAIS.flatMap((p) => [`### ${p.q}`, '', p.a, '']),
+    ...[...PERGUNTAS_GERAIS, ...PERGUNTAS_CHEGAR.slice(0, 3)].flatMap((p) => [`### ${p.q}`, '', p.a, '']),
   ].join('\n')
 }

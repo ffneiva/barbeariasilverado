@@ -124,6 +124,12 @@ export const ROUTES: Route[] = [
       'Preço do corte, horário, se precisa agendar, onde fica, formas de pagamento: as respostas diretas sobre a Barbearia Silverado, no Jardim América.',
   },
   {
+    path: '/como-chegar',
+    title: 'Barbearia perto do Setor Bueno e da Videira · Silverado',
+    description:
+      'A Barbearia Silverado fica na Avenida C-4, 73, na divisa do Jardim América com o Setor Bueno, a 300 metros da Igreja Videira Bueno. Veja o caminho e o mapa.',
+  },
+  {
     path: '/politica-de-privacidade',
     title: 'Política de privacidade · Barbearia Silverado',
     description:

@@ -216,7 +216,7 @@ jobs:
             # CloudFront Function quebrar, a URL ainda devolve 200, só que com a
             # home inteira dentro. O título esperado vem do próprio build
             # (dist/<rota>/index.html): não quebra quando um título muda.
-            for rota in agendar produtos loja servicos servicos/corte cortes/degrade perguntas-frequentes; do
+            for rota in agendar produtos loja servicos servicos/corte cortes/degrade perguntas-frequentes como-chegar; do
               ESPERADO=$(grep -o '<title>[^<]*</title>' "dist/$rota/index.html")
               TITULO=$(curl -s --max-time 20 "https://barbeariasilverado.com.br/$rota" | grep -o '<title>[^<]*</title>')
               echo "  /$rota → $TITULO"
